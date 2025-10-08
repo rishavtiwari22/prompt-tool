@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+@import 'paper-css/paper.css';
+@import "./styles/theme.css";
+
