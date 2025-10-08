@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { RefreshCw, Send } from 'lucide-react';
 import illustrationImage from '../assets/Frame 473.svg';
 
+
 const Home = () => {
   const [prompt, setPrompt] = useState('');
   const [accuracy, setAccuracy] = useState(70);
