@@ -57,10 +57,15 @@
 }
 
 /* ===== BODY BACKGROUND PATTERN ===== */
-body {
-  background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px);
-  background-size: 20px 20px;
-  background-color: var(--color-bg);
+html, body {
+  min-height: 100%;
+}
+
+/* Increase specificity to avoid resets/paper-css overwriting */
+html body {
+  background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px) !important;
+  background-size: 20px 20px !important;
+  background-color: var(--color-bg) !important;
   font-family: var(--font-body);
 }
 
@@ -79,4 +84,17 @@ h4, .h4 {
   font-size: var(--font-size-subtitle1);
   line-height: var(--line-height-subtitle1);
   letter-spacing: var(--letter-spacing-subtitle1);
+}
+
+/* ===== COMPONENT UTILITIES ===== */
+/* Prompt input placeholder styling */
+.input--prompt::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.8;
+  font-style: italic;
+}
+
+/* Subtle helper text color */
+.text-secondary {
+  color: var(--color-text-secondary);
 }
