@@ -120,19 +120,19 @@ function Navbar() {
                 <img 
                   src="/src/assets/speaker.svg" 
                   alt="Speaker/Guide"
-                  className="w-7 h-7"
+                  className="w-10 h-10"
                 />
               </button>
 
               {/* Rules button */}
               <button 
-                className="w-12 h-12 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
+                className="w-20 h-20 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <img 
                   src="/src/assets/rules.svg" 
                   alt="Rules"
-                  className="w-9 h-9"
+                  className="w-20 h-20"
                 />
               </button>
 
@@ -144,7 +144,7 @@ function Navbar() {
                 <img 
                   src="/src/assets/user.svg" 
                   alt="User/Settings"
-                  className="w-7 h-7"
+                  className="w-10 h-10"
                 />
               </button>
             </div>
