@@ -21,14 +21,22 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen p-6 md:p-10">
+    <div className="p-6 md:p-10">
       <div className="max-w-7xl mx-auto">
+        {/* Center guide to align levels between the two boxes */}
+        <div className="hidden lg:block" aria-hidden="true" style={{ height: '0' }}></div>
         {/* Two Column Layout with Divider */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 relative">
-          {/* Vertical Divider Line - Thin Grey */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 relative" style={{ overflow: 'hidden' }}>
+          {/* Vertical Divider - shared style; spans between cards */}
           <div
-            className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-[1px]"
-            style={{ backgroundColor: '#D1D5DB', transform: 'translateX(-50%)' }}
+            className="hidden lg:block divider-vertical absolute left-1/2"
+            aria-hidden="true"
+            style={{
+              top: '0',
+              bottom: '0',
+              transform: 'translateX(-50%)',
+              zIndex: 0
+            }}
           ></div>
 
           {/* LEFT COLUMN */}
