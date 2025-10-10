@@ -1,19 +1,18 @@
-
-import React, { useState } from 'react';
-import { RefreshCw, Send } from 'lucide-react';
-import illustrationImage from '../assets/Frame 473.svg';
+import React, { useState } from "react";
+import { RefreshCw, Send } from "lucide-react";
+import illustrationImage from "../assets/Frame 473.svg";
 
 const Home = () => {
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState("");
   const [accuracy, setAccuracy] = useState(70);
 
   const handleReset = () => {
-    setPrompt('');
+    setPrompt("");
     setAccuracy(0);
   };
 
   const handleCreateImage = () => {
-    console.log('Creating image with prompt:', prompt);
+    console.log("Creating image with prompt:", prompt);
     // Add your image generation logic here
   };
 
@@ -21,18 +20,31 @@ const Home = () => {
     <div className="px-6 md:px-10">
       <div className="max-w-7xl mx-auto">
         {/* Center guide to align levels between the two boxes */}
-        <div className="hidden lg:block" aria-hidden="true" style={{ height: '0' }}></div>
+        <div
+          className="hidden lg:block"
+          aria-hidden="true"
+          style={{ height: "0" }}
+        ></div>
         {/* Two Column Layout with Divider */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 relative" style={{ overflow: 'hidden', paddingTop: '2.5rem' }}>
+
+        <div
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 relative"
+          style={{ overflow: "hidden", paddingTop: "4rem" }}
+        >
           {/* Vertical Divider - extended upward to meet horizontal divider */}
           <div
-            className="hidden lg:block divider-vertical absolute left-1/2"
+            className="hidden lg:block absolute left-1/2"
             aria-hidden="true"
             style={{
-              top: '-2.5rem',
-              bottom: '0',
-              transform: 'translateX(-50%)',
-              zIndex: 0
+              top: "-4rem", // Match the paddingTop value
+              bottom: "0",
+              transform: "translateX(-50%)",
+              zIndex: 0,
+              margin: 0,
+              border: "none",
+              borderLeft: "2px solid #000000",
+              opacity: 0.25,
+              width: 0,
             }}
           ></div>
 
@@ -42,20 +54,24 @@ const Home = () => {
             <div
               className="paper border-3"
               style={{
-                borderColor: 'var(--color-text-primary)',
-                backgroundColor: 'white',
-                padding: '2rem',
-                height: '400px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '2rem'
+                borderColor: "var(--color-text-primary)",
+                backgroundColor: "white",
+                padding: "2rem",
+                height: "400px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: "2rem",
               }}
             >
               <img
                 src="https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=400&h=400&fit=crop"
                 alt="Cardboard box"
-                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                style={{
+                  maxWidth: "100%",
+                  maxHeight: "100%",
+                  objectFit: "contain",
+                }}
               />
             </div>
 
@@ -63,30 +79,33 @@ const Home = () => {
             <div>
               <h4
                 className="h4 text-center"
-                style={{ color: 'var(--color-text-primary)', marginBottom: '1.25rem' }}
+                style={{
+                  color: "var(--color-text-primary)",
+                  marginBottom: "1.25rem",
+                }}
               >
                 Accuracy Score
               </h4>
 
               {/* Progress Bar - Constrained to card width */}
-              <div className="relative" style={{ padding: '0 0.25rem' }}>
+              <div className="relative" style={{ padding: "0 0.25rem" }}>
                 <div
                   style={{
-                    width: '100%',
-                    height: '22px',
-                    border: '3px solid var(--color-text-primary)',
-                    borderRadius: '20px',
-                    backgroundColor: 'white',
-                    position: 'relative',
-                    overflow: 'hidden'
+                    width: "100%",
+                    height: "22px",
+                    border: "3px solid var(--color-text-primary)",
+                    borderRadius: "20px",
+                    backgroundColor: "white",
+                    position: "relative",
+                    overflow: "hidden",
                   }}
                 >
                   <div
                     style={{
                       width: `${accuracy}%`,
-                      height: '100%',
-                      backgroundColor: 'var(--color-primary)',
-                      transition: 'width 0.3s ease'
+                      height: "100%",
+                      backgroundColor: "var(--color-primary)",
+                      transition: "width 0.3s ease",
                     }}
                   ></div>
                 </div>
@@ -95,10 +114,10 @@ const Home = () => {
                 <div
                   className="flex justify-between"
                   style={{
-                    marginTop: '0.5rem',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '16px',
-                    color: 'var(--color-text-secondary)'
+                    marginTop: "0.5rem",
+                    fontFamily: "var(--font-body)",
+                    fontSize: "16px",
+                    color: "var(--color-text-secondary)",
                   }}
                 >
                   <span>0%</span>
@@ -114,42 +133,49 @@ const Home = () => {
             <div
               className="paper border-3"
               style={{
-                borderColor: 'var(--color-text-primary)',
-                backgroundColor: 'white',
-                padding: '2rem',
-                height: '400px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
-                marginBottom: '2rem'
+                borderColor: "var(--color-text-primary)",
+                backgroundColor: "white",
+                padding: "2rem",
+                height: "400px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                marginBottom: "2rem",
               }}
             >
               <img
                 src={illustrationImage}
                 alt="Prompt learning illustration"
-                style={{ maxWidth: '280px', height: 'auto', marginBottom: '1.5rem' }}
+                style={{
+                  maxWidth: "280px",
+                  height: "auto",
+                  marginBottom: "1.5rem",
+                }}
               />
             </div>
 
             {/* Reset Button - Centered */}
-            <div className="flex justify-center" style={{ marginBottom: '1rem' }}>
+            <div
+              className="flex justify-center"
+              style={{ marginBottom: "1rem" }}
+            >
               <button
                 onClick={handleReset}
                 className="paper-btn"
                 style={{
-                  backgroundColor: 'var(--color-accent-light)',
-                  color: 'var(--color-accent-dark)',
-                  border: '2px solid var(--color-accent)',
-                  padding: '0.5rem 1.25rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.4rem',
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '16px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
+                  backgroundColor: "var(--color-accent-light)",
+                  color: "var(--color-accent-dark)",
+                  border: "2px solid var(--color-accent)",
+                  padding: "0.5rem 1.25rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.4rem",
+                  fontFamily: "var(--font-body)",
+                  fontSize: "16px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
                 }}
               >
                 Reset
@@ -161,9 +187,9 @@ const Home = () => {
             <div
               className="paper border-3"
               style={{
-                borderColor: 'var(--color-text-primary)',
-                backgroundColor: 'white',
-                padding: '1rem 1.25rem'
+                borderColor: "var(--color-text-primary)",
+                backgroundColor: "white",
+                padding: "1rem 1.25rem",
               }}
             >
               <div className="flex items-center gap-3">
@@ -174,35 +200,35 @@ const Home = () => {
                   placeholder="prompt to generate image"
                   className="flex-1 input--prompt"
                   style={{
-                    border: 'none',
-                    outline: 'none',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '16px',
-                    color: 'var(--color-text-primary)',
-                    backgroundColor: 'transparent',
-                    height: '46px',
-                    padding: '0 0.5rem'
+                    border: "none",
+                    outline: "none",
+                    fontFamily: "var(--font-body)",
+                    fontSize: "16px",
+                    color: "var(--color-text-primary)",
+                    backgroundColor: "transparent",
+                    height: "46px",
+                    padding: "0 0.5rem",
                   }}
                 />
                 <button
                   onClick={handleCreateImage}
                   className="paper-btn"
                   style={{
-                    backgroundColor: 'var(--color-primary-light)',
-                    color: 'var(--color-primary-dark)',
-                    border: '2px solid var(--color-primary)',
-                    height: '46px',
-                    padding: '0 18px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.4rem',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '16px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    whiteSpace: 'nowrap',
-                    minWidth: '150px'
+                    backgroundColor: "var(--color-primary-light)",
+                    color: "var(--color-primary-dark)",
+                    border: "2px solid var(--color-primary)",
+                    height: "46px",
+                    padding: "0 18px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.4rem",
+                    fontFamily: "var(--font-body)",
+                    fontSize: "16px",
+                    cursor: "pointer",
+                    transition: "all 0.2s ease",
+                    whiteSpace: "nowrap",
+                    minWidth: "150px",
                   }}
                 >
                   Create Image
