@@ -7,15 +7,22 @@ function Navbar({ currentLevel, onLevelChange }) {
 
   return (
     <>
-      <div className="relative">
+      {/* Wrapper to prevent horizontal overflow */}
+      <div className="relative" style={{ overflow: 'hidden' }}>
         <nav className="bg-transparent py-2 sm:py-3">
           <div
-            className="w-full px-3 sm:px-6 lg:px-10 overflow-x-hidden grid items-center gap-4 sm:gap-6 md:gap-8"
-            style={{ gridTemplateColumns: '1fr auto 1fr' }}
+            className="w-full px-3 sm:px-6 lg:px-10 grid items-center gap-4 sm:gap-6 md:gap-8"
+            style={{ 
+              gridTemplateColumns: '1fr auto 1fr',
+              overflow: 'visible' // Allow children to be visible but parent clips
+            }}
           >
           {/* Left side - Logo/Icon (Hidden on mobile) */}
           <div className="hidden md:flex items-center flex-shrink-0">
-            <div className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-22 lg:h-22 bg-gray-100 rounded-lg flex items-center justify-center">
+            <div 
+              className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-22 lg:h-22 bg-gray-100 rounded-lg flex items-center justify-center"
+              style={{ willChange: 'transform' }}
+            >
               <img 
                 src="/src/assets/left-top.svg" 
                 alt="Logo"
@@ -36,6 +43,7 @@ function Navbar({ currentLevel, onLevelChange }) {
                       ? 'bg-purple-50'
                       : 'bg-transparent hover:bg-gray-50'
                   }`}
+                  style={{ willChange: 'transform' }}
                 >
                   <img 
                     src={`/src/assets/${level}.svg`} 
@@ -69,6 +77,7 @@ function Navbar({ currentLevel, onLevelChange }) {
                       ? 'bg-purple-50'
                       : 'bg-transparent hover:bg-gray-50'
                   }`}
+                  style={{ willChange: 'transform' }}
                 >
                   <img 
                     src={`/src/assets/${level}.svg`} 
@@ -83,7 +92,10 @@ function Navbar({ currentLevel, onLevelChange }) {
           {/* Right side - Action buttons (Desktop) */}
           <div className="hidden md:flex items-center space-x-1 sm:space-x-2 md:space-x-3 flex-shrink-0 justify-self-end">
             {/* Document/Guide button */}
-            <button className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-22 lg:h-22 rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-200">
+            <button 
+              className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-22 lg:h-22 rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-200"
+              style={{ willChange: 'transform' }}
+            >
               <img 
                 src="/src/assets/speaker.svg" 
                 alt="Speaker/Guide"
@@ -95,6 +107,7 @@ function Navbar({ currentLevel, onLevelChange }) {
             <button 
               onClick={() => setIsRulesOpen(true)}
               className="w-18 h-18 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-26 lg:h-26 rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-200"
+              style={{ willChange: 'transform' }}
             >
               <img 
                 src="/src/assets/rules.svg" 
@@ -104,7 +117,10 @@ function Navbar({ currentLevel, onLevelChange }) {
             </button>
 
             {/* Settings button */}
-            <button className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-22 lg:h-22 rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-200">
+            <button 
+              className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-22 lg:h-22 rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-200"
+              style={{ willChange: 'transform' }}
+            >
               <img 
                 src="/src/assets/user.svg" 
                 alt="User/Settings"
@@ -125,6 +141,7 @@ function Navbar({ currentLevel, onLevelChange }) {
                 <button 
                   className="w-18 h-18 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
+                  style={{ willChange: 'transform' }}
                 >
                   <img 
                     src="/src/assets/speaker.svg" 
@@ -140,6 +157,7 @@ function Navbar({ currentLevel, onLevelChange }) {
                     setIsMenuOpen(false);
                     setIsRulesOpen(true);
                   }}
+                  style={{ willChange: 'transform' }}
                 >
                   <img 
                     src="/src/assets/rules.svg" 
@@ -152,6 +170,7 @@ function Navbar({ currentLevel, onLevelChange }) {
                 <button 
                   className="w-24 h-24 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
+                  style={{ willChange: 'transform' }}
                 >
                   <img 
                     src="/src/assets/user.svg" 
