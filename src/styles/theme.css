@@ -110,11 +110,11 @@ h4, .h4 {
 }
 
 /* ===== DIVIDER UTILITIES ===== */
-.divider-horizontal {
-  /* full-bleed without causing horizontal scrollbars */
-  width: 100%;
-  height: var(--divider-thickness);
-  background-color: var(--color-divider);
+.divider-vertical {
+  width: 2px;
+  height: 700%;
+  background-color: #000000 !important;
+  opacity: 0.25;
 }
 
 .divider-vertical {

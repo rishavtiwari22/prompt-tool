@@ -13,7 +13,7 @@ function App() {
         style={{ 
           margin: 0,
           border: 'none',
-          borderTop: '2px solid #000000',
+          borderTop: '1px solid #000000',
           opacity: 0.25,
           height: 0
         }} 
