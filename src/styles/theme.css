@@ -39,8 +39,8 @@
   --divider-thickness: 2px;
   
   /* === BACKGROUND COLORS === */
-  --color-bg: #f4f4f4;                   /* Page background */
-  --color-dot: #ccc;                     /* Dotted pattern color */
+ --color-bg: #FEFEFE;                   /* Page background */
+--color-dot: rgba(204, 204, 204, 0.4);             /* Dotted pattern color */
   
   /* === TYPOGRAPHY === */
   --font-heading: 'Patrick Hand SC', cursive;
@@ -64,8 +64,8 @@ html, body {
 
 /* Increase specificity to avoid resets/paper-css overwriting */
 html body {
-  background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px) !important;
-  background-size: 20px 20px !important;
+background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px) !important;
+background-size: 20px 20px !important;
   background-color: var(--color-bg) !important;
   font-family: var(--font-body);
   overflow-x: hidden; /* guard against sub-pixel overflow */

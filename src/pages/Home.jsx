@@ -1,10 +1,7 @@
 
-
-
 import React, { useState } from 'react';
 import { RefreshCw, Send } from 'lucide-react';
 import illustrationImage from '../assets/Frame 473.svg';
-
 
 const Home = () => {
   const [prompt, setPrompt] = useState('');
@@ -21,18 +18,18 @@ const Home = () => {
   };
 
   return (
-    <div className="p-6 md:p-10">
+    <div className="px-6 md:px-10">
       <div className="max-w-7xl mx-auto">
         {/* Center guide to align levels between the two boxes */}
         <div className="hidden lg:block" aria-hidden="true" style={{ height: '0' }}></div>
         {/* Two Column Layout with Divider */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 relative" style={{ overflow: 'hidden' }}>
-          {/* Vertical Divider - shared style; spans between cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 relative" style={{ overflow: 'hidden', paddingTop: '2.5rem' }}>
+          {/* Vertical Divider - extended upward to meet horizontal divider */}
           <div
             className="hidden lg:block divider-vertical absolute left-1/2"
             aria-hidden="true"
             style={{
-              top: '0',
+              top: '-2.5rem',
               bottom: '0',
               transform: 'translateX(-50%)',
               zIndex: 0
@@ -221,5 +218,3 @@ const Home = () => {
 };
 
 export default Home;
-
-

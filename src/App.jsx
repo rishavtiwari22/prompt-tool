@@ -1,22 +1,25 @@
-
-
-
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Navbar';
 import Home from './pages/Home';
 
-
-
 function App() {
   return (
     <Router>
       <Header />
-      {/* Full-bleed horizontal divider under header */}
-      <div className="divider-horizontal" aria-hidden="true" style={{ margin: '0.5rem 0 1rem 0' }}></div>
+      {/* PaperCSS-style thick horizontal divider matching Figma */}
+      <hr 
+        className="border-primary" 
+        style={{ 
+          margin: 0,
+          border: 'none',
+          borderTop: '2px solid #000000',
+          opacity: 0.25,
+          height: 0
+        }} 
+      />
       <Routes>
         <Route path="/" element={<Home />} />
-       
       </Routes>
     </Router>
   );
