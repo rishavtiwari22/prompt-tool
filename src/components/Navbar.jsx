@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import RulesModal from '../components/RulesModal';
 
-function Navbar() {
+function Navbar({ currentLevel, onLevelChange }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
 
@@ -30,8 +30,9 @@ function Navbar() {
               {[1, 2, 3, 4, 5].map((level) => (
                 <button
                   key={level}
+                  onClick={() => onLevelChange && onLevelChange(level)}
                   className={`flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 hover:scale-105 ${
-                    level === 1
+                    level === currentLevel
                       ? 'bg-purple-50'
                       : 'bg-transparent hover:bg-gray-50'
                   }`}
@@ -62,8 +63,9 @@ function Navbar() {
               {[1, 2, 3, 4, 5].map((level) => (
                 <button
                   key={level}
+                  onClick={() => onLevelChange && onLevelChange(level)}
                   className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-lg transition-all duration-200 hover:scale-105 sm:hover:scale-110 ${
-                    level === 1
+                    level === currentLevel
                       ? 'bg-purple-50'
                       : 'bg-transparent hover:bg-gray-50'
                   }`}

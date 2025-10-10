@@ -2,19 +2,84 @@
 import React, { useState } from 'react';
 import { RefreshCw, Send } from 'lucide-react';
 import illustrationImage from '../assets/Frame 473.svg';
+import { compareImages } from '../utils/imageComparison';
+import { generateImageWithProgress } from '../utils/imageGeneration';
 
-const Home = () => {
+// Import target images
+import carImage from '../assets/car.jpg';
+import horseImage from '../assets/horse.jpg';
+import mountainImage from '../assets/line_mountain.jpg';
+import oulImage from '../assets/oul.jpg';
+import sheepImage from '../assets/sheep.avif';
+
+const Home = ({ currentLevel, onLevelChange }) => {
   const [prompt, setPrompt] = useState('');
-  const [accuracy, setAccuracy] = useState(70);
+  const [accuracy, setAccuracy] = useState(0);
+  const [generatedImage, setGeneratedImage] = useState(null);
+  const [isComparing, setIsComparing] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Target images for each level
+  const targetImages = {
+    1: carImage,
+    2: horseImage,
+    3: mountainImage,
+    4: oulImage,
+    5: sheepImage
+  };
+
+  // Level descriptions
+  const levelDescriptions = {
+    1: "Car",
+    2: "Horse", 
+    3: "Mountain",
+    4: "Owl",
+    5: "Sheep"
+  };
 
   const handleReset = () => {
     setPrompt('');
     setAccuracy(0);
+    setGeneratedImage(null);
   };
 
-  const handleCreateImage = () => {
-    console.log('Creating image with prompt:', prompt);
-    // Add your image generation logic here
+  const handleLevelChange = (level) => {
+    onLevelChange(level);
+    setAccuracy(0);
+    setGeneratedImage(null);
+  };
+
+  const handleCreateImage = async () => {
+    if (!prompt.trim()) return;
+    
+    setIsGenerating(true);
+    setGeneratedImage(null);
+    setAccuracy(0);
+    
+    try {
+      console.log('Creating image with prompt:', prompt);
+      
+      // Generate image using the utility
+      const generatedImageUrl = await generateImageWithProgress(
+        prompt.trim()
+      );
+      
+      setGeneratedImage(generatedImageUrl);
+      
+      // Automatically compare with target image when generation is complete
+      const targetImage = targetImages[currentLevel];
+      setIsComparing(true);
+      
+      const similarity = await compareImages(generatedImageUrl, targetImage);
+      setAccuracy(similarity);
+      
+    } catch (error) {
+      console.error('Image generation or comparison failed:', error);
+      setAccuracy(0);
+    } finally {
+      setIsGenerating(false);
+      setIsComparing(false);
+    }
   };
 
   return (
@@ -38,7 +103,7 @@ const Home = () => {
 
           {/* LEFT COLUMN */}
           <div className="lg:pr-12">
-            {/* Image Box */}
+            {/* Target Image Box */}
             <div
               className="paper border-3"
               style={{
@@ -47,14 +112,16 @@ const Home = () => {
                 padding: '2rem',
                 height: '400px',
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: '2rem'
               }}
             >
+              
               <img
-                src="https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=400&h=400&fit=crop"
-                alt="Cardboard box"
+                src={targetImages[currentLevel]}
+                alt={`Level ${currentLevel} target: ${levelDescriptions[currentLevel]}`}
                 style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
               />
             </div>
@@ -67,6 +134,7 @@ const Home = () => {
               >
                 Accuracy Score
               </h4>
+
 
               {/* Progress Bar - Constrained to card width */}
               <div className="relative" style={{ padding: '0 0.25rem' }}>
@@ -110,7 +178,7 @@ const Home = () => {
 
           {/* RIGHT COLUMN */}
           <div className="lg:pl-12">
-            {/* Top Illustration Box */}
+            {/* Generated Image Box */}
             <div
               className="paper border-3"
               style={{
@@ -126,11 +194,23 @@ const Home = () => {
                 marginBottom: '2rem'
               }}
             >
-              <img
-                src={illustrationImage}
-                alt="Prompt learning illustration"
-                style={{ maxWidth: '280px', height: 'auto', marginBottom: '1.5rem' }}
-              />
+              {generatedImage ? (
+                <>
+                  <img
+                    src={generatedImage}
+                    alt="Generated image"
+                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                  />
+                </>
+              ) : (
+                <div>
+                  <img
+                    src={illustrationImage}
+                    alt="Prompt learning illustration"
+                    style={{ maxWidth: '280px', height: 'auto', marginBottom: '1.5rem' }}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Reset Button - Centered */}
@@ -166,11 +246,19 @@ const Home = () => {
                 padding: '1rem 1.25rem'
               }}
             >
+              
+              
               <div className="flex items-center gap-3">
                 <input
                   type="text"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleCreateImage();
+                    }
+                  }}
                   placeholder="prompt to generate image"
                   className="flex-1 input--prompt"
                   style={{
@@ -186,11 +274,12 @@ const Home = () => {
                 />
                 <button
                   onClick={handleCreateImage}
+                  disabled={!prompt.trim() || isComparing || isGenerating}
                   className="paper-btn"
                   style={{
-                    backgroundColor: 'var(--color-primary-light)',
-                    color: 'var(--color-primary-dark)',
-                    border: '2px solid var(--color-primary)',
+                    backgroundColor: (!prompt.trim() || isComparing || isGenerating) ? '#f3f4f6' : 'var(--color-primary-light)',
+                    color: (!prompt.trim() || isComparing || isGenerating) ? '#9ca3af' : 'var(--color-primary-dark)',
+                    border: `2px solid ${(!prompt.trim() || isComparing || isGenerating) ? '#d1d5db' : 'var(--color-primary)'}`,
                     height: '46px',
                     padding: '0 18px',
                     display: 'flex',
@@ -199,13 +288,13 @@ const Home = () => {
                     gap: '0.4rem',
                     fontFamily: 'var(--font-body)',
                     fontSize: '16px',
-                    cursor: 'pointer',
+                    cursor: (!prompt.trim() || isComparing || isGenerating) ? 'not-allowed' : 'pointer',
                     transition: 'all 0.2s ease',
                     whiteSpace: 'nowrap',
                     minWidth: '150px'
                   }}
                 >
-                  Create Image
+                  {isGenerating ? 'Generating...' : isComparing ? 'Analyzing...' : 'Create Image'}
                   <Send size={16} />
                 </button>
               </div>
