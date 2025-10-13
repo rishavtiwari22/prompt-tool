@@ -117,7 +117,7 @@ function Navbar({ currentLevel, onLevelChange }) {
             </button>
 
             {/* Settings button */}
-            <button 
+            {/* <button 
               className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-22 lg:h-22 rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-200"
               style={{ willChange: 'transform' }}
             >
@@ -126,7 +126,7 @@ function Navbar({ currentLevel, onLevelChange }) {
                 alt="User/Settings"
                 className="w-8 h-8 sm:w-10 sm:h-10 md:w-10 md:h-10 lg:w-12 lg:h-12"
               />
-            </button>
+            </button> */}
           </div>
           </div>
         </nav>
