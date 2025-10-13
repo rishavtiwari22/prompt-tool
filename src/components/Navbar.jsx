@@ -1,9 +1,22 @@
 import React, { useState } from 'react';
 import RulesModal from '../components/RulesModal';
 
+// Import images from src/assets
+import leftTopIcon from '../assets/left-top.svg';
+import speakerIcon from '../assets/speaker.svg';
+import rulesIcon from '../assets/rules.svg';
+import userIcon from '../assets/user.svg';
+import level1Icon from '../assets/1.svg';
+import level2Icon from '../assets/2.svg';
+import level3Icon from '../assets/3.svg';
+import level4Icon from '../assets/4.svg';
+import level5Icon from '../assets/5.svg';
+
 function Navbar({ currentLevel, onLevelChange }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
+
+  const levelIcons = [level1Icon, level2Icon, level3Icon, level4Icon, level5Icon];
 
   return (
     <>
@@ -24,7 +37,7 @@ function Navbar({ currentLevel, onLevelChange }) {
               style={{ willChange: 'transform' }}
             >
               <img 
-                src="/src/assets/left-top.svg" 
+                src={leftTopIcon} 
                 alt="Logo"
                 className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-14 lg:h-14"
               />
@@ -34,7 +47,7 @@ function Navbar({ currentLevel, onLevelChange }) {
           {/* Center - Level buttons (Mobile) */}
           <div className="flex md:hidden items-center justify-center flex-1 mx-2 pt-3">
             <div className="flex items-center space-x-3">
-              {[1, 2, 3, 4, 5].map((level) => (
+              {[1, 2, 3, 4, 5].map((level, idx) => (
                 <button
                   key={level}
                   onClick={() => onLevelChange && onLevelChange(level)}
@@ -46,7 +59,7 @@ function Navbar({ currentLevel, onLevelChange }) {
                   style={{ willChange: 'transform' }}
                 >
                   <img 
-                    src={`/src/assets/${level}.svg`} 
+                    src={levelIcons[idx]} 
                     alt={`Level ${level}`}
                     className="w-14 h-14"
                   />
@@ -68,7 +81,7 @@ function Navbar({ currentLevel, onLevelChange }) {
           {/* Center - Level buttons (Desktop) */}
           <div className="hidden md:flex items-center justify-center mx-2 sm:mx-4 justify-self-center">
             <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3 lg:space-x-4">
-              {[1, 2, 3, 4, 5].map((level) => (
+              {[1, 2, 3, 4, 5].map((level, idx) => (
                 <button
                   key={level}
                   onClick={() => onLevelChange && onLevelChange(level)}
@@ -80,7 +93,7 @@ function Navbar({ currentLevel, onLevelChange }) {
                   style={{ willChange: 'transform' }}
                 >
                   <img 
-                    src={`/src/assets/${level}.svg`} 
+                    src={levelIcons[idx]} 
                     alt={`Level ${level}`}
                     className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-18 lg:h-18"
                   />
@@ -97,7 +110,7 @@ function Navbar({ currentLevel, onLevelChange }) {
               style={{ willChange: 'transform' }}
             >
               <img 
-                src="/src/assets/speaker.svg" 
+                src={speakerIcon} 
                 alt="Speaker/Guide"
                 className="w-8 h-8 sm:w-10 sm:h-10 md:w-10 md:h-10 lg:w-12 lg:h-12"
               />
@@ -110,7 +123,7 @@ function Navbar({ currentLevel, onLevelChange }) {
               style={{ willChange: 'transform' }}
             >
               <img 
-                src="/src/assets/rules.svg" 
+                src={rulesIcon} 
                 alt="Rules"
                 className="w-18 h-18 sm:w-20 sm:h-20 md:w-22 md:h-22 lg:w-24 lg:h-24"
               />
@@ -122,7 +135,7 @@ function Navbar({ currentLevel, onLevelChange }) {
               style={{ willChange: 'transform' }}
             >
               <img 
-                src="/src/assets/user.svg" 
+                src={userIcon} 
                 alt="User/Settings"
                 className="w-8 h-8 sm:w-10 sm:h-10 md:w-10 md:h-10 lg:w-12 lg:h-12"
               />
@@ -144,7 +157,7 @@ function Navbar({ currentLevel, onLevelChange }) {
                   style={{ willChange: 'transform' }}
                 >
                   <img 
-                    src="/src/assets/speaker.svg" 
+                    src={speakerIcon} 
                     alt="Speaker/Guide"
                     className="w-14 h-14"
                   />
@@ -160,7 +173,7 @@ function Navbar({ currentLevel, onLevelChange }) {
                   style={{ willChange: 'transform' }}
                 >
                   <img 
-                    src="/src/assets/rules.svg" 
+                    src={rulesIcon} 
                     alt="Rules"
                     className="w-20 h-20"
                   />
@@ -173,7 +186,7 @@ function Navbar({ currentLevel, onLevelChange }) {
                   style={{ willChange: 'transform' }}
                 >
                   <img 
-                    src="/src/assets/user.svg" 
+                    src={userIcon} 
                     alt="User/Settings"
                     className="w-14 h-14"
                   />
