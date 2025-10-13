@@ -1,0 +1,228 @@
+/* Enhanced Landing Page Animations and Styles */
+
+/* Cinematic entrance animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes floatGentle {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-15px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(-8px) rotate(-1deg);
+  }
+}
+
+@keyframes shimmerEffect {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(100vh) translateX(0px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100px) translateX(50px);
+    opacity: 0;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(115, 69, 228, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(115, 69, 228, 0.6);
+  }
+}
+
+/* Landing page specific styles */
+.landing-page-container {
+  font-family: var(--font-body);
+  animation: fadeInScale 0.8s ease-out;
+}
+
+.hero-title {
+  animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+.hero-subtitle {
+  animation: fadeInUp 1s ease-out 0.4s both;
+}
+
+.hero-features {
+  animation: fadeInUp 1s ease-out 0.6s both;
+}
+
+.hero-cta {
+  animation: fadeInScale 1s ease-out 0.8s both;
+}
+
+.floating-orb {
+  animation: floatGentle 8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.start-button {
+  position: relative;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.start-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.start-button:hover::before {
+  left: 100%;
+}
+
+.start-button:hover {
+  animation: pulseGlow 2s infinite;
+}
+
+.particle {
+  animation: particleFloat linear infinite;
+  will-change: transform, opacity;
+}
+
+.feature-badge {
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.feature-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive optimizations */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: clamp(2rem, 8vw, 3rem) !important;
+  }
+  
+  .hero-subtitle {
+    font-size: clamp(1rem, 4vw, 1.2rem) !important;
+  }
+  
+  .start-button {
+    min-width: 200px !important;
+    padding: 1rem 2rem !important;
+  }
+  
+  .floating-orb {
+    animation-duration: 12s;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-features {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+  
+  .feature-badge {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .start-button {
+    border-width: 4px;
+  }
+  
+  .floating-orb {
+    opacity: 0.3 !important;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .floating-orb,
+  .particle,
+  .start-button::before {
+    animation: none !important;
+  }
+  
+  .hero-title,
+  .hero-subtitle,
+  .hero-features,
+  .hero-cta {
+    animation: fadeInUp 0.3s ease-out both;
+  }
+}
+
+/* Focus management for accessibility */
+.start-button:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Dark mode support (if needed in future) */
+@media (prefers-color-scheme: dark) {
+  .landing-page-container {
+    color-scheme: dark;
+  }
+}
+
+/* Performance optimizations */
+.landing-page-container * {
+  box-sizing: border-box;
+}
+
+.floating-orb {
+  transform: translateZ(0); /* Force GPU acceleration */
+}
+
+.start-button {
+  transform: translateZ(0); /* Force GPU acceleration */
+}
