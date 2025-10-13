@@ -25,7 +25,7 @@ function Navbar({ currentLevel, onLevelChange }) {
   return (
     <>
       {/* Wrapper to prevent horizontal overflow */}
-      <div className="relative" style={{ overflow: 'hidden' }}>
+   <div className="relative" style={{ overflow: isMenuOpen ? 'visible' : 'hidden' }}>
         <nav className="bg-transparent py-2 sm:py-3">
           <div
             className="w-full px-3 sm:px-6 lg:px-10 grid items-center gap-4 sm:gap-6 md:gap-8"
