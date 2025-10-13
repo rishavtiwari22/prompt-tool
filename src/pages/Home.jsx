@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { RefreshCw, Send } from 'lucide-react';
 import illustrationImage from '../assets/Frame 473.svg';
 import { compareImages } from '../utils/imageComparison';
 import { generateImageWithProgress } from '../utils/imageGeneration';
+import { ZoneToast, InfoToast } from '../components/Toast';
 
 // Import challenge images
 import challenge1Image from '../assets/challanges/challenge-1.png';
@@ -19,6 +19,10 @@ const Home = ({ currentLevel, onLevelChange }) => {
   const [generatedImage, setGeneratedImage] = useState(null);
   const [isComparing, setIsComparing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+
+  // Simple toast states
+  const [showZoneToast, setShowZoneToast] = useState(false);
+  const [showInfoToast, setShowInfoToast] = useState(false);
 
   // Target images for each level
   const targetImages = {
@@ -50,6 +54,8 @@ const Home = ({ currentLevel, onLevelChange }) => {
     setGeneratedImage(null);
   };
 
+
+
   const handleCreateImage = async () => {
     if (!prompt.trim()) return;
     
@@ -67,6 +73,9 @@ const Home = ({ currentLevel, onLevelChange }) => {
       
       setGeneratedImage(generatedImageUrl);
       
+      // Show success toast
+      setShowInfoToast(true);
+      
       // Automatically compare with target image when generation is complete
       const targetImage = targetImages[currentLevel];
       setIsComparing(true);
@@ -74,9 +83,19 @@ const Home = ({ currentLevel, onLevelChange }) => {
       const similarity = await compareImages(generatedImageUrl, targetImage);
       setAccuracy(similarity);
       
+      // Show zone toast if accuracy is high
+      if (similarity >= 70) {
+        setTimeout(() => {
+          setShowZoneToast(true);
+        }, 1000);
+      }
+      
     } catch (error) {
       console.error('Image generation or comparison failed:', error);
       setAccuracy(0);
+      
+      // Show error toast (using InfoToast for simplicity)
+      setShowInfoToast(true);
     } finally {
       setIsGenerating(false);
       setIsComparing(false);
@@ -257,6 +276,44 @@ const Home = ({ currentLevel, onLevelChange }) => {
               </button>
             </div>
 
+            
+
+            {/* Demo Toast Buttons */}
+            {/* <div className="flex justify-center gap-2" style={{ marginBottom: '1rem' }}>
+              <button
+                onClick={() => setShowZoneToast(true)}
+                style={{
+                  backgroundColor: '#f8d7da',
+                  color: '#721c24',
+                  border: '2px solid #f5c6cb',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                Zone Toast
+              </button>
+              <button
+                onClick={() => setShowInfoToast(true)}
+                style={{
+                  backgroundColor: '#cce7f0',
+                  color: '#0c5460',
+                  border: '2px solid #b6d4d9',
+                  padding: '0.75rem 1rem',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                Info Toast
+              </button>
+            </div> */}
+
+            
+
             {/* Prompt Input Box - Full Width Aligned */}
             <div
               className="paper border-3"
@@ -322,6 +379,16 @@ const Home = ({ currentLevel, onLevelChange }) => {
           </div>
         </div>
       </div>
+
+      {/* Toast Components */}
+      <ZoneToast 
+        show={showZoneToast} 
+        onClose={() => setShowZoneToast(false)} 
+      />
+      <InfoToast 
+        show={showInfoToast} 
+        onClose={() => setShowInfoToast(false)} 
+      />
     </div>
   );
 };
