@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Navbar';
 import Home from './pages/Home';
+import AudioDebugger from './components/AudioDebugger';
 
 function App() {
   const [currentLevel, setCurrentLevel] = useState(1);
@@ -27,6 +28,9 @@ function App() {
       <Routes>
         <Route path="/" element={<Home currentLevel={currentLevel} onLevelChange={handleLevelChange} />} />
       </Routes>
+      
+      {/* Audio Debug Component - Remove in production */}
+      {import.meta.env.DEV && <AudioDebugger />}
     </Router>
   );
 }

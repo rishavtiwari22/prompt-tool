@@ -1,12 +1,13 @@
 
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RefreshCw, Send } from 'lucide-react';
 import illustrationImage from '../assets/Frame 473.svg';
 import { compareImages } from '../utils/imageComparison';
 import { generateImageWithProgress } from '../utils/imageGeneration';
 import { ZoneToast, InfoToast } from '../components/Toast';
+import audioManager from '../utils/audioManager';
 
 // Import challenge images
 import challenge1Image from '../assets/challanges/challenge-1.png';
@@ -26,6 +27,7 @@ const Home = ({ currentLevel, onLevelChange }) => {
   // Simple toast states
   const [showZoneToast, setShowZoneToast] = useState(false);
   const [showInfoToast, setShowInfoToast] = useState(false);
+  const [previousAccuracy, setPreviousAccuracy] = useState(0);
 
   // Target images for each level
   const targetImages = {
@@ -45,14 +47,17 @@ const Home = ({ currentLevel, onLevelChange }) => {
     5: "Challenge 5"
   };
 
-  const handleReset = () => {
+  const handleReset = async () => {
+    await audioManager.playReset();
     setPrompt("");
+    setPreviousAccuracy(accuracy);
     setAccuracy(0);
     setGeneratedImage(null);
   };
 
   const handleLevelChange = (level) => {
     onLevelChange(level);
+    setPreviousAccuracy(accuracy);
     setAccuracy(0);
     setGeneratedImage(null);
   };
@@ -73,8 +78,12 @@ const Home = ({ currentLevel, onLevelChange }) => {
   const handleCreateImage = async () => {
     if (!prompt.trim()) return;
     
+    // Play button click sound
+    await audioManager.playButtonClick();
+    
     setIsGenerating(true);
     setGeneratedImage(null);
+    setPreviousAccuracy(accuracy);
     setAccuracy(0);
     
     try {
@@ -87,6 +96,9 @@ const Home = ({ currentLevel, onLevelChange }) => {
       
       setGeneratedImage(generatedImageUrl);
       
+      // Play image generation success sound
+      await audioManager.playImageGenerated();
+      
       // Show success toast
       setShowInfoToast(true);
       
@@ -97,11 +109,23 @@ const Home = ({ currentLevel, onLevelChange }) => {
       const similarity = await compareImages(generatedImageUrl, targetImage);
       setAccuracy(similarity);
       
-      // Show zone toast if accuracy is high
+      // Play score-based audio feedback
+      await audioManager.playScoreBasedFeedback(similarity);
+      
+      // Additional feedback for high scores
       if (similarity >= 70) {
+        // High accuracy - also play level completion sound
+        setTimeout(async () => {
+          await audioManager.playLevelComplete();
+        }, 500);
         setTimeout(() => {
           setShowZoneToast(true);
         }, 1000);
+      } else if (similarity < previousAccuracy) {
+        // Accuracy decreased - play additional negative feedback
+        setTimeout(async () => {
+          await audioManager.playAccuracyDecrease();
+        }, 800);
       }
       
     } catch (error) {

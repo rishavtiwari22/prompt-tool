@@ -1,9 +1,26 @@
 import React, { useState } from 'react';
 import RulesModal from '../components/RulesModal';
+import AudioControl from '../components/AudioControl';
+import audioManager from '../utils/audioManager';
 
 function Navbar({ currentLevel, onLevelChange }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
+
+  const handleLevelChange = async (level) => {
+    await audioManager.playLevelChange();
+    onLevelChange && onLevelChange(level);
+  };
+
+  const handleMenuToggle = async () => {
+    await audioManager.playButtonClick();
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleRulesToggle = async () => {
+    await audioManager.playButtonClick();
+    setIsRulesOpen(!isRulesOpen);
+  };
 
   return (
     <>
@@ -37,7 +54,7 @@ function Navbar({ currentLevel, onLevelChange }) {
               {[1, 2, 3, 4, 5].map((level) => (
                 <button
                   key={level}
-                  onClick={() => onLevelChange && onLevelChange(level)}
+                  onClick={() => handleLevelChange(level)}
                   className={`flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 hover:scale-105 ${
                     level === currentLevel
                       ? 'bg-purple-50'
@@ -58,7 +75,7 @@ function Navbar({ currentLevel, onLevelChange }) {
           {/* Hamburger Menu Button (Mobile Only) */}
           <button 
             className="md:hidden w-8 h-8 flex flex-col justify-center items-center space-y-1"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onClick={handleMenuToggle}
           >
             <span className={`w-5 h-0.5 bg-gray-600 transition-all duration-300 ${isMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`}></span>
             <span className={`w-5 h-0.5 bg-gray-600 transition-all duration-300 ${isMenuOpen ? 'opacity-0' : ''}`}></span>
@@ -71,7 +88,7 @@ function Navbar({ currentLevel, onLevelChange }) {
               {[1, 2, 3, 4, 5].map((level) => (
                 <button
                   key={level}
-                  onClick={() => onLevelChange && onLevelChange(level)}
+                  onClick={() => handleLevelChange(level)}
                   className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-lg transition-all duration-200 hover:scale-105 sm:hover:scale-110 ${
                     level === currentLevel
                       ? 'bg-purple-50'
@@ -91,21 +108,12 @@ function Navbar({ currentLevel, onLevelChange }) {
 
           {/* Right side - Action buttons (Desktop) */}
           <div className="hidden md:flex items-center space-x-1 sm:space-x-2 md:space-x-3 flex-shrink-0 justify-self-end">
-            {/* Document/Guide button */}
-            <button 
-              className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-22 lg:h-22 rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-200"
-              style={{ willChange: 'transform' }}
-            >
-              <img 
-                src="/src/assets/speaker.svg" 
-                alt="Speaker/Guide"
-                className="w-8 h-8 sm:w-10 sm:h-10 md:w-10 md:h-10 lg:w-12 lg:h-12"
-              />
-            </button>
+            {/* Audio Control */}
+            <AudioControl />
 
             {/* Rules button */}
             <button 
-              onClick={() => setIsRulesOpen(true)}
+              onClick={handleRulesToggle}
               className="w-18 h-18 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-26 lg:h-26 rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-200"
               style={{ willChange: 'transform' }}
             >
@@ -137,23 +145,14 @@ function Navbar({ currentLevel, onLevelChange }) {
             <div className="px-4 py-4">
               <h3 className="text-sm font-medium text-gray-700 mb-4 text-center">Actions</h3>
               <div className="flex flex-col items-center space-y-4">
-                {/* Document/Guide button */}
-                <button 
-                  className="w-18 h-18 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                  style={{ willChange: 'transform' }}
-                >
-                  <img 
-                    src="/src/assets/speaker.svg" 
-                    alt="Speaker/Guide"
-                    className="w-14 h-14"
-                  />
-                </button>
+                {/* Audio Control */}
+                <AudioControl className="flex-col space-y-2 space-x-0" />
 
                 {/* Rules button */}
                 <button 
                   className="w-24 h-24 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-                  onClick={() => {
+                  onClick={async () => {
+                    await audioManager.playButtonClick();
                     setIsMenuOpen(false);
                     setIsRulesOpen(true);
                   }}
@@ -163,19 +162,6 @@ function Navbar({ currentLevel, onLevelChange }) {
                     src="/src/assets/rules.svg" 
                     alt="Rules"
                     className="w-20 h-20"
-                  />
-                </button>
-
-                {/* Settings button */}
-                <button 
-                  className="w-24 h-24 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                  style={{ willChange: 'transform' }}
-                >
-                  <img 
-                    src="/src/assets/user.svg" 
-                    alt="User/Settings"
-                    className="w-14 h-14"
                   />
                 </button>
               </div>
