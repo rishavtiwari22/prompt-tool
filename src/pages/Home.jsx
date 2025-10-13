@@ -1,3 +1,6 @@
+
+
+
 import React, { useState } from 'react';
 import { RefreshCw, Send } from 'lucide-react';
 import illustrationImage from '../assets/Frame 473.svg';
@@ -54,7 +57,18 @@ const Home = ({ currentLevel, onLevelChange }) => {
     setGeneratedImage(null);
   };
 
-
+  // Get progress bar color based on accuracy range
+  const getProgressBarColor = (accuracy) => {
+    if (accuracy >= 70) {
+      return 'var(--color-success)'; // Green for high scores (70%+)
+    } else if (accuracy >= 50) {
+      return 'var(--color-secondary)'; // Blue for medium scores (50-69%)
+    } else if (accuracy >= 25) {
+      return 'var(--color-accent)'; // Pink for low scores (25-49%)
+    } else {
+      return 'var(--color-primary)'; // Purple for very low scores (0-24%)
+    }
+  };
 
   const handleCreateImage = async () => {
     if (!prompt.trim()) return;
@@ -185,28 +199,70 @@ const Home = ({ currentLevel, onLevelChange }) => {
                     overflow: "hidden",
                   }}
                 >
+                  {/* Progress Fill */}
                   <div
                     style={{
                       width: `${accuracy}%`,
                       height: "100%",
-                      backgroundColor: "var(--color-primary)",
-                      transition: "width 0.3s ease",
+                      backgroundColor: getProgressBarColor(accuracy),
+                      transition: "width 0.3s ease, background-color 0.3s ease",
+                    }}
+                  ></div>
+
+                  {/* 70% Standing Line Marker */}
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: "70%",
+                      top: "-6px",
+                      bottom: "-6px",
+                      width: "3px",
+                      backgroundColor: "var(--color-text-primary)",
+                      zIndex: 2,
+                      transform: "translateX(-50%)",
                     }}
                   ></div>
                 </div>
 
-                {/* Labels */}
+                {/* Labels - Positioned at their respective percentages */}
                 <div
-                  className="flex justify-between"
                   style={{
+                    position: "relative",
+                    width: "100%",
+                    height: "30px",
                     marginTop: "0.5rem",
-                    fontFamily: "var(--font-body)",
-                    fontSize: "16px",
-                    color: "var(--color-text-secondary)",
                   }}
                 >
-                  <span>0%</span>
-                  <span>{`${accuracy}%`}</span>
+                  {/* Accuracy Percentage Label - Shows below the progress fill */}
+                  {accuracy > 0 && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        left: `${accuracy}%`,
+                        transform: "translateX(-50%)",
+                        fontFamily: "var(--font-body)",
+                        fontSize: "16px",
+                        color: "var(--color-text-secondary)",
+                      }}
+                    >
+                      {`${accuracy}%`}
+                    </span>
+                  )}
+
+                  {/* 70% Target Label - Always shows at standing line position */}
+                  <span
+                    style={{
+                      position: "absolute",
+                      left: "70%",
+                      transform: "translateX(-50%)",
+                      fontFamily: "var(--font-body)",
+                      fontSize: "16px",
+                      color: "var(--color-text-primary)",
+                      fontWeight: "600",
+                    }}
+                  >
+                    70%
+                  </span>
                 </div>
               </div>
             </div>
@@ -342,7 +398,7 @@ const Home = ({ currentLevel, onLevelChange }) => {
                     border: "none",
                     outline: "none",
                     fontFamily: "var(--font-body)",
-                    fontSize: "16px",
+                    fontSize: "18px",
                     color: "var(--color-text-primary)",
                     backgroundColor: "transparent",
                     height: "46px",
