@@ -34,7 +34,7 @@ function Navbar({ currentLevel, onLevelChange }) {
           {/* Center - Level buttons (Mobile) */}
           <div className="flex md:hidden items-center justify-center flex-1 mx-2 pt-3">
             <div className="flex items-center space-x-3">
-              {[1, 2, 3, 4, 5].map((level) => (
+              {[1, 2, 3, 4, 5, 6].map((level) => (
                 <button
                   key={level}
                   onClick={() => onLevelChange && onLevelChange(level)}
@@ -68,7 +68,7 @@ function Navbar({ currentLevel, onLevelChange }) {
           {/* Center - Level buttons (Desktop) */}
           <div className="hidden md:flex items-center justify-center mx-2 sm:mx-4 justify-self-center">
             <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3 lg:space-x-4">
-              {[1, 2, 3, 4, 5].map((level) => (
+              {[1, 2, 3, 4, 5, 6].map((level) => (
                 <button
                   key={level}
                   onClick={() => onLevelChange && onLevelChange(level)}
