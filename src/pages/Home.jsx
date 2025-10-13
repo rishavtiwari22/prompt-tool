@@ -5,12 +5,13 @@ import illustrationImage from '../assets/Frame 473.svg';
 import { compareImages } from '../utils/imageComparison';
 import { generateImageWithProgress } from '../utils/imageGeneration';
 
-// Import target images
-import carImage from '../assets/car.jpg';
-import horseImage from '../assets/horse.jpg';
-import mountainImage from '../assets/line_mountain.jpg';
-import oulImage from '../assets/oul.jpg';
-import sheepImage from '../assets/sheep.avif';
+// Import challenge images
+import challenge1Image from '../assets/challanges/challenge-1.png';
+import challenge2Image from '../assets/challanges/challenge-2.png';
+import challenge3Image from '../assets/challanges/challenge-3.png';
+import challenge4Image from '../assets/challanges/challenge-4.png';
+import challenge5Image from '../assets/challanges/challenge-5.png';
+import challenge6Image from '../assets/challanges/challenge-6.png';
 
 const Home = ({ currentLevel, onLevelChange }) => {
   const [prompt, setPrompt] = useState('');
@@ -21,20 +22,20 @@ const Home = ({ currentLevel, onLevelChange }) => {
 
   // Target images for each level
   const targetImages = {
-    1: carImage,
-    2: horseImage,
-    3: mountainImage,
-    4: oulImage,
-    5: sheepImage
+    1: challenge1Image,
+    2: challenge2Image,
+    3: challenge3Image,
+    4: challenge4Image,
+    5: challenge5Image
   };
 
   // Level descriptions
   const levelDescriptions = {
-    1: "Car",
-    2: "Horse", 
-    3: "Mountain",
-    4: "Owl",
-    5: "Sheep"
+    1: "Challenge 1",
+    2: "Challenge 2", 
+    3: "Challenge 3",
+    4: "Challenge 4",
+    5: "Challenge 5"
   };
 
   const handleReset = () => {
