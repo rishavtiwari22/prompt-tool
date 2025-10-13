@@ -21,7 +21,7 @@ function Navbar({ currentLevel, onLevelChange }) {
   return (
     <>
       {/* Wrapper to prevent horizontal overflow */}
-      <div className="relative" style={{ overflow: 'hidden' }}>
+      <div className="relative" style={{ overflow: isMenuOpen ? 'visible' : 'hidden' }}>
         <nav className="bg-transparent py-2 sm:py-3">
           <div
             className="w-full px-3 sm:px-6 lg:px-10 grid items-center gap-4 sm:gap-6 md:gap-8"
@@ -129,17 +129,7 @@ function Navbar({ currentLevel, onLevelChange }) {
               />
             </button>
 
-            {/* Settings button */}
-            {/* <button 
-              className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-22 lg:h-22 rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-200"
-              style={{ willChange: 'transform' }}
-            >
-              <img 
-                src={userIcon} 
-                alt="User/Settings"
-                className="w-8 h-8 sm:w-10 sm:h-10 md:w-10 md:h-10 lg:w-12 lg:h-12"
-              />
-            </button> */}
+         
           </div>
           </div>
         </nav>
@@ -179,18 +169,7 @@ function Navbar({ currentLevel, onLevelChange }) {
                   />
                 </button>
 
-                {/* Settings button */}
-                <button 
-                  className="w-24 h-24 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
-                  style={{ willChange: 'transform' }}
-                >
-                  <img 
-                    src={userIcon} 
-                    alt="User/Settings"
-                    className="w-14 h-14"
-                  />
-                </button>
+         
               </div>
             </div>
           </div>
