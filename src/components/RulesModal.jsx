@@ -1,4 +1,5 @@
 import React from 'react';
+import audioManager from '../utils/audioManager';
 
 function RulesModal({ isOpen, onClose }) {
   if (!isOpen) return null;
@@ -8,7 +9,10 @@ function RulesModal({ isOpen, onClose }) {
       {/* Backdrop with blur */}
       <div 
         className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 transition-opacity duration-300"
-        onClick={onClose}
+        onClick={async () => {
+          await audioManager.playButtonClick();
+          onClose();
+        }}
       />
       
       {/* Modal */}
@@ -44,7 +48,10 @@ function RulesModal({ isOpen, onClose }) {
               RULES
             </h4>
             <button
-              onClick={onClose}
+              onClick={async () => {
+                await audioManager.playButtonClick();
+                onClose();
+              }}
               className="absolute right-6 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors p-1"
               aria-label="Close modal"
             >
