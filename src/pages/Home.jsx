@@ -1,8 +1,5 @@
-
-
-
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Send, Target } from 'lucide-react';
+import { RefreshCw, Send, Target, Loader2 } from 'lucide-react';
 import illustrationImage from '../assets/Frame 473.svg';
 import { compareImages } from '../utils/imageComparison';
 import { generateImageWithProgress } from '../utils/imageGeneration';
@@ -16,6 +13,24 @@ import challenge3Image from '../assets/challanges/challenge-3.png';
 import challenge4Image from '../assets/challanges/challenge-4.png';
 import challenge5Image from '../assets/challanges/challenge-5.png';
 import challenge6Image from '../assets/challanges/challenge-6.png';
+
+// Loading dots animation component
+const LoadingDots = () => {
+  const [dots, setDots] = useState('');
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots(prev => {
+        if (prev === '...') return '';
+        return prev + '.';
+      });
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return <span>{dots}</span>;
+};
 
 const Home = ({ currentLevel, onLevelChange }) => {
   const [prompt, setPrompt] = useState('');
@@ -240,11 +255,10 @@ const Home = ({ currentLevel, onLevelChange }) => {
                   marginBottom: "1.25rem",
                 }}
               >
-                Accuracy Score
+                Accuracy
               </h4>
 
-
-              {/* Progress Bar - Constrained to card width */}
+              {/* Progress Bar - Redesigned to match reference images */}
               <div className="relative" style={{ padding: "0 0.25rem" }}>
                 <div
                   style={{
@@ -254,7 +268,7 @@ const Home = ({ currentLevel, onLevelChange }) => {
                     borderRadius: "20px",
                     backgroundColor: "white",
                     position: "relative",
-                    overflow: "hidden",
+                    overflow: "visible",
                   }}
                 >
                   {/* Progress Fill */}
@@ -263,9 +277,35 @@ const Home = ({ currentLevel, onLevelChange }) => {
                       width: `${accuracy}%`,
                       height: "100%",
                       backgroundColor: getProgressBarColor(accuracy),
-                      transition: "width 0.3s ease, background-color 0.3s ease",
+                      borderRadius: "17px",
+                      transition: "width 0.5s ease, background-color 0.3s ease",
+                      position: "relative",
                     }}
-                  ></div>
+                  >
+                    {/* Current Percentage Badge on Progress Bar - Only show when accuracy > 0 */}
+                    {accuracy > 0 && (
+                      <div
+                        style={{
+                          position: "absolute",
+                          right: "-20px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          backgroundColor: "white",
+                          border: "3px solid var(--color-text-primary)",
+                          borderRadius: "20px",
+                          padding: "2px 12px",
+                          fontFamily: "var(--font-body)",
+                          fontSize: "16px",
+                          fontWeight: "600",
+                          color: "var(--color-text-primary)",
+                          whiteSpace: "nowrap",
+                          zIndex: 3,
+                        }}
+                      >
+                        {accuracy}%
+                      </div>
+                    )}
+                  </div>
 
                   {/* 70% Standing Line Marker */}
                   <div
@@ -280,9 +320,32 @@ const Home = ({ currentLevel, onLevelChange }) => {
                       transform: "translateX(-50%)",
                     }}
                   ></div>
+
+                  {/* 0% Label at Start - Only show when accuracy is 0 */}
+                  {accuracy === 0 && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: "0",
+                        top: "50%",
+                        transform: "translate(-8px, -50%)",
+                        backgroundColor: "white",
+                        border: "3px solid var(--color-text-primary)",
+                        borderRadius: "20px",
+                        padding: "2px 10px",
+                        fontFamily: "var(--font-body)",
+                        fontSize: "16px",
+                        fontWeight: "600",
+                        color: "var(--color-text-primary)",
+                        zIndex: 3,
+                      }}
+                    >
+                      0%
+                    </div>
+                  )}
                 </div>
 
-                {/* Labels - Positioned at their respective percentages */}
+                {/* 70% Target Label - Below the standing line */}
                 <div
                   style={{
                     position: "relative",
@@ -291,23 +354,6 @@ const Home = ({ currentLevel, onLevelChange }) => {
                     marginTop: "0.5rem",
                   }}
                 >
-                  {/* Accuracy Percentage Label - Shows below the progress fill */}
-                  {accuracy > 0 && (
-                    <span
-                      style={{
-                        position: "absolute",
-                        left: `${accuracy}%`,
-                        transform: "translateX(-50%)",
-                        fontFamily: "var(--font-body)",
-                        fontSize: "16px",
-                        color: "var(--color-text-secondary)",
-                      }}
-                    >
-                      {`${accuracy}%`}
-                    </span>
-                  )}
-
-                  {/* 70% Target Label - Always shows at standing line position */}
                   <span
                     style={{
                       position: "absolute",
@@ -344,7 +390,61 @@ const Home = ({ currentLevel, onLevelChange }) => {
                 marginBottom: "2rem",
               }}
             >
-              {generatedImage ? (
+              {isGenerating || isComparing ? (
+                // Loading State with Animation
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '1.5rem'
+                }}>
+                  {/* Animated Spinner */}
+                  <div style={{
+                    animation: 'spin 1s linear infinite',
+                  }}>
+                    <Loader2 
+                      size={64} 
+                      style={{ 
+                        color: 'var(--color-primary)',
+                        strokeWidth: 2.5
+                      }} 
+                    />
+                  </div>
+                  
+                  {/* Loading Text with Dots Animation */}
+                  <div style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: '1.25rem',
+                    color: 'var(--color-text-primary)',
+                    fontWeight: '500'
+                  }}>
+                    {isComparing ? (
+                      <>
+                        Analyzing your image<LoadingDots />
+                      </>
+                    ) : (
+                      <>
+                        Creating your masterpiece<LoadingDots />
+                      </>
+                    )}
+                  </div>
+
+                  {/* Subtle message */}
+                  <p style={{
+                    fontFamily: 'var(--font-body)',
+                    fontSize: '0.95rem',
+                    color: 'var(--color-text-secondary)',
+                    maxWidth: '280px',
+                    lineHeight: '1.5'
+                  }}>
+                    {isComparing 
+                      ? 'Comparing with target image...'
+                      : 'This may take a few moments'
+                    }
+                  </p>
+                </div>
+              ) : generatedImage ? (
                 <>
                   <img
                     src={generatedImage}
@@ -395,7 +495,7 @@ const Home = ({ currentLevel, onLevelChange }) => {
               )}
             </div>
 
-            {/* Reset Button - Centered */}
+            {/* Reset Button - Centered - Space always reserved, button visible only when image is generated */}
             <div
               className="flex justify-center"
               style={{ marginBottom: "1rem" }}
@@ -413,52 +513,17 @@ const Home = ({ currentLevel, onLevelChange }) => {
                   gap: "0.4rem",
                   fontFamily: "var(--font-body)",
                   fontSize: "16px",
-                  cursor: "pointer",
+                  cursor: generatedImage ? "pointer" : "default",
                   transition: "all 0.2s ease",
+                  opacity: generatedImage ? 1 : 0,
+                  visibility: generatedImage ? "visible" : "hidden",
+                  pointerEvents: generatedImage ? "auto" : "none",
                 }}
               >
                 Reset
                 <RefreshCw size={16} />
               </button>
             </div>
-
-            
-
-            {/* Demo Toast Buttons */}
-            {/* <div className="flex justify-center gap-2" style={{ marginBottom: '1rem' }}>
-              <button
-                onClick={() => setShowZoneToast(true)}
-                style={{
-                  backgroundColor: '#f8d7da',
-                  color: '#721c24',
-                  border: '2px solid #f5c6cb',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-              >
-                Zone Toast
-              </button>
-              <button
-                onClick={() => setShowInfoToast(true)}
-                style={{
-                  backgroundColor: '#cce7f0',
-                  color: '#0c5460',
-                  border: '2px solid #b6d4d9',
-                  padding: '0.75rem 1rem',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-              >
-                Info Toast
-              </button>
-            </div> */}
-
-            
 
             {/* Prompt Input Box - Full Width Aligned */}
             <div
@@ -517,8 +582,22 @@ const Home = ({ currentLevel, onLevelChange }) => {
                     minWidth: '150px'
                   }}
                 >
-                  {isGenerating ? 'Generating...' : isComparing ? 'Analyzing...' : 'Create Image'}
-                  <Send size={16} />
+                  {isGenerating ? (
+                    <>
+                      Generating
+                      <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                    </>
+                  ) : isComparing ? (
+                    <>
+                      Analyzing
+                      <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                    </>
+                  ) : (
+                    <>
+                      Create Image
+                      <Send size={16} />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -535,6 +614,18 @@ const Home = ({ currentLevel, onLevelChange }) => {
         show={showInfoToast} 
         onClose={() => setShowInfoToast(false)} 
       />
+
+      {/* CSS for spinner animation */}
+      <style>{`
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+      `}</style>
     </div>
   );
 };
