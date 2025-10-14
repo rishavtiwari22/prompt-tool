@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Test - Prompt Learning Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #7345E4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #5130A0;
+        }
+        .status {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <h1>🎵 Audio System Test</h1>
+    
+    <div class="test-section">
+        <h3>Audio File Accessibility Test</h3>
+        <button onclick="testAudioFiles()">Test All Audio Files</button>
+        <div id="audioTestResults"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Individual Audio Tests</h3>
+        <button onclick="testAudio('buttonClick')">Button Click</button>
+        <button onclick="testAudio('levelComplete')">Level Complete</button>
+        <button onclick="testAudio('resultGenerate')">Result Generate</button>
+        <button onclick="testAudio('score81to100')">High Score</button>
+        <button onclick="testFallback()">Test Fallback Tone</button>
+        <div id="playTestResults"></div>
+    </div>
+
+    <script>
+        const audioFiles = {
+            backgroundSound: '/audio/backgroundSound.mp3',
+            buttonClick: '/audio/ButtonClick.mp3',
+            levelComplete: '/audio/Level-completion.mp3',
+            moveToNewLevel: '/audio/Move-to-new_level.mp3',
+            resultGenerate: '/audio/resultgenerate.mp3',
+            reset: '/audio/Reset.mp3',
+            accuracyGoingBack: '/audio/AccuracyGoingBack.mp3',
+            soundToggle: '/audio/SoundOnOffButton.mp3',
+            score0to25: '/audio/0-25.mp3',
+            score26to50: '/audio/26-50.mp3',
+            score51to80: '/audio/51-80.mp3',
+            score81to100: '/audio/81-100.mp3'
+        };
+
+        async function testAudioFiles() {
+            const resultsDiv = document.getElementById('audioTestResults');
+            resultsDiv.innerHTML = '<p>Testing audio file accessibility...</p>';
+            
+            const results = [];
+            
+            for (const [key, path] of Object.entries(audioFiles)) {
+                try {
+                    const response = await fetch(path, { method: 'HEAD' });
+                    results.push({
+                        file: key,
+                        path: path,
+                        status: response.status,
+                        ok: response.ok
+                    });
+                } catch (error) {
+                    results.push({
+                        file: key,
+                        path: path,
+                        error: error.message,
+                        ok: false
+                    });
+                }
+            }
+            
+            let html = '<h4>Results:</h4>';
+            results.forEach(result => {
+                const statusClass = result.ok ? 'success' : 'error';
+                html += `<div class="status ${statusClass}">
+                    <strong>${result.file}</strong>: ${result.ok ? '✓ OK' : '✗ FAILED'} 
+                    ${result.status ? `(${result.status})` : ''} 
+                    ${result.error ? `- ${result.error}` : ''}
+                    <br><small>${result.path}</small>
+                </div>`;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        async function testAudio(audioKey) {
+            const resultsDiv = document.getElementById('playTestResults');
+            
+            try {
+                const audio = new Audio(audioFiles[audioKey]);
+                audio.volume = 0.5;
+                
+                await audio.play();
+                resultsDiv.innerHTML = `<div class="status success">✓ Successfully played: ${audioKey}</div>`;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="status error">✗ Failed to play ${audioKey}: ${error.message}</div>`;
+            }
+        }
+
+        function testFallback() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.value = 440; // A note
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.01);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+
+                document.getElementById('playTestResults').innerHTML = 
+                    '<div class="status success">✓ Fallback tone played successfully</div>';
+
+            } catch (error) {
+                document.getElementById('playTestResults').innerHTML = 
+                    `<div class="status error">✗ Fallback tone failed: ${error.message}</div>`;
+            }
+        }
+
+        // Auto-test on page load
+        window.onload = () => {
+            testAudioFiles();
+        };
+    </script>
+</body>
+</html>

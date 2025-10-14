@@ -8,38 +8,27 @@ class AudioManager {
     this.audioCache = new Map();
     this.currentBackgroundAudio = null;
     
-    // Audio file mappings
+    // Audio file mappings - using public folder paths for deployment
     this.audioFiles = {
-      backgroundSound: '/src/assets/Audio/backgroundSound.mp3',
-      buttonClick: '/src/assets/Audio/ButtonClick.mp3',
-      levelComplete: '/src/assets/Audio/Level-completion.mp3',
-      moveToNewLevel: '/src/assets/Audio/Move-to-new_level.mp3',
-      resultGenerate: '/src/assets/Audio/resultgenerate.mp3',
-      reset: '/src/assets/Audio/Reset.mp3',
-      accuracyGoingBack: '/src/assets/Audio/AccuracyGoingBack.mp3',
-      soundToggle: '/src/assets/Audio/SoundOnOffButton.mp3',
+      backgroundSound: '/audio/backgroundSound.mp3',
+      buttonClick: '/audio/ButtonClick.mp3',
+      levelComplete: '/audio/Level-completion.mp3',
+      moveToNewLevel: '/audio/Move-to-new_level.mp3',
+      resultGenerate: '/audio/resultgenerate.mp3',
+      reset: '/audio/Reset.mp3',
+      accuracyGoingBack: '/audio/AccuracyGoingBack.mp3',
+      soundToggle: '/audio/SoundOnOffButton.mp3',
       // Score-based feedback audio
-      score0to25: '/src/assets/Audio/0-25.mp3',
-      score26to50: '/src/assets/Audio/26-50.mp3',
-      score51to80: '/src/assets/Audio/51-80.mp3',
-      score81to100: '/src/assets/Audio/81-100.mp3'
+      score0to25: '/audio/0-25.mp3',
+      score26to50: '/audio/26-50.mp3',
+      score51to80: '/audio/51-80.mp3',
+      score81to100: '/audio/81-100.mp3'
     };
     
     this.init();
   }
 
   async init() {
-    // Preload critical sounds for better UX
-    await this.preloadAudio([
-      'buttonClick', 
-      'resultGenerate', 
-      'levelComplete',
-      'score0to25',
-      'score26to50', 
-      'score51to80',
-      'score81to100'
-    ]);
-    
     // Load audio preference from localStorage
     const savedPreference = localStorage.getItem('audioEnabled');
     if (savedPreference !== null) {
@@ -50,11 +39,98 @@ class AudioManager {
     if (savedVolume !== null) {
       this.volume = parseFloat(savedVolume);
     }
+
+    // Test audio file accessibility
+    console.log('Testing audio file accessibility...');
+    await this.testAudioAccessibility();
+    
+    // Preload critical sounds for better UX (only if audio is enabled)
+    if (this.audioEnabled) {
+      console.log('Preloading critical audio files...');
+      await this.preloadAudio([
+        'buttonClick', 
+        'resultGenerate', 
+        'levelComplete',
+        'score0to25',
+        'score26to50', 
+        'score51to80',
+        'score81to100'
+      ]);
+    }
+  }
+
+  async testAudioAccessibility() {
+    const testKeys = ['buttonClick', 'resultGenerate'];
+    const results = [];
+    
+    for (const key of testKeys) {
+      try {
+        const response = await fetch(this.audioFiles[key], { method: 'HEAD' });
+        results.push({
+          file: key,
+          path: this.audioFiles[key],
+          accessible: response.ok,
+          status: response.status
+        });
+        console.log(`Audio file ${key}: ${response.ok ? 'OK' : 'FAILED'} (${response.status})`);
+      } catch (error) {
+        results.push({
+          file: key,
+          path: this.audioFiles[key],
+          accessible: false,
+          error: error.message
+        });
+        console.error(`Audio file ${key}: FAILED -`, error.message);
+      }
+    }
+    
+    return results;
   }
 
   async preloadAudio(audioKeys) {
     const loadPromises = audioKeys.map(key => this.loadAudio(key));
-    await Promise.allSettled(loadPromises);
+    const results = await Promise.allSettled(loadPromises);
+    
+    // Log results
+    results.forEach((result, index) => {
+      const key = audioKeys[index];
+      if (result.status === 'fulfilled') {
+        console.log(`✓ Preloaded: ${key}`);
+      } else {
+        console.warn(`✗ Failed to preload: ${key}`, result.reason);
+      }
+    });
+  }
+
+  // Fallback audio generation using Web Audio API
+  createFallbackTone(frequency = 440, duration = 0.2, type = 'sine') {
+    if (typeof window === 'undefined' || !window.AudioContext) {
+      return null;
+    }
+
+    try {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+
+      oscillator.frequency.value = frequency;
+      oscillator.type = type;
+
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(this.volume * 0.3, audioContext.currentTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + duration);
+
+      return oscillator;
+    } catch (error) {
+      console.warn('Failed to create fallback tone:', error);
+      return null;
+    }
   }
 
   async loadAudio(audioKey) {
@@ -63,31 +139,66 @@ class AudioManager {
     }
 
     return new Promise((resolve, reject) => {
-      const audio = new Audio(this.audioFiles[audioKey]);
+      const audioPath = this.audioFiles[audioKey];
+      if (!audioPath) {
+        console.warn(`Audio key not found: ${audioKey}`);
+        reject(new Error(`Audio key not found: ${audioKey}`));
+        return;
+      }
+
+      const audio = new Audio(audioPath);
       audio.preload = 'auto';
       audio.volume = this.volume;
       
+      // Add timeout for loading
+      const timeout = setTimeout(() => {
+        console.warn(`Audio loading timeout for: ${audioKey}`);
+        reject(new Error(`Audio loading timeout: ${audioKey}`));
+      }, 5000);
+      
       audio.addEventListener('canplaythrough', () => {
+        clearTimeout(timeout);
         this.audioCache.set(audioKey, audio);
+        console.log(`Audio loaded successfully: ${audioKey}`);
         resolve(audio);
       });
       
+      audio.addEventListener('loadeddata', () => {
+        // Fallback if canplaythrough doesn't fire
+        if (!this.audioCache.has(audioKey)) {
+          clearTimeout(timeout);
+          this.audioCache.set(audioKey, audio);
+          console.log(`Audio loaded (fallback): ${audioKey}`);
+          resolve(audio);
+        }
+      });
+      
       audio.addEventListener('error', (e) => {
-        console.warn(`Failed to load audio: ${audioKey}`, e);
+        clearTimeout(timeout);
+        console.error(`Failed to load audio: ${audioKey}`, {
+          error: e,
+          path: audioPath,
+          networkState: audio.networkState,
+          readyState: audio.readyState
+        });
         reject(e);
       });
+
+      // Start loading
+      audio.load();
     });
   }
 
   async playSound(audioKey, options = {}) {
     if (!this.audioEnabled && audioKey !== 'soundToggle') {
-      return;
+      return Promise.resolve();
     }
 
     try {
       let audio = this.audioCache.get(audioKey);
       
       if (!audio) {
+        console.log(`Loading audio for: ${audioKey}`);
         audio = await this.loadAudio(audioKey);
       }
       
@@ -98,19 +209,43 @@ class AudioManager {
       if (options.loop) {
         audioClone.loop = true;
       }
+
+      // Add error handling for the cloned audio
+      audioClone.addEventListener('error', (e) => {
+        console.warn(`Playback error for ${audioKey}:`, e);
+      });
       
       const playPromise = audioClone.play();
       
       if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.warn('Audio play failed:', error);
+        return playPromise.catch(error => {
+          console.warn(`Audio play failed for ${audioKey}:`, error);
         });
       }
       
       return audioClone;
     } catch (error) {
       console.warn(`Failed to play audio: ${audioKey}`, error);
+      // Fallback to generated tone
+      this.playFallbackTone(audioKey);
     }
+  }
+
+  playFallbackTone(audioKey) {
+    const toneMap = {
+      'buttonClick': { frequency: 800, duration: 0.1 },
+      'levelComplete': { frequency: 523, duration: 0.5 }, // C note
+      'resultGenerate': { frequency: 659, duration: 0.3 }, // E note
+      'reset': { frequency: 392, duration: 0.2 }, // G note
+      'moveToNewLevel': { frequency: 698, duration: 0.4 }, // F note
+      'score0to25': { frequency: 330, duration: 0.3 },
+      'score26to50': { frequency: 440, duration: 0.3 },
+      'score51to80': { frequency: 554, duration: 0.3 },
+      'score81to100': { frequency: 659, duration: 0.4 }
+    };
+
+    const toneConfig = toneMap[audioKey] || { frequency: 440, duration: 0.2 };
+    this.createFallbackTone(toneConfig.frequency, toneConfig.duration);
   }
 
   // Specific game action sounds

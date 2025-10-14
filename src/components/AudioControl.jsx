@@ -7,15 +7,30 @@ const AudioControl = ({ className = "" }) => {
   const [volume, setVolume] = useState(0.7);
 
   useEffect(() => {
-    // Initialize audio state from audioManager
-    const audioState = audioManager.getAudioState();
-    setAudioEnabled(audioState.enabled);
-    setVolume(audioState.volume);
+    const initAudio = async () => {
+      try {
+        // Initialize audio state from audioManager
+        const audioState = audioManager.getAudioState();
+        setAudioEnabled(audioState.enabled);
+        setVolume(audioState.volume);
 
-    // Start background music when component mounts (if audio is enabled)
-    if (audioState.enabled) {
-      audioManager.playBackgroundMusic();
-    }
+        // Test audio accessibility
+        console.log('AudioControl: Testing audio system...');
+        await audioManager.testAudioAccessibility();
+
+        // Start background music when component mounts (if audio is enabled)
+        if (audioState.enabled) {
+          console.log('AudioControl: Starting background music...');
+          audioManager.playBackgroundMusic().catch(error => {
+            console.warn('AudioControl: Failed to start background music:', error);
+          });
+        }
+      } catch (error) {
+        console.warn('AudioControl: Audio initialization failed:', error);
+      }
+    };
+
+    initAudio();
 
     // Cleanup on unmount
     return () => {
