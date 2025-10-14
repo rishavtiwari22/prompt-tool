@@ -7,94 +7,98 @@ class AudioManager {
     this.volume = 0.7;
     this.audioCache = new Map();
     this.currentBackgroundAudio = null;
-    
+
     // Audio file mappings - using public folder paths for deployment
     this.audioFiles = {
-      backgroundSound: '/audio/backgroundSound.mp3',
-      buttonClick: '/audio/ButtonClick.mp3',
-      levelComplete: '/audio/Level-completion.mp3',
-      moveToNewLevel: '/audio/Move-to-new_level.mp3',
-      resultGenerate: '/audio/resultgenerate.mp3',
-      reset: '/audio/Reset.mp3',
-      accuracyGoingBack: '/audio/AccuracyGoingBack.mp3',
-      soundToggle: '/audio/SoundOnOffButton.mp3',
+      backgroundSound: "/audio/backgroundSound.mp3",
+      buttonClick: "/audio/ButtonClick.mp3",
+      levelComplete: "/audio/Level-completion.mp3",
+      moveToNewLevel: "/audio/Move-to-new_level.mp3",
+      resultGenerate: "/audio/resultgenerate.mp3",
+      reset: "/audio/Reset.mp3",
+      accuracyGoingBack: "/audio/AccuracyGoingBack.mp3",
+      soundToggle: "/audio/SoundOnOffButton.mp3",
       // Score-based feedback audio
-      score0to25: '/audio/0-25.mp3',
-      score26to50: '/audio/26-50.mp3',
-      score51to80: '/audio/51-80.mp3',
-      score81to100: '/audio/81-100.mp3'
+      score0to25: "/audio/0-25.mp3",
+      score26to50: "/audio/26-50.mp3",
+      score51to80: "/audio/51-80.mp3",
+      score81to100: "/audio/81-100.mp3",
     };
-    
+
     this.init();
   }
 
   async init() {
     // Load audio preference from localStorage
-    const savedPreference = localStorage.getItem('audioEnabled');
+    const savedPreference = localStorage.getItem("audioEnabled");
     if (savedPreference !== null) {
       this.audioEnabled = JSON.parse(savedPreference);
     }
-    
-    const savedVolume = localStorage.getItem('audioVolume');
+
+    const savedVolume = localStorage.getItem("audioVolume");
     if (savedVolume !== null) {
       this.volume = parseFloat(savedVolume);
     }
 
     // Test audio file accessibility
-    console.log('Testing audio file accessibility...');
+    console.log("Testing audio file accessibility...");
     await this.testAudioAccessibility();
-    
+
     // Preload critical sounds for better UX (only if audio is enabled)
     if (this.audioEnabled) {
-      console.log('Preloading critical audio files...');
+      console.log("Preloading critical audio files...");
       await this.preloadAudio([
-        'buttonClick', 
-        'resultGenerate', 
-        'levelComplete',
-        'score0to25',
-        'score26to50', 
-        'score51to80',
-        'score81to100'
+        "buttonClick",
+        "resultGenerate",
+        "levelComplete",
+        "score0to25",
+        "score26to50",
+        "score51to80",
+        "score81to100",
       ]);
     }
   }
 
   async testAudioAccessibility() {
-    const testKeys = ['buttonClick', 'resultGenerate'];
+    const testKeys = ["buttonClick", "resultGenerate"];
     const results = [];
-    
+
     for (const key of testKeys) {
       try {
-        const response = await fetch(this.audioFiles[key], { method: 'HEAD' });
+        const response = await fetch(this.audioFiles[key], { method: "HEAD" });
         results.push({
           file: key,
           path: this.audioFiles[key],
           accessible: response.ok,
-          status: response.status
+          status: response.status,
         });
-        console.log(`Audio file ${key}: ${response.ok ? 'OK' : 'FAILED'} (${response.status})`);
+        console.log(
+          `Audio file ${key}: ${response.ok ? "OK" : "FAILED"} (${
+            response.status
+          })`
+        );
       } catch (error) {
         results.push({
           file: key,
           path: this.audioFiles[key],
           accessible: false,
-          error: error.message
+          error: error.message,
         });
         console.error(`Audio file ${key}: FAILED -`, error.message);
       }
     }
-    
+
     return results;
   }
 
   async preloadAudio(audioKeys) {
-    const loadPromises = audioKeys.map(key => this.loadAudio(key));
+    const loadPromises = audioKeys.map((key) => this.loadAudio(key));
     const results = await Promise.allSettled(loadPromises);
-    
+
     // Log results
     results.forEach((result, index) => {
       const key = audioKeys[index];
-      if (result.status === 'fulfilled') {
+      if (result.status === "fulfilled") {
         console.log(`✓ Preloaded: ${key}`);
       } else {
         console.warn(`✗ Failed to preload: ${key}`, result.reason);
@@ -103,13 +107,14 @@ class AudioManager {
   }
 
   // Fallback audio generation using Web Audio API
-  createFallbackTone(frequency = 440, duration = 0.2, type = 'sine') {
-    if (typeof window === 'undefined' || !window.AudioContext) {
+  createFallbackTone(frequency = 440, duration = 0.2, type = "sine") {
+    if (typeof window === "undefined" || !window.AudioContext) {
       return null;
     }
 
     try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
       const gainNode = audioContext.createGain();
 
@@ -120,15 +125,21 @@ class AudioManager {
       oscillator.type = type;
 
       gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(this.volume * 0.3, audioContext.currentTime + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+      gainNode.gain.linearRampToValueAtTime(
+        this.volume * 0.3,
+        audioContext.currentTime + 0.01
+      );
+      gainNode.gain.exponentialRampToValueAtTime(
+        0.01,
+        audioContext.currentTime + duration
+      );
 
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + duration);
 
       return oscillator;
     } catch (error) {
-      console.warn('Failed to create fallback tone:', error);
+      console.warn("Failed to create fallback tone:", error);
       return null;
     }
   }
@@ -147,23 +158,23 @@ class AudioManager {
       }
 
       const audio = new Audio(audioPath);
-      audio.preload = 'auto';
+      audio.preload = "auto";
       audio.volume = this.volume;
-      
+
       // Add timeout for loading
       const timeout = setTimeout(() => {
         console.warn(`Audio loading timeout for: ${audioKey}`);
         reject(new Error(`Audio loading timeout: ${audioKey}`));
       }, 5000);
-      
-      audio.addEventListener('canplaythrough', () => {
+
+      audio.addEventListener("canplaythrough", () => {
         clearTimeout(timeout);
         this.audioCache.set(audioKey, audio);
         console.log(`Audio loaded successfully: ${audioKey}`);
         resolve(audio);
       });
-      
-      audio.addEventListener('loadeddata', () => {
+
+      audio.addEventListener("loadeddata", () => {
         // Fallback if canplaythrough doesn't fire
         if (!this.audioCache.has(audioKey)) {
           clearTimeout(timeout);
@@ -172,14 +183,14 @@ class AudioManager {
           resolve(audio);
         }
       });
-      
-      audio.addEventListener('error', (e) => {
+
+      audio.addEventListener("error", (e) => {
         clearTimeout(timeout);
         console.error(`Failed to load audio: ${audioKey}`, {
           error: e,
           path: audioPath,
           networkState: audio.networkState,
-          readyState: audio.readyState
+          readyState: audio.readyState,
         });
         reject(e);
       });
@@ -190,39 +201,39 @@ class AudioManager {
   }
 
   async playSound(audioKey, options = {}) {
-    if (!this.audioEnabled && audioKey !== 'soundToggle') {
+    if (!this.audioEnabled && audioKey !== "soundToggle") {
       return Promise.resolve();
     }
 
     try {
       let audio = this.audioCache.get(audioKey);
-      
+
       if (!audio) {
         console.log(`Loading audio for: ${audioKey}`);
         audio = await this.loadAudio(audioKey);
       }
-      
+
       // Clone audio for overlapping sounds
       const audioClone = audio.cloneNode();
       audioClone.volume = options.volume ?? this.volume;
-      
+
       if (options.loop) {
         audioClone.loop = true;
       }
 
       // Add error handling for the cloned audio
-      audioClone.addEventListener('error', (e) => {
+      audioClone.addEventListener("error", (e) => {
         console.warn(`Playback error for ${audioKey}:`, e);
       });
-      
+
       const playPromise = audioClone.play();
-      
+
       if (playPromise !== undefined) {
-        return playPromise.catch(error => {
+        return playPromise.catch((error) => {
           console.warn(`Audio play failed for ${audioKey}:`, error);
         });
       }
-      
+
       return audioClone;
     } catch (error) {
       console.warn(`Failed to play audio: ${audioKey}`, error);
@@ -233,15 +244,15 @@ class AudioManager {
 
   playFallbackTone(audioKey) {
     const toneMap = {
-      'buttonClick': { frequency: 800, duration: 0.1 },
-      'levelComplete': { frequency: 523, duration: 0.5 }, // C note
-      'resultGenerate': { frequency: 659, duration: 0.3 }, // E note
-      'reset': { frequency: 392, duration: 0.2 }, // G note
-      'moveToNewLevel': { frequency: 698, duration: 0.4 }, // F note
-      'score0to25': { frequency: 330, duration: 0.3 },
-      'score26to50': { frequency: 440, duration: 0.3 },
-      'score51to80': { frequency: 554, duration: 0.3 },
-      'score81to100': { frequency: 659, duration: 0.4 }
+      buttonClick: { frequency: 800, duration: 0.1 },
+      levelComplete: { frequency: 523, duration: 0.5 }, // C note
+      resultGenerate: { frequency: 659, duration: 0.3 }, // E note
+      reset: { frequency: 392, duration: 0.2 }, // G note
+      moveToNewLevel: { frequency: 698, duration: 0.4 }, // F note
+      score0to25: { frequency: 330, duration: 0.3 },
+      score26to50: { frequency: 440, duration: 0.3 },
+      score51to80: { frequency: 554, duration: 0.3 },
+      score81to100: { frequency: 659, duration: 0.4 },
     };
 
     const toneConfig = toneMap[audioKey] || { frequency: 440, duration: 0.2 };
@@ -250,27 +261,27 @@ class AudioManager {
 
   // Specific game action sounds
   async playButtonClick() {
-    await this.playSound('buttonClick', { volume: 0.5 });
+    await this.playSound("buttonClick", { volume: 0.5 });
   }
 
   async playLevelChange() {
-    await this.playSound('moveToNewLevel', { volume: 0.6 });
+    await this.playSound("moveToNewLevel", { volume: 0.6 });
   }
 
   async playLevelComplete() {
-    await this.playSound('levelComplete', { volume: 0.8 });
+    await this.playSound("levelComplete", { volume: 0.8 });
   }
 
   async playImageGenerated() {
-    await this.playSound('resultGenerate', { volume: 0.7 });
+    await this.playSound("resultGenerate", { volume: 0.7 });
   }
 
   async playReset() {
-    await this.playSound('reset', { volume: 0.6 });
+    await this.playSound("reset", { volume: 0.6 });
   }
 
   async playAccuracyDecrease() {
-    await this.playSound('accuracyGoingBack', { volume: 0.5 });
+    await this.playSound("accuracyGoingBack", { volume: 0.5 });
   }
 
   /**
@@ -283,16 +294,16 @@ class AudioManager {
 
     // Determine audio file and volume based on score ranges
     if (accuracy >= 81 && accuracy <= 100) {
-      audioKey = 'score81to100';    // Excellent! 🎉
+      audioKey = "score81to100"; // Excellent! 🎉
       volume = 0.8; // Loudest for excellent performance
     } else if (accuracy >= 51 && accuracy <= 80) {
-      audioKey = 'score51to80';     // Good job! 👍
+      audioKey = "score51to80"; // Good job! 👍
       volume = 0.7; // Good performance
     } else if (accuracy >= 26 && accuracy <= 50) {
-      audioKey = 'score26to50';     // Keep trying! 💪
+      audioKey = "score26to50"; // Keep trying! 💪
       volume = 0.6; // Average performance
     } else if (accuracy >= 0 && accuracy <= 25) {
-      audioKey = 'score0to25';      // Try again! 🤔
+      audioKey = "score0to25"; // Try again! 🤔
       volume = 0.5; // Quiet for poor performance
     }
 
@@ -304,10 +315,10 @@ class AudioManager {
     if (this.currentBackgroundAudio) {
       return; // Already playing
     }
-    
-    this.currentBackgroundAudio = await this.playSound('backgroundSound', { 
-      volume: 0.3, 
-      loop: true 
+
+    this.currentBackgroundAudio = await this.playSound("backgroundSound", {
+      volume: 0.3,
+      loop: true,
     });
   }
 
@@ -320,29 +331,29 @@ class AudioManager {
   }
 
   async toggleAudio() {
-    await this.playSound('soundToggle', { volume: 0.8 });
+    await this.playSound("soundToggle", { volume: 0.8 });
     this.audioEnabled = !this.audioEnabled;
-    localStorage.setItem('audioEnabled', JSON.stringify(this.audioEnabled));
-    
+    localStorage.setItem("audioEnabled", JSON.stringify(this.audioEnabled));
+
     if (!this.audioEnabled) {
       this.stopBackgroundMusic();
     } else {
       // Small delay before starting background music
       setTimeout(() => this.playBackgroundMusic(), 500);
     }
-    
+
     return this.audioEnabled;
   }
 
   setVolume(newVolume) {
     this.volume = Math.max(0, Math.min(1, newVolume));
-    localStorage.setItem('audioVolume', this.volume.toString());
-    
+    localStorage.setItem("audioVolume", this.volume.toString());
+
     // Update volume for cached audio
-    this.audioCache.forEach(audio => {
+    this.audioCache.forEach((audio) => {
       audio.volume = this.volume;
     });
-    
+
     if (this.currentBackgroundAudio) {
       this.currentBackgroundAudio.volume = this.volume * 0.3; // Background music is quieter
     }
@@ -351,16 +362,16 @@ class AudioManager {
   getAudioState() {
     return {
       enabled: this.audioEnabled,
-      volume: this.volume
+      volume: this.volume,
     };
   }
 
   // Clean up resources
   destroy() {
     this.stopBackgroundMusic();
-    this.audioCache.forEach(audio => {
+    this.audioCache.forEach((audio) => {
       audio.pause();
-      audio.src = '';
+      audio.src = "";
     });
     this.audioCache.clear();
   }
@@ -384,5 +395,5 @@ export const {
   stopBackgroundMusic,
   toggleAudio,
   setVolume,
-  getAudioState
+  getAudioState,
 } = audioManager;

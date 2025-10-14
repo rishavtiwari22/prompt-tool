@@ -2,7 +2,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Send } from 'lucide-react';
+import { RefreshCw, Send, Target } from 'lucide-react';
 import illustrationImage from '../assets/Frame 473.svg';
 import { compareImages } from '../utils/imageComparison';
 import { generateImageWithProgress } from '../utils/imageGeneration';
@@ -28,6 +28,9 @@ const Home = ({ currentLevel, onLevelChange }) => {
   const [showZoneToast, setShowZoneToast] = useState(false);
   const [showInfoToast, setShowInfoToast] = useState(false);
   const [previousAccuracy, setPreviousAccuracy] = useState(0);
+  
+  // Image loading states
+  const [imageLoadErrors, setImageLoadErrors] = useState({});
 
   // Target images for each level
   const targetImages = {
@@ -190,11 +193,42 @@ const Home = ({ currentLevel, onLevelChange }) => {
               }}
             >
               
-              <img
-                src={targetImages[currentLevel]}
-                alt={`Level ${currentLevel} target: ${levelDescriptions[currentLevel]}`}
-                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-              />
+              {!imageLoadErrors[currentLevel] ? (
+                <img
+                  src={targetImages[currentLevel]}
+                  alt={`Level ${currentLevel} target: ${levelDescriptions[currentLevel]}`}
+                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                  onError={(e) => {
+                    console.error(`Failed to load challenge image for level ${currentLevel}:`, e);
+                    setImageLoadErrors(prev => ({ ...prev, [currentLevel]: true }));
+                  }}
+                  onLoad={() => {
+                    console.log(`Challenge image loaded successfully for level ${currentLevel}`);
+                    setImageLoadErrors(prev => ({ ...prev, [currentLevel]: false }));
+                  }}
+                />
+              ) : (
+                <div 
+                  style={{
+                    width: '100%',
+                    height: '200px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'var(--color-primary-light)',
+                    border: '2px dashed var(--color-primary)',
+                    borderRadius: '8px',
+                    color: 'var(--color-primary-dark)'
+                  }}
+                >
+                  <Target size={48} style={{ marginBottom: '1rem', opacity: 0.6 }} />
+                  <p style={{ fontFamily: 'var(--font-body)', fontSize: '1rem', textAlign: 'center' }}>
+                    Challenge Image<br />
+                    <small>Level {currentLevel}</small>
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Accuracy Score Section */}
@@ -320,11 +354,43 @@ const Home = ({ currentLevel, onLevelChange }) => {
                 </>
               ) : (
                 <div>
-                  <img
-                    src={illustrationImage}
-                    alt="Prompt learning illustration"
-                    style={{ maxWidth: '280px', height: 'auto', marginBottom: '1.5rem' }}
-                  />
+                  {!imageLoadErrors.illustration ? (
+                    <img
+                      src={illustrationImage}
+                      alt="Prompt learning illustration"
+                      style={{ maxWidth: '280px', height: 'auto', marginBottom: '1.5rem' }}
+                      onError={(e) => {
+                        console.error('Failed to load illustration image:', e);
+                        setImageLoadErrors(prev => ({ ...prev, illustration: true }));
+                      }}
+                      onLoad={() => {
+                        console.log('Illustration image loaded successfully');
+                        setImageLoadErrors(prev => ({ ...prev, illustration: false }));
+                      }}
+                    />
+                  ) : (
+                    <div 
+                      style={{
+                        width: '280px',
+                        height: '200px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'var(--color-secondary-light)',
+                        border: '2px dashed var(--color-secondary)',
+                        borderRadius: '12px',
+                        color: 'var(--color-secondary-dark)',
+                        marginBottom: '1.5rem'
+                      }}
+                    >
+                      <Send size={48} style={{ marginBottom: '1rem', opacity: 0.6 }} />
+                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '1rem', textAlign: 'center' }}>
+                        Ready to Create<br />
+                        <small>Enter your prompt below</small>
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
