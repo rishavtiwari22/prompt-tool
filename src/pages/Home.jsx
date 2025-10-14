@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, Send } from 'lucide-react';
 import illustrationImage from '../assets/Frame 473.svg';
@@ -8,6 +5,7 @@ import { compareImages } from '../utils/imageComparison';
 import { generateImageWithProgress } from '../utils/imageGeneration';
 import { ZoneToast, InfoToast } from '../components/Toast';
 import audioManager from '../utils/audioManager';
+import ModalLevel from '../components/ModalLevel';
 
 // Import challenge images
 import challenge1Image from '../assets/challanges/challenge-1.png';
@@ -17,7 +15,22 @@ import challenge4Image from '../assets/challanges/challenge-4.png';
 import challenge5Image from '../assets/challanges/challenge-5.png';
 import challenge6Image from '../assets/challanges/challenge-6.png';
 
-const Home = ({ currentLevel, onLevelChange }) => {
+const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnlocked }) => {
+  // Use unlockedLevels and setLevelUnlocked from props, not local state
+
+  // Handler for Play button in modal
+  const handlePlayNextLevel = () => {
+    const nextLevel = currentLevel + 1;
+    if (typeof setLevelUnlocked === 'function') {
+      setLevelUnlocked(nextLevel); // Unlock next level globally
+    }
+    if (typeof onLevelChange === 'function') {
+      onLevelChange(nextLevel);    // Navigate to next level
+    }
+    setPrompt("");
+    setGeneratedImage(null);
+    setAccuracy(0);              // Close modal
+  };
   const [prompt, setPrompt] = useState('');
   const [accuracy, setAccuracy] = useState(0);
   const [generatedImage, setGeneratedImage] = useState(null);
@@ -36,6 +49,7 @@ const Home = ({ currentLevel, onLevelChange }) => {
     3: challenge3Image,
     4: challenge4Image,
     5: challenge5Image
+    // 6: challenge6Image // removed, not used
   };
 
   // Level descriptions
@@ -45,6 +59,7 @@ const Home = ({ currentLevel, onLevelChange }) => {
     3: "Challenge 3",
     4: "Challenge 4",
     5: "Challenge 5"
+    // 6: "Challenge 6" // removed, not used
   };
 
   const handleReset = async () => {
@@ -60,6 +75,7 @@ const Home = ({ currentLevel, onLevelChange }) => {
     setPreviousAccuracy(accuracy);
     setAccuracy(0);
     setGeneratedImage(null);
+    setPrompt("");
   };
 
   // Get progress bar color based on accuracy range
@@ -189,6 +205,26 @@ const Home = ({ currentLevel, onLevelChange }) => {
                 marginBottom: '2rem'
               }}
             >
+            {/* ModalLevel - Show when accuracy >= 70 */}
+            {accuracy >= 70 && (
+              <ModalLevel
+                onClose={() => {
+                  const nextLevel = currentLevel + 1;
+                  if (typeof setLevelUnlocked === 'function') {
+                    setLevelUnlocked(nextLevel);
+                  }
+                  if (typeof onLevelChange === 'function') {
+                    onLevelChange(nextLevel);
+                  }
+                  setPrompt("");
+                  setGeneratedImage(null);
+                  setAccuracy(0);
+                }}
+                onPlay={handlePlayNextLevel}
+                score={accuracy}
+                level={currentLevel}
+              />
+            )}
               
               <img
                 src={targetImages[currentLevel]}

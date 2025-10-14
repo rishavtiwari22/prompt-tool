@@ -1,0 +1,217 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  padding-top: 160px;
+  z-index: 1000;
+}
+
+.modal-level {
+  position: relative;
+  width: 928px;
+  height: 564px;
+  background: rgba(96, 94, 94, 1);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.modal-heading {
+  color: var(--Primary-Contrast, rgba(255,255,255,1));
+  text-align: center;
+  margin: 16px 0; 
+  font-family: var(--font-heading, 'Patrick Hand SC'), cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: var(--font-size-heading-large, 52px);
+  line-height: var(--line-height-heading-large, 130%);
+  letter-spacing: var(--letter-spacing-heading-large, -0.28px);
+}
+
+.modal-content {
+  display: flex;
+  gap: 20px;
+  padding: 0 28px 28px 28px;
+  height: calc(100% - 90px);
+  align-items: flex-start; 
+}
+
+.modal-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; 
+  padding-top: 32px; 
+}
+
+.image-section .product-image {
+  width: 307px;
+  height: 285px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #fff;
+  padding: 12px;
+  position: relative;
+}
+
+.stats-section {
+  color: #fff;
+  gap: 16px;
+  align-items: flex-start; 
+  text-align: left;
+  padding-left: 12px;
+}
+
+
+.badges {
+  display: flex;
+  gap: 24px; 
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stats-section p {
+  font-family: var(--font-body, 'Neucha'), cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 36px;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  color: var(--Primary-Contrast, rgba(255,255,255,1));
+  margin: 0;
+}
+
+.badge-label {
+  color: #fff;
+  font-weight: 600;
+}
+
+.badge-image {
+  width: 114.66062927246094px;
+  height: 162.2371826171875px;
+  object-fit: contain;
+}
+
+
+.score-text {
+  max-width: 240px;
+  width: 100%;
+  text-align: center;
+}
+
+
+.progress-container {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  position: relative;
+}
+
+.progress-track {
+  width: 455px; 
+  height: 16.00000762939453px; 
+  margin-top: 17px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 100px;
+  overflow: visible; 
+  position: relative; 
+  border: 3px solid var(--Accent-Contrast, rgba(46, 46, 46, 1)); 
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--Success-Main, rgba(34, 139, 34, 1));
+  border-radius: 100px 0 0 100px; 
+  transition: width 0.4s ease;
+  z-index: 2;
+}
+
+.progress-handle {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px; 
+  height: 32px;
+  background: #fff;
+  border-radius: 16px; 
+  border: 1px solid rgba(0,0,0,0.12);
+  z-index: 3;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+}
+
+.progress-handle-label {
+  position: absolute;
+  top: calc(100% + 14px); 
+  transform: translateX(-50%);
+  font-family: var(--font-heading, 'Patrick Hand SC'), cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  color: rgba(255, 255, 255, 1);
+  z-index: 3;
+  white-space: nowrap;
+}
+
+.progress-label {
+  font-family: var(--font-heading, 'Patrick Hand SC'), cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  color: rgba(255, 255, 255, 1);
+  align-self: center;
+}
+
+.play-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 191px; 
+  height: 54px; 
+  margin-top: 48px; 
+  background: var(--Primary-Light, rgba(227, 218, 250, 1));
+  color: rgba(115, 69, 228, 1);
+  border: 1px solid var(--Primary-Primary, rgba(115, 69, 228, 1));
+  border-radius: 8px;
+  font-family: 'Neucha', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  cursor: pointer;
+  padding: 0; 
+}
+
+.play-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+}

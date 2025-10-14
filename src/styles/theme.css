@@ -55,6 +55,31 @@
   --font-size-subtitle1: 20px;
   --line-height-subtitle1: 150%;
   --letter-spacing-subtitle1: -0.28px;
+
+  /* === ALIASES / COMPONENT-THEME === */
+  /* Primary / Accent aliases used by older components */
+  --Primary-Primary: var(--color-primary);
+  --Primary-Light: var(--color-primary-light);
+  --Primary-Contrast: var(--color-primary-contrast);
+  --Accent-Contrast: var(--color-accent-contrast);
+
+  /* Success alias */
+  --Success-Main: var(--color-success);
+
+  /* Heading and body sizes used by modal and components */
+  --font-size-heading-large: 52px;
+  --line-height-heading-large: 130%;
+  --letter-spacing-heading-large: -0.28px;
+
+  --font-size-body-large: 36px;
+  --line-height-body-large: 150%;
+  --letter-spacing-body-large: -0.28px;
+
+  /* Progress defaults */
+  --progress-width: 455px;
+  --progress-height: 16px;
+  --progress-border-width: 3px;
+  --progress-radius: 100px;
 }
 
 /* ===== BODY BACKGROUND PATTERN ===== */
@@ -96,6 +121,55 @@ h4, .h4 {
   letter-spacing: var(--letter-spacing-subtitle1);
 }
 
+/* ===== THEME UTILITY CLASSES (reusable) ===== */
+.heading-large {
+  font-family: var(--font-heading);
+  font-weight: 400;
+  font-style: normal;
+  font-size: var(--font-size-heading-large);
+  line-height: var(--line-height-heading-large);
+  letter-spacing: var(--letter-spacing-heading-large);
+  color: var(--Primary-Contrast);
+}
+
+.body-large {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-style: normal;
+  font-size: var(--font-size-body-large);
+  line-height: var(--line-height-body-large);
+  letter-spacing: var(--letter-spacing-body-large);
+  color: var(--Primary-Contrast);
+}
+
+.btn-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 191px;
+  height: 54px;
+  padding: 0;
+  border-radius: 8px;
+  background: var(--Primary-Light);
+  color: var(--Primary-Primary);
+  border: 1px solid var(--Primary-Primary);
+  font-family: var(--font-body);
+  font-size: 24px;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+}
+
+.progress-theme {
+  width: var(--progress-width);
+  max-width: 100%;
+  height: var(--progress-height);
+  border-radius: var(--progress-radius);
+  border: var(--progress-border-width) solid var(--Accent-Contrast);
+  background: rgba(255,255,255,0.04);
+  box-sizing: border-box;
+}
+
 /* ===== COMPONENT UTILITIES ===== */
 /* Prompt input placeholder styling */
 .input--prompt::placeholder {
@@ -110,11 +184,11 @@ h4, .h4 {
 }
 
 /* ===== DIVIDER UTILITIES ===== */
-.divider-vertical {
-  width: 2px;
-  height: 700%;
-  background-color: #000000 !important;
-  opacity: 0.25;
+.divider-horizontal {
+  /* full-bleed without causing horizontal scrollbars */
+  width: 100%;
+  height: var(--divider-thickness);
+  background-color: var(--color-divider);
 }
 
 .divider-vertical {

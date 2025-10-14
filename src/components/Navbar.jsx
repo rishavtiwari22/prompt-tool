@@ -14,7 +14,8 @@ import level3Icon from "../assets/3.svg";
 import level4Icon from "../assets/4.svg";
 import level5Icon from "../assets/5.svg";
 
-function Navbar({ currentLevel, onLevelChange }) {
+
+function Navbar({ currentLevel, onLevelChange, unlockedLevels = [1] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
 
@@ -73,24 +74,43 @@ function Navbar({ currentLevel, onLevelChange }) {
             {/* Center - Level buttons (Mobile) */}
             <div className="flex md:hidden items-center justify-center flex-1 mx-2 pt-3">
               <div className="flex items-center space-x-3">
-                {[1, 2, 3, 4, 5].map((level, idx) => (
-                  <button
-                    key={level}
-                    onClick={() => handleLevelChange(level)}
-                    className={`flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 hover:scale-105 ${
-                      level === currentLevel
-                        ? "bg-purple-50"
-                        : "bg-transparent hover:bg-gray-50"
-                    }`}
-                    style={{ willChange: "transform" }}
-                  >
-                    <img
-                      src={levelIcons[idx]}
-                      alt={`Level ${level}`}
-                      className="w-14 h-14"
-                    />
-                  </button>
-                ))}
+                {[1, 2, 3, 4, 5].map((level) => {
+                  const isUnlocked = unlockedLevels.includes(level);
+                  const isCurrent = level === currentLevel;
+                  const iconColor = isCurrent
+                    ? 'var(--Primary-Primary, rgba(115, 69, 228, 1))'
+                    : isUnlocked
+                    ? 'rgba(34, 139, 34, 1)'
+                    : 'rgba(130,130,130,1)';
+                  return (
+                    <button
+                      key={level}
+                      onClick={() => isUnlocked && onLevelChange && onLevelChange(level)}
+                      className="flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 hover:scale-105"
+                      style={{ willChange: 'transform' }}
+                      aria-disabled={!isUnlocked}
+                    >
+                      {/* icon as masked element so we can recolor via backgroundColor */}
+                      <span
+                        aria-hidden="true"
+                        className="w-14 h-14"
+                        style={{
+                          display: 'inline-block',
+                          backgroundColor: iconColor,
+                          WebkitMaskImage: `url(/src/assets/${level}.svg)`,
+                          maskImage: `url(/src/assets/${level}.svg)`,
+                          WebkitMaskSize: 'contain',
+                          maskSize: 'contain',
+                          WebkitMaskRepeat: 'no-repeat',
+                          maskRepeat: 'no-repeat',
+                          WebkitMaskPosition: 'center',
+                          maskPosition: 'center',
+                          opacity: isUnlocked ? 1 : 0.45
+                        }}
+                      />
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -119,79 +139,148 @@ function Navbar({ currentLevel, onLevelChange }) {
             {/* Center - Level buttons (Desktop) */}
             <div className="hidden md:flex items-center justify-center mx-2 sm:mx-4 justify-self-center">
               <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3 lg:space-x-4">
-                {[1, 2, 3, 4, 5].map((level, idx) => (
-                  <button
-                    key={level}
-                    onClick={() => handleLevelChange(level)}
-                    className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-lg transition-all duration-200 hover:scale-105 sm:hover:scale-110 ${
-                      level === currentLevel
-                        ? "bg-purple-50"
-                        : "bg-transparent hover:bg-gray-50"
-                    }`}
-                    style={{ willChange: "transform" }}
-                  >
-                    <img
-                      src={levelIcons[idx]}
-                      alt={`Level ${level}`}
-                      className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-18 lg:h-18"
-                    />
-                  </button>
-                ))}
+                {[1, 2, 3, 4, 5].map((level) => {
+                  const isUnlocked = unlockedLevels.includes(level);
+                  const isCurrent = level === currentLevel;
+                  const iconColor = isCurrent
+                    ? 'var(--Primary-Primary, rgba(115, 69, 228, 1))'
+                    : isUnlocked
+                    ? 'rgba(34, 139, 34, 1)'
+                    : 'rgba(130,130,130,1)';
+                  return (
+                    <button
+                      key={level}
+                      onClick={() => isUnlocked && handleLevelChange(level)}
+                      className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-lg transition-all duration-200 hover:scale-105 sm:hover:scale-110"
+                      style={{ willChange: 'transform' }}
+                      aria-disabled={!isUnlocked}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-18 lg:h-18"
+                        style={{
+                          display: 'inline-block',
+                          backgroundColor: iconColor,
+                          WebkitMaskImage: `url(/src/assets/${level}.svg)`,
+                          maskImage: `url(/src/assets/${level}.svg)`,
+                          WebkitMaskSize: 'contain',
+                          maskSize: 'contain',
+                          WebkitMaskRepeat: 'no-repeat',
+                          maskRepeat: 'no-repeat',
+                          WebkitMaskPosition: 'center',
+                          maskPosition: 'center',
+                          opacity: isUnlocked ? 1 : 0.45
+                        }}
+                      />
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Right side - Action buttons (Desktop) */}
-            <div className="hidden md:flex items-center space-x-1 sm:space-x-2 md:space-x-3 flex-shrink-0 justify-self-end">
-              {/* Audio Control */}
-              <AudioControl />
+            {/* Right side - User, Speaker, Rules (Hidden on mobile) */}
+            <div className="hidden md:flex items-center flex-shrink-0 space-x-4">
+              {/* User Icon */}
+             
 
-              {/* Rules button */}
+              {/* Speaker Icon with Audio Control */}
+              <div className="flex items-center space-x-2">
+                
+                <AudioControl />
+              </div>
+
+              {/* Rules Button */}
               <button
                 onClick={handleRulesToggle}
-                className="w-18 h-18 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-26 lg:h-26 rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-200"
-                style={{ willChange: "transform" }}
+                className="flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg transition-all duration-200 hover:bg-gray-200"
               >
                 <img
                   src={rulesIcon}
                   alt="Rules"
-                  className="w-18 h-18 sm:w-20 sm:h-20 md:w-22 md:h-22 lg:w-24 lg:h-24"
+                  className="w-5 h-5"
                 />
+                <span className="text-sm font-medium">Rules</span>
               </button>
             </div>
           </div>
         </nav>
 
-        {/* Mobile Menu Dropdown */}
+        {/* Mobile Menu - Levels and Rules */}
         {isMenuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg md:hidden z-50 pt-3">
-            <div className="px-4 py-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-4 text-center">
-                Actions
-              </h3>
-              <div className="flex flex-col items-center space-y-4">
-                {/* Audio Control */}
-                <AudioControl className="flex-col space-y-2 space-x-0" />
-
-                {/* Rules button */}
+          <div className="absolute top-0 left-0 w-full bg-white shadow-lg z-50">
+            <div className="px-4 py-2">
+              {/* Close button */}
+              <div className="flex justify-end">
                 <button
-                  className="w-24 h-24 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
-                  onClick={async () => {
-                    await audioManager.playButtonClick();
-                    setIsMenuOpen(false);
-                    setIsRulesOpen(true);
-                  }}
-                  style={{ willChange: "transform" }}
+                  onClick={handleMenuToggle}
+                  className="text-gray-600"
                 >
-                  <img src={rulesIcon} alt="Rules" className="w-20 h-20" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
                 </button>
               </div>
+
+              {/* Level buttons - stacked layout for mobile */}
+              <div className="grid grid-cols-3 gap-4 py-4">
+                {[1, 2, 3, 4, 5].map((level) => {
+                  const isUnlocked = unlockedLevels.includes(level);
+                  const isCurrent = level === currentLevel;
+                  const iconColor = isCurrent
+                    ? 'var(--Primary-Primary, rgba(115, 69, 228, 1))'
+                    : isUnlocked
+                    ? 'rgba(34, 139, 34, 1)'
+                    : 'rgba(130,130,130,1)';
+                  return (
+                    <button
+                      key={level}
+                      onClick={() => isUnlocked && onLevelChange && onLevelChange(level)}
+                      className="flex items-center justify-center w-full h-16 rounded-lg transition-all duration-200 hover:scale-105"
+                      style={{ willChange: 'transform' }}
+                      aria-disabled={!isUnlocked}
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="w-10 h-10"
+                        style={{
+                          display: 'inline-block',
+                          backgroundColor: iconColor,
+                          WebkitMaskImage: `url(/src/assets/${level}.svg)`,
+                          maskImage: `url(/src/assets/${level}.svg)`,
+                          WebkitMaskSize: 'contain',
+                          maskSize: 'contain',
+                          WebkitMaskRepeat: 'no-repeat',
+                          maskRepeat: 'no-repeat',
+                          WebkitMaskPosition: 'center',
+                          maskPosition: 'center',
+                          opacity: isUnlocked ? 1 : 0.45
+                        }}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Rules button (stacked under levels) */}
+              
             </div>
           </div>
         )}
-      </div>
 
-      {/* Rules Modal */}
-      <RulesModal isOpen={isRulesOpen} onClose={() => setIsRulesOpen(false)} />
+        {/* Rules Modal */}
+        {isRulesOpen && <RulesModal onClose={handleRulesToggle} />}
+      </div>
     </>
   );
 }
