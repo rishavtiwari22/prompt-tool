@@ -31,11 +31,8 @@ const LandingPage = ({ onStartGame }) => {
     setIsStarting(true);
 
     try {
-      // Start background music and button sound
-      await Promise.all([
-        audioManager.playButtonClick(),
-        audioManager.playBackgroundMusic(),
-      ]);
+      // Play button click sound
+      await audioManager.playButtonClick();
 
       // Smooth transition delay
       setTimeout(() => {

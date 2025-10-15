@@ -4,13 +4,10 @@
 class AudioManager {
   constructor() {
     this.audioEnabled = true;
-    this.volume = 0.7;
     this.audioCache = new Map();
-    this.currentBackgroundAudio = null;
 
     // Audio file mappings - using public folder paths for deployment
     this.audioFiles = {
-      backgroundSound: "/audio/backgroundSound.mp3",
       buttonClick: "/audio/ButtonClick.mp3",
       levelComplete: "/audio/Level-completion.mp3",
       moveToNewLevel: "/audio/Move-to-new_level.mp3",
@@ -33,11 +30,6 @@ class AudioManager {
     const savedPreference = localStorage.getItem("audioEnabled");
     if (savedPreference !== null) {
       this.audioEnabled = JSON.parse(savedPreference);
-    }
-
-    const savedVolume = localStorage.getItem("audioVolume");
-    if (savedVolume !== null) {
-      this.volume = parseFloat(savedVolume);
     }
 
     // Test audio file accessibility
@@ -126,7 +118,7 @@ class AudioManager {
 
       gainNode.gain.setValueAtTime(0, audioContext.currentTime);
       gainNode.gain.linearRampToValueAtTime(
-        this.volume * 0.3,
+        0.21, // Fixed volume: 0.7 * 0.3
         audioContext.currentTime + 0.01
       );
       gainNode.gain.exponentialRampToValueAtTime(
@@ -159,7 +151,7 @@ class AudioManager {
 
       const audio = new Audio(audioPath);
       audio.preload = "auto";
-      audio.volume = this.volume;
+      audio.volume = 0.7; // Fixed default volume
 
       // Add timeout for loading
       const timeout = setTimeout(() => {
@@ -215,7 +207,7 @@ class AudioManager {
 
       // Clone audio for overlapping sounds
       const audioClone = audio.cloneNode();
-      audioClone.volume = options.volume ?? this.volume;
+      audioClone.volume = options.volume ?? 0.7; // Fixed default volume
 
       if (options.loop) {
         audioClone.loop = true;
@@ -311,64 +303,22 @@ class AudioManager {
     await this.playSound(audioKey, { volume });
   }
 
-  async playBackgroundMusic() {
-    if (this.currentBackgroundAudio) {
-      return; // Already playing
-    }
-
-    this.currentBackgroundAudio = await this.playSound("backgroundSound", {
-      volume: 0.3,
-      loop: true,
-    });
-  }
-
-  stopBackgroundMusic() {
-    if (this.currentBackgroundAudio) {
-      this.currentBackgroundAudio.pause();
-      this.currentBackgroundAudio.currentTime = 0;
-      this.currentBackgroundAudio = null;
-    }
-  }
-
   async toggleAudio() {
     await this.playSound("soundToggle", { volume: 0.8 });
     this.audioEnabled = !this.audioEnabled;
     localStorage.setItem("audioEnabled", JSON.stringify(this.audioEnabled));
 
-    if (!this.audioEnabled) {
-      this.stopBackgroundMusic();
-    } else {
-      // Small delay before starting background music
-      setTimeout(() => this.playBackgroundMusic(), 500);
-    }
-
     return this.audioEnabled;
-  }
-
-  setVolume(newVolume) {
-    this.volume = Math.max(0, Math.min(1, newVolume));
-    localStorage.setItem("audioVolume", this.volume.toString());
-
-    // Update volume for cached audio
-    this.audioCache.forEach((audio) => {
-      audio.volume = this.volume;
-    });
-
-    if (this.currentBackgroundAudio) {
-      this.currentBackgroundAudio.volume = this.volume * 0.3; // Background music is quieter
-    }
   }
 
   getAudioState() {
     return {
       enabled: this.audioEnabled,
-      volume: this.volume,
     };
   }
 
   // Clean up resources
   destroy() {
-    this.stopBackgroundMusic();
     this.audioCache.forEach((audio) => {
       audio.pause();
       audio.src = "";
@@ -385,15 +335,14 @@ export default audioManager;
 // Export individual functions for convenience
 export const {
   playButtonClick,
-  playLevelChange,
   playLevelComplete,
+  playMoveToNewLevel,
   playImageGenerated,
   playReset,
-  playAccuracyDecrease,
+  playAccuracyGoingBack,
+  playSoundToggle,
+  testAudioAccessibility,
   playScoreBasedFeedback,
-  playBackgroundMusic,
-  stopBackgroundMusic,
   toggleAudio,
-  setVolume,
   getAudioState,
 } = audioManager;
