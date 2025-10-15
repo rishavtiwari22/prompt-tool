@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import audioManager from "../utils/audioManager";
 import speakerIcon from "../assets/speaker.svg";
+import offSpeakerIcon from "../assets/offspeaker.svg";
 
 const AudioControl = ({ className = "" }) => {
   const [audioEnabled, setAudioEnabled] = useState(true);
@@ -47,11 +48,9 @@ const AudioControl = ({ className = "" }) => {
         style={{ willChange: "transform" }}
       >
         <img 
-          src={speakerIcon} 
+          src={audioEnabled ? speakerIcon : offSpeakerIcon} 
           alt={audioEnabled ? "Sound On" : "Sound Off"}
-          className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 lg:w-9 lg:h-9 transition-all duration-200 ${
-            audioEnabled ? "opacity-100" : "opacity-50 grayscale"
-          }`}
+          className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 lg:w-9 lg:h-9 transition-all duration-200"
         />
       </button>
     </div>

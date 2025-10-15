@@ -14,7 +14,7 @@ import level3Icon from "../assets/3.svg";
 import level4Icon from "../assets/4.svg";
 import level5Icon from "../assets/5.svg";
 
-function Navbar({ currentLevel, onLevelChange, unlockedLevels = [1] }) {
+function Navbar({ currentLevel, onLevelChange, unlockedLevels = [1], completedLevels = [] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
 
@@ -81,29 +81,58 @@ function Navbar({ currentLevel, onLevelChange, unlockedLevels = [1] }) {
               <div className="flex items-center space-x-3">
                 {[1, 2, 3, 4, 5].map((level, idx) => {
                   const isUnlocked = unlockedLevels.includes(level);
+                  const isCompleted = completedLevels.includes(level);
+                  const isActive = level === currentLevel;
+                  
+                  // Determine icon color filter
+                  let iconFilter = 'none';
+                  if (isActive && isUnlocked) {
+                    // Purple for active level: rgba(115, 69, 228, 1)
+                    iconFilter = 'brightness(0) saturate(100%) invert(28%) sepia(74%) saturate(2447%) hue-rotate(246deg) brightness(90%) contrast(91%)';
+                  } else if (isCompleted) {
+                    // Green for completed: rgba(34, 139, 34, 1)
+                    iconFilter = 'brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(556%) hue-rotate(81deg) brightness(94%) contrast(88%)';
+                  }
+                  
                   return (
-                    <button
-                      key={level}
-                      onClick={() => handleLevelChange(level)}
-                      className={`flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 hover:scale-105 ${
-                        level === currentLevel
-                          ? "bg-purple-50"
-                          : "bg-transparent hover:bg-gray-50"
-                      }`}
-                      style={{ willChange: "transform" }}
-                      aria-disabled={!isUnlocked}
-                      disabled={!isUnlocked}
-                    >
-                      <img
-                        src={levelIcons[idx]}
-                        alt={`Level ${level}`}
-                        className="w-14 h-14"
+                    <div key={level} className="flex flex-col items-center">
+                      <span
+                        className="text-sm sm:text-base md:text-lg lg:text-xl"
                         style={{
-                          opacity: isUnlocked ? 1 : 0.45,
-                          pointerEvents: isUnlocked ? "auto" : "none"
+                          fontFamily: "'Patrick Hand SC', cursive",
+                          fontWeight: 400,
+                          fontStyle: 'normal',
+                          lineHeight: '1',
+                          letterSpacing: '-0.28px',
+                          textAlign: 'center',
+                          color: isUnlocked ? 'rgba(0, 0, 0, 1)' : 'var(--Text-Icon, rgba(130, 130, 130, 1))',
+                          marginBottom: '-7px'
                         }}
-                      />
-                    </button>
+                      >
+                        Level
+                      </span>
+                      <button
+                        onClick={() => handleLevelChange(level)}
+                        className={`flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 ${
+                          isUnlocked ? "hover:scale-105 hover:bg-purple-50" : ""
+                        }`}
+                        style={{ willChange: "transform" }}
+                        aria-disabled={!isUnlocked}
+                        disabled={!isUnlocked}
+                      >
+                        <img
+                          src={levelIcons[idx]}
+                          alt={`Level ${level}`}
+                          className="w-14 h-14"
+                          style={{
+                            opacity: isUnlocked ? 1 : 0.45,
+                            pointerEvents: isUnlocked ? "auto" : "none",
+                            filter: iconFilter,
+                            transition: 'filter 0.3s ease'
+                          }}
+                        />
+                      </button>
+                    </div>
                   );
                 })}
               </div>
@@ -136,29 +165,58 @@ function Navbar({ currentLevel, onLevelChange, unlockedLevels = [1] }) {
               <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3 lg:space-x-4">
                 {[1, 2, 3, 4, 5].map((level, idx) => {
                   const isUnlocked = unlockedLevels.includes(level);
+                  const isCompleted = completedLevels.includes(level);
+                  const isActive = level === currentLevel;
+                  
+                  // Determine icon color filter
+                  let iconFilter = 'none';
+                  if (isActive && isUnlocked) {
+                    // Purple for active level: rgba(115, 69, 228, 1)
+                    iconFilter = 'brightness(0) saturate(100%) invert(28%) sepia(74%) saturate(2447%) hue-rotate(246deg) brightness(90%) contrast(91%)';
+                  } else if (isCompleted) {
+                    // Green for completed: rgba(34, 139, 34, 1)
+                    iconFilter = 'brightness(0) saturate(100%) invert(42%) sepia(93%) saturate(556%) hue-rotate(81deg) brightness(94%) contrast(88%)';
+                  }
+                  
                   return (
-                    <button
-                      key={level}
-                      onClick={() => handleLevelChange(level)}
-                      className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-lg transition-all duration-200 hover:scale-105 sm:hover:scale-110 ${
-                        level === currentLevel
-                          ? "bg-purple-50"
-                          : "bg-transparent hover:bg-gray-50"
-                      }`}
-                      style={{ willChange: "transform" }}
-                      aria-disabled={!isUnlocked}
-                      disabled={!isUnlocked}
-                    >
-                      <img
-                        src={levelIcons[idx]}
-                        alt={`Level ${level}`}
-                        className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-18 lg:h-18"
+                    <div key={level} className="flex flex-col items-center">
+                      <span
+                        className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl"
                         style={{
-                          opacity: isUnlocked ? 1 : 0.45,
-                          pointerEvents: isUnlocked ? "auto" : "none"
+                          fontFamily: "'Patrick Hand SC', cursive",
+                          fontWeight: 400,
+                          fontStyle: 'normal',
+                          lineHeight: '1',
+                          letterSpacing: '-0.28px',
+                          textAlign: 'center',
+                          color: isUnlocked ? 'rgba(0, 0, 0, 1)' : 'var(--Text-Icon, rgba(130, 130, 130, 1))',
+                          marginBottom: '-6px'
                         }}
-                      />
-                    </button>
+                      >
+                        Level
+                      </span>
+                      <button
+                        onClick={() => handleLevelChange(level)}
+                        className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-lg transition-all duration-200 ${
+                          isUnlocked ? "hover:scale-105 sm:hover:scale-110 hover:bg-purple-50" : ""
+                        }`}
+                        style={{ willChange: "transform" }}
+                        aria-disabled={!isUnlocked}
+                        disabled={!isUnlocked}
+                      >
+                        <img
+                          src={levelIcons[idx]}
+                          alt={`Level ${level}`}
+                          className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-18 lg:h-18"
+                          style={{
+                            opacity: isUnlocked ? 1 : 0.45,
+                            pointerEvents: isUnlocked ? "auto" : "none",
+                            filter: iconFilter,
+                            transition: 'filter 0.3s ease'
+                          }}
+                        />
+                      </button>
+                    </div>
                   );
                 })}
               </div>

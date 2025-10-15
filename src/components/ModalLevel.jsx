@@ -40,7 +40,9 @@ const ModalLevel = ({ onClose, score = 80, onPlay, level = 1 }) => {
               <div
                 className="progress-handle-label"
                 style={{ left: `${score}%` }}
-              >{score}%</div>
+              >
+              {score}%
+              </div>
             </div>
 
             <button className="play-button" onClick={onPlay}>

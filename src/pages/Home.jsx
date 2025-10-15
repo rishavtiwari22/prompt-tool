@@ -15,21 +15,42 @@ import challenge4Image from '../assets/challanges/challenge-4.png';
 import challenge5Image from '../assets/challanges/challenge-5.png';
 import challenge6Image from '../assets/challanges/challenge-6.png';
 
-const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnlocked }) => {
+const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnlocked, completedLevels = [], setLevelCompleted }) => {
   // Use unlockedLevels and setLevelUnlocked from props, not local state
 
   // Handler for Play button in modal
-  const handlePlayNextLevel = () => {
+  const handlePlayNextLevel = async () => {
+    console.log('Play button clicked, current level:', currentLevel);
     const nextLevel = currentLevel + 1;
-    if (typeof setLevelUnlocked === 'function') {
-      setLevelUnlocked(nextLevel); // Unlock next level globally
+    const maxLevel = 5; // Maximum available levels
+    
+    // Mark current level as completed
+    if (typeof setLevelCompleted === 'function') {
+      setLevelCompleted(currentLevel);
     }
-    if (typeof onLevelChange === 'function') {
-      onLevelChange(nextLevel);    // Navigate to next level
+    
+    // Check if next level exists
+    if (nextLevel > maxLevel) {
+      console.log('No more levels available');
+      setAccuracy(0); // Just close the modal
+      return;
     }
+    
+    // Play button click sound
+    await audioManager.playButtonClick();
+    
+    // Clear states first
     setPrompt("");
     setGeneratedImage(null);
-    setAccuracy(0);              // Close modal
+    setAccuracy(0);
+    
+    // Unlock and navigate to next level
+    if (typeof setLevelUnlocked === 'function') {
+      setLevelUnlocked(nextLevel);
+    }
+    if (typeof onLevelChange === 'function') {
+      onLevelChange(nextLevel);
+    }
   };
   const [prompt, setPrompt] = useState('');
   const [accuracy, setAccuracy] = useState(0);
