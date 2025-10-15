@@ -65,7 +65,7 @@ function Navbar({ currentLevel, onLevelChange, unlockedLevels = [1] }) {
             {/* Left side - Logo/Icon (Hidden on mobile) */}
             <div className="hidden md:flex items-center flex-shrink-0">
               <div
-                className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-22 lg:h-22 bg-gray-100 rounded-lg flex items-center justify-center"
+                className="w-16 h-16 sm:w-18 sm:h-18 md:w-20 md:h-20 lg:w-22 lg:h-22 bg-white rounded-lg flex items-center justify-center"
                 style={{ willChange: "transform" }}
               >
                 <img
