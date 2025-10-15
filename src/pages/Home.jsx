@@ -5,6 +5,7 @@ import { compareImages } from '../utils/imageComparison';
 import { generateImageWithProgress } from '../utils/imageGeneration';
 import { ZoneToast, InfoToast } from '../components/Toast';
 import audioManager from '../utils/audioManager';
+import ModalLevel from '../components/ModalLevel';
 
 // Import challenge images
 import challenge1Image from '../assets/challanges/challenge-1.png';
@@ -14,30 +15,28 @@ import challenge4Image from '../assets/challanges/challenge-4.png';
 import challenge5Image from '../assets/challanges/challenge-5.png';
 import challenge6Image from '../assets/challanges/challenge-6.png';
 
-// Loading dots animation component
-const LoadingDots = () => {
-  const [dots, setDots] = useState('');
+const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnlocked }) => {
+  // Use unlockedLevels and setLevelUnlocked from props, not local state
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setDots(prev => {
-        if (prev === '...') return '';
-        return prev + '.';
-      });
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  return <span>{dots}</span>;
-};
-
-const Home = ({ currentLevel, onLevelChange }) => {
+  // Handler for Play button in modal
+  const handlePlayNextLevel = () => {
+    const nextLevel = currentLevel + 1;
+    if (typeof setLevelUnlocked === 'function') {
+      setLevelUnlocked(nextLevel); // Unlock next level globally
+    }
+    if (typeof onLevelChange === 'function') {
+      onLevelChange(nextLevel);    // Navigate to next level
+    }
+    setPrompt("");
+    setGeneratedImage(null);
+    setAccuracy(0);              // Close modal
+  };
   const [prompt, setPrompt] = useState('');
   const [accuracy, setAccuracy] = useState(0);
   const [generatedImage, setGeneratedImage] = useState(null);
   const [isComparing, setIsComparing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isModalPreviewOpen, setIsModalPreviewOpen] = useState(false);
 
   // Simple toast states
   const [showZoneToast, setShowZoneToast] = useState(false);
@@ -54,6 +53,7 @@ const Home = ({ currentLevel, onLevelChange }) => {
     3: challenge3Image,
     4: challenge4Image,
     5: challenge5Image
+    // 6: challenge6Image // removed, not used
   };
 
   // Level descriptions
@@ -63,6 +63,7 @@ const Home = ({ currentLevel, onLevelChange }) => {
     3: "Challenge 3",
     4: "Challenge 4",
     5: "Challenge 5"
+    // 6: "Challenge 6" // removed, not used
   };
 
   const handleReset = async () => {
@@ -78,6 +79,7 @@ const Home = ({ currentLevel, onLevelChange }) => {
     setPreviousAccuracy(accuracy);
     setAccuracy(0);
     setGeneratedImage(null);
+    setPrompt("");
   };
 
   // Get progress bar color based on accuracy range
@@ -161,6 +163,19 @@ const Home = ({ currentLevel, onLevelChange }) => {
   return (
     <div className="px-6 md:px-10">
       <div className="max-w-7xl mx-auto">
+        {/* Quick button to preview ModalLevel */}
+        <div className="flex justify-end mb-4">
+          <button
+            className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-purple-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
+            onClick={async () => {
+              await audioManager.playButtonClick();
+              setIsModalPreviewOpen(true);
+            }}
+          >
+            Preview Level Modal
+          </button>
+        </div>
+
         {/* Center guide to align levels between the two boxes */}
         <div
           className="hidden lg:block"
@@ -207,6 +222,36 @@ const Home = ({ currentLevel, onLevelChange }) => {
                 marginBottom: '2rem'
               }}
             >
+            {/* ModalLevel - Show when accuracy >= 70 */}
+            {accuracy >= 70 && (
+              <ModalLevel
+                onClose={() => {
+                  const nextLevel = currentLevel + 1;
+                  if (typeof setLevelUnlocked === 'function') {
+                    setLevelUnlocked(nextLevel);
+                  }
+                  if (typeof onLevelChange === 'function') {
+                    onLevelChange(nextLevel);
+                  }
+                  setPrompt("");
+                  setGeneratedImage(null);
+                  setAccuracy(0);
+                }}
+                onPlay={handlePlayNextLevel}
+                score={accuracy}
+                level={currentLevel}
+              />
+            )}
+
+            {/* ModalLevel preview toggle */}
+            {isModalPreviewOpen && (
+              <ModalLevel
+                onClose={() => setIsModalPreviewOpen(false)}
+                onPlay={() => setIsModalPreviewOpen(false)}
+                score={accuracy || 80}
+                level={currentLevel}
+              />
+            )}
               
               {!imageLoadErrors[currentLevel] ? (
                 <img

@@ -14,13 +14,16 @@ import level3Icon from "../assets/3.svg";
 import level4Icon from "../assets/4.svg";
 import level5Icon from "../assets/5.svg";
 
-function Navbar({ currentLevel, onLevelChange }) {
+function Navbar({ currentLevel, onLevelChange, unlockedLevels = [1] }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRulesOpen, setIsRulesOpen] = useState(false);
 
+  // Only handle currentLevel change for unlocked levels
   const handleLevelChange = async (level) => {
-    await audioManager.playLevelChange();
-    onLevelChange && onLevelChange(level);
+    if (unlockedLevels.includes(level)) {
+      await audioManager.playLevelChange();
+      onLevelChange && onLevelChange(level);
+    }
   };
 
   const handleMenuToggle = async () => {
@@ -48,12 +51,15 @@ function Navbar({ currentLevel, onLevelChange }) {
         className="relative"
         style={{ overflow: isMenuOpen ? "visible" : "hidden" }}
       >
-        <nav className="bg-transparent py-2 sm:py-3">
+        <nav
+          className="bg-transparent py-2 sm:py-3"
+          style={{ backgroundColor: "rgba(255, 255, 255, 1)" }}
+        >
           <div
             className="w-full px-3 sm:px-6 lg:px-10 grid items-center gap-4 sm:gap-6 md:gap-8"
             style={{
               gridTemplateColumns: "1fr auto 1fr",
-              overflow: "visible", // Allow children to be visible but parent clips
+              overflow: "visible",
             }}
           >
             {/* Left side - Logo/Icon (Hidden on mobile) */}
@@ -73,24 +79,33 @@ function Navbar({ currentLevel, onLevelChange }) {
             {/* Center - Level buttons (Mobile) */}
             <div className="flex md:hidden items-center justify-center flex-1 mx-2 pt-3">
               <div className="flex items-center space-x-3">
-                {[1, 2, 3, 4, 5].map((level, idx) => (
-                  <button
-                    key={level}
-                    onClick={() => handleLevelChange(level)}
-                    className={`flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 hover:scale-105 ${
-                      level === currentLevel
-                        ? "bg-purple-50"
-                        : "bg-transparent hover:bg-gray-50"
-                    }`}
-                    style={{ willChange: "transform" }}
-                  >
-                    <img
-                      src={levelIcons[idx]}
-                      alt={`Level ${level}`}
-                      className="w-14 h-14"
-                    />
-                  </button>
-                ))}
+                {[1, 2, 3, 4, 5].map((level, idx) => {
+                  const isUnlocked = unlockedLevels.includes(level);
+                  return (
+                    <button
+                      key={level}
+                      onClick={() => handleLevelChange(level)}
+                      className={`flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 hover:scale-105 ${
+                        level === currentLevel
+                          ? "bg-purple-50"
+                          : "bg-transparent hover:bg-gray-50"
+                      }`}
+                      style={{ willChange: "transform" }}
+                      aria-disabled={!isUnlocked}
+                      disabled={!isUnlocked}
+                    >
+                      <img
+                        src={levelIcons[idx]}
+                        alt={`Level ${level}`}
+                        className="w-14 h-14"
+                        style={{
+                          opacity: isUnlocked ? 1 : 0.45,
+                          pointerEvents: isUnlocked ? "auto" : "none"
+                        }}
+                      />
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -119,33 +134,40 @@ function Navbar({ currentLevel, onLevelChange }) {
             {/* Center - Level buttons (Desktop) */}
             <div className="hidden md:flex items-center justify-center mx-2 sm:mx-4 justify-self-center">
               <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-3 lg:space-x-4">
-                {[1, 2, 3, 4, 5].map((level, idx) => (
-                  <button
-                    key={level}
-                    onClick={() => handleLevelChange(level)}
-                    className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-lg transition-all duration-200 hover:scale-105 sm:hover:scale-110 ${
-                      level === currentLevel
-                        ? "bg-purple-50"
-                        : "bg-transparent hover:bg-gray-50"
-                    }`}
-                    style={{ willChange: "transform" }}
-                  >
-                    <img
-                      src={levelIcons[idx]}
-                      alt={`Level ${level}`}
-                      className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-18 lg:h-18"
-                    />
-                  </button>
-                ))}
+                {[1, 2, 3, 4, 5].map((level, idx) => {
+                  const isUnlocked = unlockedLevels.includes(level);
+                  return (
+                    <button
+                      key={level}
+                      onClick={() => handleLevelChange(level)}
+                      className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 rounded-lg transition-all duration-200 hover:scale-105 sm:hover:scale-110 ${
+                        level === currentLevel
+                          ? "bg-purple-50"
+                          : "bg-transparent hover:bg-gray-50"
+                      }`}
+                      style={{ willChange: "transform" }}
+                      aria-disabled={!isUnlocked}
+                      disabled={!isUnlocked}
+                    >
+                      <img
+                        src={levelIcons[idx]}
+                        alt={`Level ${level}`}
+                        className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 lg:w-18 lg:h-18"
+                        style={{
+                          opacity: isUnlocked ? 1 : 0.45,
+                          pointerEvents: isUnlocked ? "auto" : "none"
+                        }}
+                      />
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Right side - Action buttons (Desktop) */}
             <div className="hidden md:flex items-center space-x-1 sm:space-x-2 md:space-x-3 flex-shrink-0 justify-self-end">
-              {/* Audio Control */}
               <AudioControl />
 
-              {/* Rules button */}
               <button
                 onClick={handleRulesToggle}
                 className="w-18 h-18 sm:w-20 sm:h-20 md:w-24 md:h-24 lg:w-26 lg:h-26 rounded-lg flex items-center justify-center hover:scale-105 transition-all duration-200"
@@ -169,10 +191,8 @@ function Navbar({ currentLevel, onLevelChange }) {
                 Actions
               </h3>
               <div className="flex flex-col items-center space-y-4">
-                {/* Audio Control */}
                 <AudioControl className="flex-col space-y-2 space-x-0" />
 
-                {/* Rules button */}
                 <button
                   className="w-24 h-24 rounded-lg flex items-center justify-center hover:bg-gray-50 transition-colors"
                   onClick={async () => {

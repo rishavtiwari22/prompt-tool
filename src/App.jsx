@@ -8,13 +8,25 @@ import AudioDebugger from './components/AudioDebugger';
 function App() {
   const [currentLevel, setCurrentLevel] = useState(1);
   const [gameStarted, setGameStarted] = useState(false);
+  const [unlockedLevels, setUnlockedLevels] = useState([1]);
 
   const handleLevelChange = (level) => {
+    if (!unlockedLevels.includes(level)) return;
     setCurrentLevel(level);
+
   };
 
   const handleStartGame = () => {
     setGameStarted(true);
+  };
+
+  const setLevelUnlocked = (level) => {
+    setUnlockedLevels((prev) => {
+      if (prev.includes(level)) return prev;
+      const updated = [...prev, level].sort((a, b) => a - b);
+      setCurrentLevel(level);
+      return updated;
+    });
   };
 
   return (
@@ -23,7 +35,7 @@ function App() {
         <LandingPage onStartGame={handleStartGame} />
       ) : (
         <>
-          <Header currentLevel={currentLevel} onLevelChange={handleLevelChange} />
+          <Header currentLevel={currentLevel} onLevelChange={handleLevelChange} unlockedLevels={unlockedLevels} />
           {/* PaperCSS-style thick horizontal divider matching Figma */}
           <hr 
             className="border-primary" 
@@ -36,7 +48,7 @@ function App() {
             }} 
           />
           <Routes>
-            <Route path="/" element={<Home currentLevel={currentLevel} onLevelChange={handleLevelChange} />} />
+            <Route path="/" element={<Home currentLevel={currentLevel} onLevelChange={handleLevelChange} unlockedLevels={unlockedLevels} setLevelUnlocked={setLevelUnlocked} />} />
           </Routes>
         </>
       )}

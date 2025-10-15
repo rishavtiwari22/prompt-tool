@@ -1,0 +1,364 @@
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  padding: 120px 24px 48px;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.modal-level {
+  position: relative;
+  width: 928px;
+  height: 564px;
+  background: rgba(96, 94, 94, 1);
+  border: 4px solid #000000;
+  border-radius: 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  transform: rotate(0deg);
+  opacity: 1;
+}
+
+.modal-heading {
+  color: var(--Primary-Contrast, rgba(255,255,255,1));
+  text-align: center;
+  margin: 16px 0; 
+  font-family: var(--font-heading, 'Patrick Hand SC'), cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: var(--font-size-heading-large, 52px);
+  line-height: var(--line-height-heading-large, 130%);
+  letter-spacing: var(--letter-spacing-heading-large, -0.28px);
+}
+
+.modal-content {
+  display: flex;
+  gap: 20px;
+  padding: 0 28px 28px 28px;
+  align-items: flex-start; 
+  flex-wrap: wrap;
+}
+
+.modal-section {
+  flex: 0 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 32px;
+}
+
+.image-section {
+  flex: 0 0 clamp(280px, 42%, 340px);
+  max-width: clamp(280px, 42%, 340px);
+}
+
+.image-section .product-image {
+  width: clamp(220px, 48vw, 307px);
+  height: clamp(205px, 44vw, 285px);
+  object-fit: cover;
+  border-radius: 0;
+  border: 2px solid #000000;
+  background: #fff;
+  padding: 12px;
+  position: relative;
+}
+
+.stats-section {
+  flex: 1 1 58%;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  gap: 16px;
+  align-items: flex-start;
+  text-align: left;
+  padding: 32px 32px 32px 12px;
+}
+
+
+.badges {
+  display: flex;
+  gap: 24px; 
+  margin-bottom: 12px;
+  align-items: center;
+}
+
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stats-section p {
+  font-family: 'Patrick Hand SC', cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 32px;
+  line-height: 130%;
+  letter-spacing: -0.28px;
+  color: var(--Primary-Contrast, rgba(255,255,255,1));
+  margin: 0;
+}
+
+.badge-label {
+  color: #fff;
+  font-weight: 600;
+}
+
+.badge-image {
+  width: 58.01496124267578px;
+  height: 83.70477294921875px;
+  object-fit: contain;
+  transform: rotate(0deg);
+  opacity: 1;
+}
+
+
+.score-text {
+  max-width: 240px;
+  width: 100%;
+  font-family: 'Patrick Hand SC', cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 28px;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  text-align: left;
+  align-self: flex-start;
+}
+
+
+.progress-container {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  position: relative;
+}
+
+.progress-track {
+  width: min(455px, 100%); 
+  height: 16.00000762939453px; 
+  margin-top: 17px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 100px;
+  overflow: visible; 
+  position: relative; 
+  border: 3px solid var(--Accent-Contrast, rgba(46, 46, 46, 1)); 
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--Success-Main, rgba(34, 139, 34, 1));
+  border-radius: 100px 0 0 100px; 
+  transition: width 0.4s ease;
+  z-index: 2;
+}
+
+.progress-handle {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px; 
+  height: 32px;
+  background: #fff;
+  border-radius: 16px; 
+  border: 1px solid rgba(0,0,0,0.12);
+  z-index: 3;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+}
+
+.progress-handle-label {
+  position: absolute;
+  top: calc(100% + 14px); 
+  transform: translateX(-50%);
+  font-family: var(--font-heading, 'Patrick Hand SC'), cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  color: rgba(255, 255, 255, 1);
+  z-index: 3;
+  white-space: nowrap;
+}
+
+.progress-label {
+  font-family: var(--font-heading, 'Patrick Hand SC'), cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  color: rgba(255, 255, 255, 1);
+  align-self: center;
+}
+
+.play-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 191px; 
+  height: 54px; 
+  margin-top: 48px; 
+  background: var(--Primary-Light, rgba(227, 218, 250, 1));
+  color: rgba(115, 69, 228, 1);
+  border: 1px solid var(--Primary-Primary, rgba(115, 69, 228, 1));
+  border-radius: 8px;
+  font-family: 'Neucha', sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 150%;
+  letter-spacing: -0.28px;
+  cursor: pointer;
+  padding: 0; 
+}
+
+.play-icon {
+  width: 41px;
+  height: 24px;
+  transform: rotate(0deg);
+  opacity: 1;
+}
+
+.play-text {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.play-label {
+  font-family: 'Patrick Hand SC', cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 130%;
+  letter-spacing: -0.28px;
+}
+
+.play-level-count {
+  font-family: 'Patrick Hand SC', cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 130%;
+  letter-spacing: -0.28px;
+  color: rgba(115, 69, 228, 1);
+}
+
+@media (max-width: 1024px) {
+  .modal-overlay {
+    padding-top: 96px;
+  }
+
+  .modal-level {
+    min-height: auto;
+  }
+
+  .modal-content {
+    height: auto;
+  }
+
+  .modal-section {
+    padding-top: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    align-items: stretch;
+    padding: 80px 16px 32px;
+  }
+
+  .modal-level {
+    width: 100%;
+  }
+
+  .modal-heading {
+    font-size: 40px;
+    line-height: 120%;
+    margin: 12px 0;
+  }
+
+  .modal-content {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 0 20px 24px;
+  }
+
+  .modal-section {
+    width: 100%;
+    padding-top: 16px;
+    align-items: center;
+    flex: 1 1 100%;
+  }
+
+  .image-section {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .stats-section {
+    align-items: center;
+    text-align: center;
+    padding: 24px 16px 24px;
+  }
+
+  .badges {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .stats-section p {
+    font-size: 28px;
+  }
+
+  .progress-track {
+    margin-top: 12px;
+  }
+
+  .progress-handle-label {
+    font-size: 20px;
+  }
+
+  .play-button {
+    width: 100%;
+    max-width: 280px;
+    margin-top: 32px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-heading {
+    font-size: 32px;
+  }
+
+  .image-section .product-image {
+    width: 100%;
+    height: auto;
+  }
+
+  .stats-section p {
+    font-size: 24px;
+  }
+
+  .progress-track {
+    height: 14px;
+  }
+
+  .progress-handle-label {
+    top: calc(100% + 10px);
+  }
+}
