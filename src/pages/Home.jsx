@@ -36,6 +36,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
   const [generatedImage, setGeneratedImage] = useState(null);
   const [isComparing, setIsComparing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isModalPreviewOpen, setIsModalPreviewOpen] = useState(false);
 
   // Simple toast states
   const [showZoneToast, setShowZoneToast] = useState(false);
@@ -159,6 +160,19 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
   return (
     <div className="px-6 md:px-10">
       <div className="max-w-7xl mx-auto">
+        {/* Quick button to preview ModalLevel */}
+        {/* <div className="flex justify-end mb-4">
+          <button
+            className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-purple-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
+            onClick={async () => {
+              await audioManager.playButtonClick();
+              setIsModalPreviewOpen(true);
+            }}
+          >
+            Preview Level Modal
+          </button>
+        </div> */}
+
         {/* Center guide to align levels between the two boxes */}
         <div
           className="hidden lg:block"
@@ -222,6 +236,16 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                 }}
                 onPlay={handlePlayNextLevel}
                 score={accuracy}
+                level={currentLevel}
+              />
+            )}
+
+            {/* ModalLevel preview toggle */}
+            {isModalPreviewOpen && (
+              <ModalLevel
+                onClose={() => setIsModalPreviewOpen(false)}
+                onPlay={() => setIsModalPreviewOpen(false)}
+                score={accuracy || 80}
                 level={currentLevel}
               />
             )}

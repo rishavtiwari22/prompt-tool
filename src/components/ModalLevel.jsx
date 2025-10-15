@@ -1,25 +1,20 @@
 import '../styles/modalLevel.css';
 import samples from '../data/modalSamples';
-import productImg from '../assets/modallevel/Boximage.jpg';
 
 const ModalLevel = ({ onClose, score = 80, onPlay, level = 1 }) => {
   const sample = samples[level - 1] || samples[0];
+  const targetImage = sample.targetImage || samples[0]?.targetImage;
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-level" onClick={(e) => e.stopPropagation()}>
-        <button
-          onClick={onClose}
-          className="modal-close"
-          aria-label="Close modal"
-        >
-          <svg width="28" height="28" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
         <h2 className="modal-heading">Level Complete!</h2>
         <div className="modal-content">
           <section className="modal-section image-section">
-            <img src={productImg} alt="Product" className="product-image" />
+            <img
+              src={targetImage}
+              alt={`Level ${level} target preview`}
+              className="product-image"
+            />
           </section>
 
           <section className="modal-section stats-section">
@@ -49,8 +44,12 @@ const ModalLevel = ({ onClose, score = 80, onPlay, level = 1 }) => {
             </div>
 
             <button className="play-button" onClick={onPlay}>
-              <span className="play-label">Play Next {level}</span>
-              <img src={sample.playIcon} alt="play" className="play-icon" />
+              <img src={sample.playIcon} alt="Play" className="play-icon" />
+              <span className="play-text">
+                
+                <span className="play-label">Play Level {level + 1}</span>
+    
+              </span>
             </button>
           </section>
         </div>
