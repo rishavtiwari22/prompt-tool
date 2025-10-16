@@ -696,7 +696,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                       handleCreateImage();
                     }
                   }}
-                  placeholder="prompt to generate image"
+                  placeholder="Describe what you see"
                   className="flex-1 input--prompt"
                   style={{
                     border: "none",

@@ -108,7 +108,7 @@ const LandingPage = ({ onStartGame }) => {
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6 text-center">
         {/* Logo area */}
         <div
-          className={`mb-8 transition-all duration-1000 delay-200 ${
+          className={`mb-8 mt-8 sm:mt-0 transition-all duration-1000 delay-200 ${
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
         >
@@ -163,13 +163,13 @@ const LandingPage = ({ onStartGame }) => {
             Master AI Prompts
             <br />
             <span style={{ color: "var(--color-primary)" }}>
-              Create Perfect Images
+              Create Perfect Images 
             </span>
           </h1>
 
           {/* Subtitle */}
           <p
-            className={`mb-8 max-w-2xl mx-auto transition-all duration-1000 delay-600 ${
+            className={`mb-8 max-w-3xl mx-auto transition-all duration-1000 delay-600 ${
               mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
             style={{
@@ -180,9 +180,9 @@ const LandingPage = ({ onStartGame }) => {
               letterSpacing: "0.3px",
             }}
           >
-            Embark on an interactive journey to master AI image generation.
-            Learn through play, refine your prompting skills, and create
-            stunning visuals that match your imagination.
+            Embark on an interactive journey to master AI image generation. Learn through play,
+            <br />
+            refine your prompting skills, and create stunning visuals that match your imagination.
           </p>
 
           {/* Feature highlights */}
@@ -287,35 +287,16 @@ const LandingPage = ({ onStartGame }) => {
                     className="mr-3 transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110"
                     size={24}
                   />
-                  Start Your Journey
+                 Let's Play
                 </>
               )}
 
               {/* Button shine effect */}
               <div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{
-                  background:
-                    "linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)",
-                  backgroundSize: "200% 100%",
-                  animation: !isStarting ? "shimmer 2s infinite" : "none",
-                }}
+                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 landing-shimmer-effect"
               />
             </button>
           </div>
-
-          {/* Bottom subtitle */}
-          <p
-            className={`mt-8 text-sm transition-all duration-1000 delay-1100 ${
-              mounted ? "opacity-100" : "opacity-0"
-            }`}
-            style={{
-              fontFamily: "var(--font-body)",
-              color: "var(--color-text-disabled)",
-            }}
-          >
-            🎨 Ready to unlock your creative potential? Let's begin!
-          </p>
         </div>
       </div>
 
@@ -338,49 +319,6 @@ const LandingPage = ({ onStartGame }) => {
           />
         ))}
       </div>
-
-      {/* Custom animations in CSS */}
-      <style jsx>{`
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          33% {
-            transform: translateY(-20px) rotate(2deg);
-          }
-          66% {
-            transform: translateY(-10px) rotate(-2deg);
-          }
-        }
-
-        @keyframes shimmer {
-          0% {
-            background-position: -200% 0;
-          }
-          100% {
-            background-position: 200% 0;
-          }
-        }
-
-        @keyframes particle {
-          0%,
-          100% {
-            transform: translateY(0px) translateX(0px) opacity(0.3);
-          }
-          50% {
-            transform: translateY(-100px) translateX(30px) opacity(0.8);
-          }
-        }
-
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-
-        .animate-particle {
-          animation: particle 8s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 };

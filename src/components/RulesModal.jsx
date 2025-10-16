@@ -21,7 +21,7 @@ function RulesModal({ isOpen, onClose }) {
           className="card pointer-events-auto transform transition-all duration-300 w-full max-w-3xl"
           style={{ 
             backgroundColor: '#605E5E',
-            border: '4px solid #000000',
+            border: '3px solid #000000',
             borderRadius: '0',
             boxShadow: 'none'
           }}
@@ -29,14 +29,16 @@ function RulesModal({ isOpen, onClose }) {
         >
           {/* Header */}
           <div 
-            className="card-header flex items-center justify-center relative px-6 py-5"
+            className="card-header flex items-center justify-between relative py-5"
             style={{ 
               backgroundColor: '#605E5E',
-              borderBottom: 'none'
+              borderBottom: 'none',
+              paddingLeft: '60px',
+              paddingRight: '24px'
             }}
           >
             <h4 
-              className="text-white m-0 text-center font-normal"
+              className="text-white m-0 font-normal"
               style={{ 
                 fontFamily: 'var(--font-heading)',
                 fontSize: '32px',
@@ -45,14 +47,14 @@ function RulesModal({ isOpen, onClose }) {
                 fontWeight: '400'
               }}
             >
-              RULES
+              How to play?
             </h4>
             <button
               onClick={async () => {
                 await audioManager.playButtonClick();
                 onClose();
               }}
-              className="absolute right-6 top-1/2 -translate-y-1/2 text-white hover:text-gray-300 transition-colors p-1"
+              className="text-white hover:text-gray-300 transition-colors p-1"
               aria-label="Close modal"
             >
               <svg className="w-7 h-7 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
