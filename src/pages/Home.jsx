@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { RefreshCw, Send, Target, Loader2 } from 'lucide-react';
-import illustrationImage from '../assets/Frame 473.svg';
-import { compareImages } from '../utils/imageComparison';
-import { generateImageWithProgress } from '../utils/imageGeneration';
-import { ZoneToast, InfoToast } from '../components/Toast';
-import audioManager from '../utils/audioManager';
-import ModalLevel from '../components/ModalLevel';
+import React, { useState, useEffect } from "react";
+import { RefreshCw, Send, Target, Loader2 } from "lucide-react";
+import illustrationImage from "../assets/Frame 473.svg";
+import { compareImages } from "../utils/imageComparison";
+import { generateImageWithProgress } from "../utils/imageGeneration";
+import { ZoneToast, InfoToast } from "../components/Toast";
+import audioManager from "../utils/audioManager";
+import ModalLevel from "../components/ModalLevel";
+import ResetConfirmModal from "../components/ResetConfirmModal";
 
 // Import challenge images
-import challenge1Image from '../assets/challanges/challenge-1.png';
-import challenge2Image from '../assets/challanges/challenge-2.png';
-import challenge3Image from '../assets/challanges/challenge-3.png';
-import challenge4Image from '../assets/challanges/challenge-4.png';
-import challenge5Image from '../assets/challanges/challenge-5.png';
-import challenge6Image from '../assets/challanges/challenge-6.png';
+import challenge1Image from "../assets/challanges/challenge-1.png";
+import challenge2Image from "../assets/challanges/challenge-2.png";
+import challenge3Image from "../assets/challanges/challenge-3.png";
+import challenge4Image from "../assets/challanges/challenge-4.png";
+import challenge5Image from "../assets/challanges/challenge-5.png";
+import challenge6Image from "../assets/challanges/challenge-6.png";
 
 const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnlocked, completedLevels = [], setLevelCompleted }) => {
   // Use unlockedLevels and setLevelUnlocked from props, not local state
@@ -64,7 +65,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
       onLevelChange(nextLevel);
     }
   };
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useState("");
   const [accuracy, setAccuracy] = useState(0);
   const [generatedImage, setGeneratedImage] = useState(null);
   const [isComparing, setIsComparing] = useState(false);
@@ -75,7 +76,10 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
   const [showZoneToast, setShowZoneToast] = useState(false);
   const [showInfoToast, setShowInfoToast] = useState(false);
   const [previousAccuracy, setPreviousAccuracy] = useState(0);
-  
+
+  // Reset confirmation modal state
+  const [showResetModal, setShowResetModal] = useState(false);
+
   // Image loading states
   const [imageLoadErrors, setImageLoadErrors] = useState({});
 
@@ -85,26 +89,37 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
     2: challenge2Image,
     3: challenge3Image,
     4: challenge4Image,
-    5: challenge5Image
+    5: challenge5Image,
     // 6: challenge6Image // removed, not used
   };
 
   // Level descriptions
   const levelDescriptions = {
     1: "Challenge 1",
-    2: "Challenge 2", 
+    2: "Challenge 2",
     3: "Challenge 3",
     4: "Challenge 4",
-    5: "Challenge 5"
+    5: "Challenge 5",
     // 6: "Challenge 6" // removed, not used
   };
 
-  const handleReset = async () => {
+  // Show reset confirmation modal
+  const handleReset = () => {
+    setShowResetModal(true);
+  };
+
+  // Actual reset functionality
+  const handleConfirmReset = async () => {
     await audioManager.playReset();
     setPrompt("");
     setPreviousAccuracy(accuracy);
     setAccuracy(0);
     setGeneratedImage(null);
+  };
+
+  // Close reset modal
+  const handleCloseResetModal = () => {
+    setShowResetModal(false);
   };
 
   const handleLevelChange = (level) => {
@@ -118,53 +133,51 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
   // Get progress bar color based on accuracy range
   const getProgressBarColor = (accuracy) => {
     if (accuracy >= 70) {
-      return 'var(--color-success)'; // Green for high scores (70%+)
+      return "var(--color-success)"; // Green for high scores (70%+)
     } else if (accuracy >= 50) {
-      return 'var(--color-secondary)'; // Blue for medium scores (50-69%)
+      return "var(--color-secondary)"; // Blue for medium scores (50-69%)
     } else if (accuracy >= 25) {
-      return 'var(--color-accent)'; // Pink for low scores (25-49%)
+      return "var(--color-accent)"; // Pink for low scores (25-49%)
     } else {
-      return 'var(--color-primary)'; // Purple for very low scores (0-24%)
+      return "var(--color-primary)"; // Purple for very low scores (0-24%)
     }
   };
 
   const handleCreateImage = async () => {
     if (!prompt.trim()) return;
-    
+
     // Play button click sound
     await audioManager.playButtonClick();
-    
+
     setIsGenerating(true);
     setGeneratedImage(null);
     setPreviousAccuracy(accuracy);
     setAccuracy(0);
-    
+
     try {
-      console.log('Creating image with prompt:', prompt);
-      
+      console.log("Creating image with prompt:", prompt);
+
       // Generate image using the utility
-      const generatedImageUrl = await generateImageWithProgress(
-        prompt.trim()
-      );
-      
+      const generatedImageUrl = await generateImageWithProgress(prompt.trim());
+
       setGeneratedImage(generatedImageUrl);
-      
+
       // Play image generation success sound
       await audioManager.playImageGenerated();
-      
+
       // Show success toast
       setShowInfoToast(true);
-      
+
       // Automatically compare with target image when generation is complete
       const targetImage = targetImages[currentLevel];
       setIsComparing(true);
-      
+
       const similarity = await compareImages(generatedImageUrl, targetImage);
       setAccuracy(similarity);
-      
+
       // Play score-based audio feedback
       await audioManager.playScoreBasedFeedback(similarity);
-      
+
       // Additional feedback for high scores
       if (similarity >= 70) {
         // High accuracy - also play level completion sound
@@ -180,11 +193,10 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
           await audioManager.playAccuracyDecrease();
         }, 800);
       }
-      
     } catch (error) {
-      console.error('Image generation or comparison failed:', error);
+      console.error("Image generation or comparison failed:", error);
       setAccuracy(0);
-      
+
       // Show error toast (using InfoToast for simplicity)
       setShowInfoToast(true);
     } finally {
@@ -196,6 +208,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
   return (
     <div className="px-6 md:px-10">
       <div className="max-w-7xl mx-auto">
+        {/* Quick button to preview ModalLevel */}
         {/* <div className="flex justify-end mb-4">
           <button
             className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-purple-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
@@ -242,37 +255,47 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
             <div
               className="paper border-3"
               style={{
-                borderColor: 'var(--color-text-primary)',
-                backgroundColor: 'white',
-                padding: '2rem',
-                height: '400px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '2rem'
+                borderColor: "var(--color-text-primary)",
+                backgroundColor: "white",
+                padding: "2rem",
+                height: "400px",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: "2rem",
               }}
             >
-            {/* ModalLevel - Show when accuracy >= 70 */}
-            {accuracy >= 70 && (
-              <ModalLevel
-                onClose={() => {
-                  const nextLevel = currentLevel + 1;
-                  if (typeof setLevelUnlocked === 'function') {
-                    setLevelUnlocked(nextLevel);
-                  }
-                  if (typeof onLevelChange === 'function') {
-                    onLevelChange(nextLevel);
-                  }
-                  setPrompt("");
-                  setGeneratedImage(null);
-                  setAccuracy(0);
-                }}
-                onPlay={handlePlayNextLevel}
-                score={accuracy}
-                level={currentLevel}
-              />
-            )}
+              {/* ModalLevel - Show when accuracy >= 70 */}
+              {accuracy >= 70 && (
+                <ModalLevel
+                  onClose={() => {
+                    const nextLevel = currentLevel + 1;
+                    if (typeof setLevelUnlocked === "function") {
+                      setLevelUnlocked(nextLevel);
+                    }
+                    if (typeof onLevelChange === "function") {
+                      onLevelChange(nextLevel);
+                    }
+                    setPrompt("");
+                    setGeneratedImage(null);
+                    setAccuracy(0);
+                  }}
+                  onPlay={handlePlayNextLevel}
+                  score={accuracy}
+                  level={currentLevel}
+                />
+              )}
+
+              {/* ModalLevel preview toggle */}
+              {isModalPreviewOpen && (
+                <ModalLevel
+                  onClose={() => setIsModalPreviewOpen(false)}
+                  onPlay={() => setIsModalPreviewOpen(false)}
+                  score={accuracy || 80}
+                  level={currentLevel}
+                />
+              )}
 
             {/* ModalLevel preview toggle */}
             {isModalPreviewOpen && (
@@ -288,34 +311,59 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                 <img
                   src={targetImages[currentLevel]}
                   alt={`Level ${currentLevel} target: ${levelDescriptions[currentLevel]}`}
-                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "100%",
+                    objectFit: "contain",
+                  }}
                   onError={(e) => {
-                    console.error(`Failed to load challenge image for level ${currentLevel}:`, e);
-                    setImageLoadErrors(prev => ({ ...prev, [currentLevel]: true }));
+                    console.error(
+                      `Failed to load challenge image for level ${currentLevel}:`,
+                      e
+                    );
+                    setImageLoadErrors((prev) => ({
+                      ...prev,
+                      [currentLevel]: true,
+                    }));
                   }}
                   onLoad={() => {
-                    console.log(`Challenge image loaded successfully for level ${currentLevel}`);
-                    setImageLoadErrors(prev => ({ ...prev, [currentLevel]: false }));
+                    console.log(
+                      `Challenge image loaded successfully for level ${currentLevel}`
+                    );
+                    setImageLoadErrors((prev) => ({
+                      ...prev,
+                      [currentLevel]: false,
+                    }));
                   }}
                 />
               ) : (
-                <div 
+                <div
                   style={{
-                    width: '100%',
-                    height: '200px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'var(--color-primary-light)',
-                    border: '2px dashed var(--color-primary)',
-                    borderRadius: '8px',
-                    color: 'var(--color-primary-dark)'
+                    width: "100%",
+                    height: "200px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: "var(--color-primary-light)",
+                    border: "2px dashed var(--color-primary)",
+                    borderRadius: "8px",
+                    color: "var(--color-primary-dark)",
                   }}
                 >
-                  <Target size={48} style={{ marginBottom: '1rem', opacity: 0.6 }} />
-                  <p style={{ fontFamily: 'var(--font-body)', fontSize: '1rem', textAlign: 'center' }}>
-                    Challenge Image<br />
+                  <Target
+                    size={48}
+                    style={{ marginBottom: "1rem", opacity: 0.6 }}
+                  />
+                  <p
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: "1rem",
+                      textAlign: "center",
+                    }}
+                  >
+                    Challenge Image
+                    <br />
                     <small>Level {currentLevel}</small>
                   </p>
                 </div>
@@ -468,56 +516,59 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
             >
               {isGenerating || isComparing ? (
                 // Loading State with Animation
-                <div style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '1.5rem'
-                }}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "1.5rem",
+                  }}
+                >
                   {/* Animated Spinner */}
-                  <div style={{
-                    animation: 'spin 1s linear infinite',
-                  }}>
-                    <Loader2 
-                      size={64} 
-                      style={{ 
-                        color: 'var(--color-primary)',
-                        strokeWidth: 2.5
-                      }} 
+                  <div
+                    style={{
+                      animation: "spin 1s linear infinite",
+                    }}
+                  >
+                    <Loader2
+                      size={64}
+                      style={{
+                        color: "var(--color-primary)",
+                        strokeWidth: 2.5,
+                      }}
                     />
                   </div>
-                  
+
                   {/* Loading Text with Dots Animation */}
-                  <div style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '1.25rem',
-                    color: 'var(--color-text-primary)',
-                    fontWeight: '500'
-                  }}>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: "1.25rem",
+                      color: "var(--color-text-primary)",
+                      fontWeight: "500",
+                    }}
+                  >
                     {isComparing ? (
-                      <>
-                        Analyzing your image<LoadingDots />
-                      </>
+                      <>Analyzing your image</>
                     ) : (
-                      <>
-                        Creating your masterpiece<LoadingDots />
-                      </>
+                      <>Creating your masterpiece</>
                     )}
                   </div>
 
                   {/* Subtle message */}
-                  <p style={{
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '0.95rem',
-                    color: 'var(--color-text-secondary)',
-                    maxWidth: '280px',
-                    lineHeight: '1.5'
-                  }}>
-                    {isComparing 
-                      ? 'Comparing with target image...'
-                      : 'This may take a few moments'
-                    }
+                  <p
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: "0.95rem",
+                      color: "var(--color-text-secondary)",
+                      maxWidth: "280px",
+                      lineHeight: "1.5",
+                    }}
+                  >
+                    {isComparing
+                      ? "Comparing with target image..."
+                      : "This may take a few moments"}
                   </p>
                 </div>
               ) : generatedImage ? (
@@ -525,7 +576,11 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                   <img
                     src={generatedImage}
                     alt="Generated image"
-                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                      objectFit: "contain",
+                    }}
                   />
                 </>
               ) : (
@@ -534,35 +589,55 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                     <img
                       src={illustrationImage}
                       alt="Prompt learning illustration"
-                      style={{ maxWidth: '280px', height: 'auto', marginBottom: '1.5rem' }}
+                      style={{
+                        maxWidth: "280px",
+                        height: "auto",
+                        marginBottom: "1.5rem",
+                      }}
                       onError={(e) => {
-                        console.error('Failed to load illustration image:', e);
-                        setImageLoadErrors(prev => ({ ...prev, illustration: true }));
+                        console.error("Failed to load illustration image:", e);
+                        setImageLoadErrors((prev) => ({
+                          ...prev,
+                          illustration: true,
+                        }));
                       }}
                       onLoad={() => {
-                        console.log('Illustration image loaded successfully');
-                        setImageLoadErrors(prev => ({ ...prev, illustration: false }));
+                        console.log("Illustration image loaded successfully");
+                        setImageLoadErrors((prev) => ({
+                          ...prev,
+                          illustration: false,
+                        }));
                       }}
                     />
                   ) : (
-                    <div 
+                    <div
                       style={{
-                        width: '280px',
-                        height: '200px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        background: 'var(--color-secondary-light)',
-                        border: '2px dashed var(--color-secondary)',
-                        borderRadius: '12px',
-                        color: 'var(--color-secondary-dark)',
-                        marginBottom: '1.5rem'
+                        width: "280px",
+                        height: "200px",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "var(--color-secondary-light)",
+                        border: "2px dashed var(--color-secondary)",
+                        borderRadius: "12px",
+                        color: "var(--color-secondary-dark)",
+                        marginBottom: "1.5rem",
                       }}
                     >
-                      <Send size={48} style={{ marginBottom: '1rem', opacity: 0.6 }} />
-                      <p style={{ fontFamily: 'var(--font-body)', fontSize: '1rem', textAlign: 'center' }}>
-                        Ready to Create<br />
+                      <Send
+                        size={48}
+                        style={{ marginBottom: "1rem", opacity: 0.6 }}
+                      />
+                      <p
+                        style={{
+                          fontFamily: "var(--font-body)",
+                          fontSize: "1rem",
+                          textAlign: "center",
+                        }}
+                      >
+                        Ready to Create
+                        <br />
                         <small>Enter your prompt below</small>
                       </p>
                     </div>
@@ -610,15 +685,13 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                 padding: "1rem 1.25rem",
               }}
             >
-              
-              
               <div className="flex items-center gap-3">
                 <input
                   type="text"
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
+                    if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
                       handleCreateImage();
                     }
@@ -641,32 +714,51 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                   disabled={!prompt.trim() || isComparing || isGenerating}
                   className="paper-btn"
                   style={{
-                    backgroundColor: (!prompt.trim() || isComparing || isGenerating) ? '#f3f4f6' : 'var(--color-primary-light)',
-                    color: (!prompt.trim() || isComparing || isGenerating) ? '#9ca3af' : 'var(--color-primary-dark)',
-                    border: `2px solid ${(!prompt.trim() || isComparing || isGenerating) ? '#d1d5db' : 'var(--color-primary)'}`,
-                    height: '46px',
-                    padding: '0 18px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.4rem',
-                    fontFamily: 'var(--font-body)',
-                    fontSize: '16px',
-                    cursor: (!prompt.trim() || isComparing || isGenerating) ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.2s ease',
-                    whiteSpace: 'nowrap',
-                    minWidth: '150px'
+                    backgroundColor:
+                      !prompt.trim() || isComparing || isGenerating
+                        ? "#f3f4f6"
+                        : "var(--color-primary-light)",
+                    color:
+                      !prompt.trim() || isComparing || isGenerating
+                        ? "#9ca3af"
+                        : "var(--color-primary-dark)",
+                    border: `2px solid ${
+                      !prompt.trim() || isComparing || isGenerating
+                        ? "#d1d5db"
+                        : "var(--color-primary)"
+                    }`,
+                    height: "46px",
+                    padding: "0 18px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.4rem",
+                    fontFamily: "var(--font-body)",
+                    fontSize: "16px",
+                    cursor:
+                      !prompt.trim() || isComparing || isGenerating
+                        ? "not-allowed"
+                        : "pointer",
+                    transition: "all 0.2s ease",
+                    whiteSpace: "nowrap",
+                    minWidth: "150px",
                   }}
                 >
                   {isGenerating ? (
                     <>
                       Generating
-                      <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                      <Loader2
+                        size={16}
+                        style={{ animation: "spin 1s linear infinite" }}
+                      />
                     </>
                   ) : isComparing ? (
                     <>
                       Analyzing
-                      <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                      <Loader2
+                        size={16}
+                        style={{ animation: "spin 1s linear infinite" }}
+                      />
                     </>
                   ) : (
                     <>
@@ -682,14 +774,15 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
       </div>
 
       {/* Toast Components */}
-      <ZoneToast 
-        show={showZoneToast} 
-        onClose={() => setShowZoneToast(false)} 
+      {/* Reset Confirmation Modal */}
+      <ResetConfirmModal
+        isOpen={showResetModal}
+        onClose={handleCloseResetModal}
+        onConfirm={handleConfirmReset}
       />
-      <InfoToast 
-        show={showInfoToast} 
-        onClose={() => setShowInfoToast(false)} 
-      />
+
+      <ZoneToast show={showZoneToast} onClose={() => setShowZoneToast(false)} />
+      <InfoToast show={showInfoToast} onClose={() => setShowInfoToast(false)} />
 
       {/* CSS for spinner animation */}
       <style>{`

@@ -1,56 +1,54 @@
-
-
 /* ===== CSS VARIABLES ===== */
 :root {
   /* === BACKGROUND === */
-  --color-background: #F9FAFC;
-  
+  --color-background: #f9fafc;
+
   /* === PRIMARY COLORS === */
-  --color-primary: #7345E4;              /* Primary */
-  --color-primary-light: #E3DAFA;        /* Primary/Light */
-  --color-primary-dark: #5130A0;         /* Primary/Dark */
-  --color-primary-contrast: #FFFFFF;     /* Primary/Contrast */
-  
+  --color-primary: #7345e4; /* Primary */
+  --color-primary-light: #e3dafa; /* Primary/Light */
+  --color-primary-dark: #5130a0; /* Primary/Dark */
+  --color-primary-contrast: #ffffff; /* Primary/Contrast */
+
   /* === SECONDARY COLORS === */
-  --color-secondary: #4B83EE;            /* Secondary/Secondary */
-  --color-secondary-light: #DBE6FC;      /* Secondary/Light */
-  --color-secondary-dark: #355CA7;       /* Secondary/Dark */
-  --color-secondary-contrast: #2E2E2E;   /* Secondary/Contrast */
-  --color-secondary-dark2: #0B143E;      /* Secondary/Dark-2 */
-  
+  --color-secondary: #4b83ee; /* Secondary/Secondary */
+  --color-secondary-light: #dbe6fc; /* Secondary/Light */
+  --color-secondary-dark: #355ca7; /* Secondary/Dark */
+  --color-secondary-contrast: #2e2e2e; /* Secondary/Contrast */
+  --color-secondary-dark2: #0b143e; /* Secondary/Dark-2 */
+
   /* === ACCENT COLORS === */
-  --color-accent: #DB5797;               /* Accent/Accent */
-  --color-accent-light: #F8DDEA;         /* Accent/Light */
-  --color-accent-dark: #AF4679;          /* Accent/Dark */
-  --color-accent-contrast: #2E2E2E;      /* Accent/Contrast */
-  
+  --color-accent: #db5797; /* Accent/Accent */
+  --color-accent-light: #f8ddea; /* Accent/Light */
+  --color-accent-dark: #af4679; /* Accent/Dark */
+  --color-accent-contrast: #2e2e2e; /* Accent/Contrast */
+
   /* === SUCCESS COLOR === */
-  --color-success: #228B22;              /* Success/Main */
-  --color-success-light: #D3E8D3;        /* Success/Light */
-  
+  --color-success: #228b22; /* Success/Main */
+  --color-success-light: #d3e8d3; /* Success/Light */
+
   /* === TEXT COLORS === */
-  --color-text-primary: #20293A;         /* Text/Primary */
-  --color-text-secondary: #64748B;       /* Text/Secondary */
-  --color-text-disabled: #94A3B8;        /* Text/Disabled */
-  --color-text-icon: #828282;            /* Text/Icon */
+  --color-text-primary: #20293a; /* Text/Primary */
+  --color-text-secondary: #64748b; /* Text/Secondary */
+  --color-text-disabled: #94a3b8; /* Text/Disabled */
+  --color-text-icon: #828282; /* Text/Icon */
 
   /* === DIVIDERS === */
   --color-divider: rgba(32, 41, 58, 0.25); /* subtle ink line */
   --divider-thickness: 2px;
-  
+
   /* === BACKGROUND COLORS === */
- --color-bg: #FEFEFE;                   /* Page background */
---color-dot: rgba(204, 204, 204, 0.4);             /* Dotted pattern color */
-  
+  --color-bg: #fefefe; /* Page background */
+  --color-dot: rgba(204, 204, 204, 0.4); /* Dotted pattern color */
+
   /* === TYPOGRAPHY === */
-  --font-heading: 'Patrick Hand SC', cursive;
-  --font-body: 'Neucha', cursive;
-  
+  --font-heading: "Patrick Hand SC", cursive;
+  --font-body: "Neucha", cursive;
+
   /* H4 Typography */
   --font-size-h4: 32px;
   --line-height-h4: 130%;
   --letter-spacing-h4: -0.28px;
-  
+
   /* Subtitle 1 Typography */
   --font-size-subtitle1: 20px;
   --line-height-subtitle1: 150%;
@@ -83,29 +81,49 @@
 }
 
 /* ===== BODY BACKGROUND PATTERN ===== */
-html, body {
+html,
+body {
   min-height: 100%;
 }
 
 /* Increase specificity to avoid resets/paper-css overwriting */
 html body {
-background-image: radial-gradient(circle, var(--color-dot) 1px, transparent 1px) !important;
-background-size: 20px 20px !important;
+  background-image: radial-gradient(
+    circle,
+    var(--color-dot) 1px,
+    transparent 1px
+  ) !important;
+  background-size: 20px 20px !important;
   background-color: var(--color-bg) !important;
   font-family: var(--font-body);
   overflow-x: hidden; /* guard against sub-pixel overflow */
 }
 
 /* Global overflow guard to eliminate subtle horizontal scrollbars */
-html { overflow-x: hidden; }
-#root { overflow-x: hidden; }
+html {
+  overflow-x: hidden;
+}
+#root {
+  overflow-x: hidden;
+}
 
 /* Box sizing and media defaults */
-*, *::before, *::after { box-sizing: border-box; }
-img, svg, video, canvas { max-width: 100%; height: auto; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+  height: auto;
+}
 
 /* ===== TYPOGRAPHY CLASSES ===== */
-h4, .h4 {
+h4,
+.h4 {
   font-family: var(--font-heading);
   font-weight: 400;
   font-size: var(--font-size-h4);
@@ -166,7 +184,7 @@ h4, .h4 {
   height: var(--progress-height);
   border-radius: var(--progress-radius);
   border: var(--progress-border-width) solid var(--Accent-Contrast);
-  background: rgba(255,255,255,0.04);
+  background: rgba(255, 255, 255, 0.04);
   box-sizing: border-box;
 }
 
@@ -195,4 +213,18 @@ h4, .h4 {
   width: var(--divider-thickness);
   height: 100%;
   background-color: var(--color-divider);
+}
+
+/* ===== LOADING ANIMATIONS ===== */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
