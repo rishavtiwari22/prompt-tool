@@ -9,6 +9,7 @@ function App() {
   const [currentLevel, setCurrentLevel] = useState(1);
   const [gameStarted, setGameStarted] = useState(false);
   const [unlockedLevels, setUnlockedLevels] = useState([1]);
+  const [completedLevels, setCompletedLevels] = useState([]);
 
   const handleLevelChange = (level) => {
     if (!unlockedLevels.includes(level)) return;
@@ -29,13 +30,20 @@ function App() {
     });
   };
 
+  const setLevelCompleted = (level) => {
+    setCompletedLevels((prev) => {
+      if (prev.includes(level)) return prev;
+      return [...prev, level].sort((a, b) => a - b);
+    });
+  };
+
   return (
     <Router>
       {!gameStarted ? (
         <LandingPage onStartGame={handleStartGame} />
       ) : (
         <>
-          <Header currentLevel={currentLevel} onLevelChange={handleLevelChange} unlockedLevels={unlockedLevels} />
+          <Header currentLevel={currentLevel} onLevelChange={handleLevelChange} unlockedLevels={unlockedLevels} completedLevels={completedLevels} />
           {/* PaperCSS-style thick horizontal divider matching Figma */}
           <hr 
             className="border-primary" 
@@ -48,7 +56,7 @@ function App() {
             }} 
           />
           <Routes>
-            <Route path="/" element={<Home currentLevel={currentLevel} onLevelChange={handleLevelChange} unlockedLevels={unlockedLevels} setLevelUnlocked={setLevelUnlocked} />} />
+            <Route path="/" element={<Home currentLevel={currentLevel} onLevelChange={handleLevelChange} unlockedLevels={unlockedLevels} setLevelUnlocked={setLevelUnlocked} completedLevels={completedLevels} setLevelCompleted={setLevelCompleted} />} />
           </Routes>
         </>
       )}

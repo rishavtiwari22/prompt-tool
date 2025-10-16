@@ -13,8 +13,10 @@
 
 .modal-level {
   position: relative;
-  width: 928px;
-  height: 564px;
+  width: 100%;
+  max-width: 928px;
+  min-height: 564px;
+  height: auto;
   background: rgba(96, 94, 94, 1);
   border: 4px solid #000000;
   border-radius: 0;
@@ -165,29 +167,34 @@
 .progress-handle {
   position: absolute;
   top: 50%;
-  transform: translate(-50%, -50%);
-  width: 10px; 
-  height: 32px;
+  transform: translate(-50%, -50%) rotate(90.39deg);
+  width: 27.822423403649122px;
+  height: 52.13998159447923px;
   background: #fff;
-  border-radius: 16px; 
-  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 100px;
+  border: 3px solid rgba(0,0,0,0.12);
   z-index: 3;
   box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
 }
 
-.progress-handle-label {
-  position: absolute;
-  top: calc(100% + 14px); 
-  transform: translateX(-50%);
+.progress-handle-percentage {
+  transform: rotate(-90.39deg);
   font-family: var(--font-heading, 'Patrick Hand SC'), cursive;
   font-weight: 400;
   font-style: normal;
-  font-size: 24px;
-  line-height: 150%;
+  font-size: 14px;
+  line-height: 1;
   letter-spacing: -0.28px;
-  color: rgba(255, 255, 255, 1);
-  z-index: 3;
+  color: rgba(0, 0, 0, 1);
   white-space: nowrap;
+}
+
+.progress-handle-label {
+  display: none;
 }
 
 .progress-label {
@@ -276,16 +283,17 @@
 
 @media (max-width: 768px) {
   .modal-overlay {
-    align-items: stretch;
-    padding: 80px 16px 32px;
+    align-items: flex-start;
+    padding: 60px 16px 32px;
   }
 
   .modal-level {
     width: 100%;
+    min-height: auto;
   }
 
   .modal-heading {
-    font-size: 40px;
+    font-size: clamp(28px, 5vw, 40px);
     line-height: 120%;
     margin: 12px 0;
   }
@@ -294,7 +302,7 @@
     flex-direction: column;
     align-items: center;
     gap: 16px;
-    padding: 0 20px 24px;
+    padding: 0 16px 24px;
   }
 
   .modal-section {
@@ -306,59 +314,143 @@
 
   .image-section {
     flex: 1 1 100%;
-    max-width: none;
+    max-width: 100%;
+  }
+
+  .image-section .product-image {
+    width: 100%;
+    max-width: 307px;
+    height: auto;
+    aspect-ratio: 307/285;
   }
 
   .stats-section {
     align-items: center;
     text-align: center;
-    padding: 24px 16px 24px;
+    padding: 16px;
+    gap: 12px;
   }
 
   .badges {
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 16px;
   }
 
+  .badge-image {
+    width: 48px;
+    height: 75px;
+  }
+
   .stats-section p {
-    font-size: 28px;
+    font-size: clamp(20px, 4vw, 28px);
+  }
+
+  .score-text {
+    font-size: clamp(20px, 4vw, 24px);
   }
 
   .progress-track {
     margin-top: 12px;
+    width: 100%;
   }
 
-  .progress-handle-label {
-    font-size: 20px;
+  .progress-handle {
+    width: 24px;
+    height: 45px;
+  }
+
+  .progress-handle-percentage {
+    font-size: 12px;
   }
 
   .play-button {
     width: 100%;
     max-width: 280px;
-    margin-top: 32px;
-    font-size: 20px;
+    margin-top: 24px;
+    font-size: clamp(18px, 4vw, 20px);
+    height: 48px;
+  }
+
+  .play-icon {
+    width: 35px;
+    height: 20px;
   }
 }
 
 @media (max-width: 480px) {
+  .modal-overlay {
+    padding: 40px 12px 24px;
+  }
+
+  .modal-level {
+    border: 3px solid #000000;
+  }
+
   .modal-heading {
-    font-size: 32px;
+    font-size: clamp(24px, 6vw, 32px);
+    margin: 8px 0;
+  }
+
+  .modal-content {
+    padding: 0 12px 20px;
+    gap: 12px;
   }
 
   .image-section .product-image {
     width: 100%;
-    height: auto;
+    max-width: 250px;
+    padding: 8px;
+  }
+
+  .badge-image {
+    width: 40px;
+    height: 62px;
+  }
+
+  .stats-section {
+    padding: 12px;
+    gap: 10px;
   }
 
   .stats-section p {
-    font-size: 24px;
+    font-size: clamp(18px, 5vw, 24px);
+  }
+
+  .score-text {
+    font-size: clamp(18px, 4vw, 22px);
   }
 
   .progress-track {
     height: 14px;
+    margin-top: 10px;
   }
 
-  .progress-handle-label {
-    top: calc(100% + 10px);
+  .progress-handle {
+    width: 20px;
+    height: 40px;
+    border: 2px solid rgba(0,0,0,0.12);
+  }
+
+  .progress-handle-percentage {
+    font-size: 10px;
+  }
+
+  .play-button {
+    max-width: 240px;
+    margin-top: 20px;
+    font-size: clamp(16px, 4vw, 18px);
+    height: 44px;
+    gap: 8px;
+  }
+
+  .play-icon {
+    width: 30px;
+    height: 18px;
+  }
+
+  .play-label {
+    font-size: clamp(16px, 4vw, 20px);
   }
 }

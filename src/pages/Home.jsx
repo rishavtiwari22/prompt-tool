@@ -16,26 +16,54 @@ import challenge4Image from "../assets/challanges/challenge-4.png";
 import challenge5Image from "../assets/challanges/challenge-5.png";
 import challenge6Image from "../assets/challanges/challenge-6.png";
 
-const Home = ({
-  currentLevel,
-  onLevelChange,
-  unlockedLevels = [1],
-  setLevelUnlocked,
-}) => {
+const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnlocked, completedLevels = [], setLevelCompleted }) => {
   // Use unlockedLevels and setLevelUnlocked from props, not local state
 
   // Handler for Play button in modal
-  const handlePlayNextLevel = () => {
+  const handlePlayNextLevel = async () => {
+    console.log('Play button clicked, current level:', currentLevel);
     const nextLevel = currentLevel + 1;
-    if (typeof setLevelUnlocked === "function") {
-      setLevelUnlocked(nextLevel); // Unlock next level globally
+    const maxLevel = 5; // Maximum available levels
+    
+    // Mark current level as completed
+    if (typeof setLevelCompleted === 'function') {
+      setLevelCompleted(currentLevel);
     }
-    if (typeof onLevelChange === "function") {
-      onLevelChange(nextLevel); // Navigate to next level
+    
+    // Check if this is the last level - restart from level 1
+    if (currentLevel >= maxLevel) {
+      console.log('Last level completed - restarting from level 1');
+      
+      // Play button click sound
+      await audioManager.playButtonClick();
+      
+      // Clear states
+      setPrompt("");
+      setGeneratedImage(null);
+      setAccuracy(0);
+      
+      // Navigate back to level 1
+      if (typeof onLevelChange === 'function') {
+        onLevelChange(1);
+      }
+      return;
     }
+    
+    // Play button click sound
+    await audioManager.playButtonClick();
+    
+    // Clear states first
     setPrompt("");
     setGeneratedImage(null);
-    setAccuracy(0); // Close modal
+    setAccuracy(0);
+    
+    // Unlock and navigate to next level
+    if (typeof setLevelUnlocked === 'function') {
+      setLevelUnlocked(nextLevel);
+    }
+    if (typeof onLevelChange === 'function') {
+      onLevelChange(nextLevel);
+    }
   };
   const [prompt, setPrompt] = useState("");
   const [accuracy, setAccuracy] = useState(0);
@@ -193,7 +221,6 @@ const Home = ({
           </button>
         </div> */}
 
-        {/* Center guide to align levels between the two boxes */}
         <div
           className="hidden lg:block"
           aria-hidden="true"
@@ -270,6 +297,16 @@ const Home = ({
                 />
               )}
 
+            {/* ModalLevel preview toggle */}
+            {isModalPreviewOpen && (
+              <ModalLevel
+                onClose={() => setIsModalPreviewOpen(false)}
+                onPlay={() => setIsModalPreviewOpen(false)}
+                score={accuracy }
+                level={currentLevel}
+              />
+            )}
+              
               {!imageLoadErrors[currentLevel] ? (
                 <img
                   src={targetImages[currentLevel]}
@@ -370,7 +407,7 @@ const Home = ({
                     }}
                   >
                     {/* Current Percentage Badge on Progress Bar - Only show when accuracy > 0 */}
-                    {accuracy > 0 && (
+                    {accuracy > 70 && (
                       <div
                         style={{
                           position: "absolute",
