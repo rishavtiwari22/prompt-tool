@@ -29,10 +29,22 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
       setLevelCompleted(currentLevel);
     }
     
-    // Check if next level exists
-    if (nextLevel > maxLevel) {
-      console.log('No more levels available');
-      setAccuracy(0); // Just close the modal
+    // Check if this is the last level - restart from level 1
+    if (currentLevel >= maxLevel) {
+      console.log('Last level completed - restarting from level 1');
+      
+      // Play button click sound
+      await audioManager.playButtonClick();
+      
+      // Clear states
+      setPrompt("");
+      setGeneratedImage(null);
+      setAccuracy(0);
+      
+      // Navigate back to level 1
+      if (typeof onLevelChange === 'function') {
+        onLevelChange(1);
+      }
       return;
     }
     
@@ -184,8 +196,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
   return (
     <div className="px-6 md:px-10">
       <div className="max-w-7xl mx-auto">
-        {/* Quick button to preview ModalLevel */}
-        <div className="flex justify-end mb-4">
+        {/* <div className="flex justify-end mb-4">
           <button
             className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-purple-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500"
             onClick={async () => {
@@ -195,9 +206,8 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
           >
             Preview Level Modal
           </button>
-        </div>
+        </div> */}
 
-        {/* Center guide to align levels between the two boxes */}
         <div
           className="hidden lg:block"
           aria-hidden="true"
@@ -269,7 +279,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
               <ModalLevel
                 onClose={() => setIsModalPreviewOpen(false)}
                 onPlay={() => setIsModalPreviewOpen(false)}
-                score={accuracy || 80}
+                score={accuracy }
                 level={currentLevel}
               />
             )}
@@ -349,7 +359,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                     }}
                   >
                     {/* Current Percentage Badge on Progress Bar - Only show when accuracy > 0 */}
-                    {accuracy > 0 && (
+                    {accuracy > 70 && (
                       <div
                         style={{
                           position: "absolute",
