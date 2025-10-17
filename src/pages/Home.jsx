@@ -383,7 +383,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
               </h4>
 
               {/* Progress Bar - Redesigned to match reference images */}
-              <div className="relative" style={{ padding: "0 0.25rem" }}>
+              <div className="relative" style={{ padding: "0 0.40rem" }}>
                 <div
                   style={{
                     width: "100%",
