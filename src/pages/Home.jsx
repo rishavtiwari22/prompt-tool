@@ -383,7 +383,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
               </h4>
 
               {/* Progress Bar - Redesigned to match reference images */}
-              <div className="relative" style={{ padding: "0 0.25rem" }}>
+              <div className="relative" style={{ padding: "0 0.35rem" }}>
                 <div
                   style={{
                     width: "100%",
@@ -406,8 +406,8 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                       position: "relative",
                     }}
                   >
-                    {/* Current Percentage Badge on Progress Bar - Only show when accuracy > 0 */}
-                    {accuracy > 70 && (
+                    {/* Current Percentage Badge on Progress Bar - Show when accuracy > 0 */}
+                    {accuracy > 0 && (
                       <div
                         style={{
                           position: "absolute",
