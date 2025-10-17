@@ -1,9 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Play, Sparkles, Palette, Target, Star, Image as ImageIcon } from 'lucide-react';
-import audioManager from '../utils/audioManager';
-import '../styles/landing.css';
+import React, { useState, useEffect } from "react";
+import {
+  Play,
+  Sparkles,
+  Palette,
+  Target,
+  Star,
+  Image as ImageIcon,
+} from "lucide-react";
+import audioManager from "../utils/audioManager";
+import "../styles/landing.css";
 // Import image assets properly for production
-import leftTopIcon from '../assets/left-top.svg';
+import leftTopIcon from "../assets/left-top.svg";
 
 const LandingPage = ({ onStartGame }) => {
   const [isStarting, setIsStarting] = useState(false);
@@ -13,15 +20,15 @@ const LandingPage = ({ onStartGame }) => {
 
   useEffect(() => {
     setMounted(true);
-    
+
     // Preload the logo image
     const img = new Image();
     img.onload = () => {
-      console.log('Landing page logo loaded successfully');
+      console.log("Landing page logo loaded successfully");
       setImageLoaded(true);
     };
     img.onerror = (e) => {
-      console.error('Failed to load landing page logo:', e);
+      console.error("Failed to load landing page logo:", e);
       setImageError(true);
     };
     img.src = leftTopIcon;
@@ -120,24 +127,26 @@ const LandingPage = ({ onStartGame }) => {
             }}
           >
             {!imageError ? (
-              <img 
-                src={leftTopIcon} 
+              <img
+                src={leftTopIcon}
                 alt="Prompt Learning Tool"
-                className={`w-10 h-10 transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                className={`w-10 h-10 transition-opacity duration-300 ${
+                  imageLoaded ? "opacity-100" : "opacity-0"
+                }`}
                 onError={(e) => {
-                  console.error('Failed to load logo image:', e);
+                  console.error("Failed to load logo image:", e);
                   setImageError(true);
                 }}
                 onLoad={() => {
-                  console.log('Logo loaded successfully');
+                  console.log("Logo loaded successfully");
                   setImageLoaded(true);
                 }}
               />
             ) : (
               // Fallback icon if image fails to load
-              <div 
+              <div
                 className="w-10 h-10 flex items-center justify-center"
-                style={{ color: 'var(--color-primary)' }}
+                style={{ color: "var(--color-primary)" }}
               >
                 <ImageIcon size={28} />
               </div>
@@ -160,10 +169,10 @@ const LandingPage = ({ onStartGame }) => {
               textShadow: "2px 2px 0px rgba(115, 69, 228, 0.1)",
             }}
           >
-            Master AI Prompts
+         Image genie
             <br />
             <span style={{ color: "var(--color-primary)" }}>
-              Create Perfect Images 
+          Abracadraw
             </span>
           </h1>
 
@@ -180,9 +189,11 @@ const LandingPage = ({ onStartGame }) => {
               letterSpacing: "0.3px",
             }}
           >
-            Embark on an interactive journey to master AI image generation. Learn through play,
-            <br />
-            refine your prompting skills, and create stunning visuals that match your imagination.
+            Say the magic words and bring images to life. Level up your prompt
+            power play with the Image Genie!
+            {/* <br /> */}
+            Beat every challenge with the magic of your words! Describe it
+            right, and your genie brings it to life!
           </p>
 
           {/* Feature highlights */}
@@ -287,14 +298,12 @@ const LandingPage = ({ onStartGame }) => {
                     className="mr-3 transition-transform duration-300 group-hover:translate-x-1 group-hover:scale-110"
                     size={24}
                   />
-                 Let's Play
+                  Let's Play
                 </>
               )}
 
               {/* Button shine effect */}
-              <div
-                className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 landing-shimmer-effect"
-              />
+              <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 landing-shimmer-effect" />
             </button>
           </div>
         </div>
