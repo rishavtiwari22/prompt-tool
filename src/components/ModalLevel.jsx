@@ -12,7 +12,7 @@ const LevelCompleteModal = ({ onPlay, level = 1 }) => {
       if (onPlay) {
         onPlay(); 
       }
-    }, 25000); 
+    }, 5000); 
 
     const timer1 = setTimeout(() => createConfetti(), 800);
     const timer2 = setTimeout(() => createConfetti(), 2000);
