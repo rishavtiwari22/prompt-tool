@@ -9,8 +9,8 @@ import ModalLevel from "../components/ModalLevel";
 import ResetConfirmModal from "../components/ResetConfirmModal";
 
 // Import challenge images
-import challenge1Image from "../assets/challanges/challenge-1.png";
-import challenge2Image from "../assets/challanges/challenge-2.png";
+import challenge2Image from "../assets/challanges/challenge-1.png";
+import challenge1Image from "../assets/challanges/challenge-2.png";
 import challenge3Image from "../assets/challanges/challenge-3.png";
 import challenge4Image from "../assets/challanges/challenge-4.png";
 import challenge5Image from "../assets/challanges/challenge-5.png";
@@ -383,7 +383,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
               </h4>
 
               {/* Progress Bar - Redesigned to match reference images */}
-              <div className="relative" style={{ padding: "0 0.40rem" }}>
+              <div className="relative" style={{ padding: "0 0.25rem" }}>
                 <div
                   style={{
                     width: "100%",
