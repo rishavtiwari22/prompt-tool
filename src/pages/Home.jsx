@@ -206,7 +206,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
   };
 
   return (
-    <div className="px-6 md:px-10">
+    <div className="px-6 md:px-10 pb-16px">
       <div className="max-w-7xl mx-auto">
         {/* Quick button to preview ModalLevel */}
         {/* <div className="flex justify-end mb-4">
@@ -683,6 +683,8 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                 borderColor: "var(--color-text-primary)",
                 backgroundColor: "white",
                 padding: "1rem 1.25rem",
+               
+                
               }}
             >
               <div className="flex items-end gap-3">
@@ -707,7 +709,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                     backgroundColor: "transparent",
                     resize: "none",
                     overflowY: "auto",
-                    maxHeight: "16px",
+                    maxHeight: "64px",
                     minHeight: "46px",
                     padding: "0.75rem 0.5rem",
                     lineHeight: "1.4",
