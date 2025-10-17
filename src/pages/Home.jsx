@@ -206,7 +206,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
   };
 
   return (
-    <div className="px-6 md:px-10">
+    <div className="px-6 md:px-10 pb-16px">
       <div className="max-w-7xl mx-auto">
         {/* Quick button to preview ModalLevel */}
         {/* <div className="flex justify-end mb-4">
@@ -683,11 +683,12 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                 borderColor: "var(--color-text-primary)",
                 backgroundColor: "white",
                 padding: "1rem 1.25rem",
+               
+                
               }}
             >
-              <div className="flex items-center gap-3">
-                <input
-                  type="text"
+              <div className="flex items-end gap-3">
+                <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   onKeyDown={(e) => {
@@ -698,6 +699,7 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                   }}
                   placeholder="Describe what you see"
                   className="flex-1 input--prompt"
+                  rows={1}
                   style={{
                     border: "none",
                     outline: "none",
@@ -705,14 +707,25 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                     fontSize: "18px",
                     color: "var(--color-text-primary)",
                     backgroundColor: "transparent",
-                    height: "46px",
-                    padding: "0 0.5rem",
+                    resize: "none",
+                    overflowY: "auto",
+                    maxHeight: "64px",
+                    minHeight: "46px",
+                    padding: "0.75rem 0.5rem",
+                    lineHeight: "1.4",
+                    transition: "all 0.2s ease",
+                  }}
+                  onInput={(e) => {
+                    // Auto-expand as you type
+                    e.target.style.height = "auto";
+                    e.target.style.height = `${e.target.scrollHeight}px`;
                   }}
                 />
+
                 <button
                   onClick={handleCreateImage}
                   disabled={!prompt.trim() || isComparing || isGenerating}
-                  className="paper-btn"
+                  className="paper-btn flex items-center justify-center"
                   style={{
                     backgroundColor:
                       !prompt.trim() || isComparing || isGenerating
@@ -728,46 +741,36 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                         : "var(--color-primary)"
                     }`,
                     height: "46px",
-                    padding: "0 18px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "0.4rem",
-                    fontFamily: "var(--font-body)",
-                    fontSize: "16px",
+                    padding: prompt.trim() ? "0 16px" : "0 18px",
+                    minWidth: prompt.trim() ? "46px" : "150px",
                     cursor:
                       !prompt.trim() || isComparing || isGenerating
                         ? "not-allowed"
                         : "pointer",
-                    transition: "all 0.2s ease",
+                    transition: "all 0.3s ease",
                     whiteSpace: "nowrap",
-                    minWidth: "150px",
                   }}
                 >
                   {isGenerating ? (
                     <>
-                      Generating
-                      <Loader2
-                        size={16}
-                        style={{ animation: "spin 1s linear infinite" }}
-                      />
+                      <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
+                      <span style={{ marginLeft: "6px" }}>Generating</span>
                     </>
                   ) : isComparing ? (
                     <>
-                      Analyzing
-                      <Loader2
-                        size={16}
-                        style={{ animation: "spin 1s linear infinite" }}
-                      />
+                      <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
+                      <span style={{ marginLeft: "6px" }}>Analyzing</span>
                     </>
+                  ) : prompt.trim() ? (
+                    <Send size={18} />
                   ) : (
                     <>
-                      Create Image
-                      <Send size={16} />
+                      Create Image <Send size={16} style={{ marginLeft: "6px" }} />
                     </>
                   )}
                 </button>
               </div>
+
             </div>
           </div>
         </div>
