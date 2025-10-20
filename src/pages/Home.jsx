@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { RefreshCw, Send, Target, Loader2 } from "lucide-react";
+import { RefreshCw, Send, Target, Loader2, Lightbulb, Eye, ChevronDown, ChevronUp } from "lucide-react";
 import illustrationImage from "../assets/Frame 473.svg";
-import { compareImages } from "../utils/imageComparison";
+import { compareImagesWithFeedback } from "../utils/imageComparison";
 import { generateImageWithProgress } from "../utils/imageGeneration";
 import { ZoneToast, InfoToast } from "../components/Toast";
 import audioManager from "../utils/audioManager";
@@ -77,6 +77,10 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
   const [showInfoToast, setShowInfoToast] = useState(false);
   const [previousAccuracy, setPreviousAccuracy] = useState(0);
 
+  // AI Feedback states
+  const [aiFeedback, setAiFeedback] = useState(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+
   // Reset confirmation modal state
   const [showResetModal, setShowResetModal] = useState(false);
 
@@ -115,6 +119,8 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
     setPreviousAccuracy(accuracy);
     setAccuracy(0);
     setGeneratedImage(null);
+    setAiFeedback(null);
+    setShowFeedback(false);
   };
 
   // Close reset modal
@@ -128,6 +134,8 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
     setAccuracy(0);
     setGeneratedImage(null);
     setPrompt("");
+    setAiFeedback(null);
+    setShowFeedback(false);
   };
 
   // Get progress bar color based on accuracy range
@@ -172,8 +180,12 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
       const targetImage = targetImages[currentLevel];
       setIsComparing(true);
 
-      const similarity = await compareImages(generatedImageUrl, targetImage);
+      const result = await compareImagesWithFeedback(targetImage, generatedImageUrl, prompt.trim());
+      const similarity = result.score || 0;
+      
       setAccuracy(similarity);
+      setAiFeedback(result);
+      setShowFeedback(false); // Reset to collapsed state
 
       // Play score-based audio feedback
       await audioManager.playScoreBasedFeedback(similarity);
@@ -774,6 +786,143 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
             </div>
           </div>
         </div>
+
+        {/* AI Feedback Section - At Bottom of Page */}
+        {aiFeedback && aiFeedback.feedback && (
+          <div
+            className="paper border-2"
+            style={{
+              borderColor: showFeedback ? "var(--color-primary)" : "var(--color-secondary)",
+              backgroundColor: showFeedback ? "var(--color-primary-light)" : "white",
+              padding: "1rem 1.5rem",
+              marginTop: "2rem",
+              maxWidth: "900px",
+              marginLeft: "auto",
+              marginRight: "auto",
+              transition: "all 0.3s ease",
+              cursor: "pointer",
+            }}
+            onClick={() => setShowFeedback(!showFeedback)}
+          >
+            {/* Header - Always Visible */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "0.5rem",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <Lightbulb
+                  size={24}
+                  style={{ color: "var(--color-primary)" }}
+                />
+                <span
+                  style={{
+                    fontFamily: "var(--font-heading)",
+                    fontSize: "20px",
+                    fontWeight: "400",
+                    color: "var(--color-text-primary)",
+                  }}
+                >
+                  AI Feedback
+                </span>
+              </div>
+              {showFeedback ? (
+                <ChevronUp size={24} style={{ color: "var(--color-primary)" }} />
+              ) : (
+                <ChevronDown size={24} style={{ color: "var(--color-text-secondary)" }} />
+              )}
+            </div>
+
+            {/* Expandable Content */}
+            {showFeedback && (
+              <div
+                style={{
+                  marginTop: "1rem",
+                  paddingTop: "1rem",
+                  borderTop: "2px solid var(--color-divider)",
+                  animation: "fadeIn 0.3s ease",
+                }}
+              >
+                {/* Visual Differences */}
+                {aiFeedback.feedback && (
+                  <div style={{ marginBottom: "1.5rem" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        marginBottom: "0.75rem",
+                      }}
+                    >
+                      <Eye size={20} style={{ color: "var(--color-accent)" }} />
+                      <span
+                        style={{
+                          fontFamily: "var(--font-body)",
+                          fontSize: "18px",
+                          fontWeight: "600",
+                          color: "var(--color-accent-dark)",
+                        }}
+                      >
+                        Visual Differences
+                      </span>
+                    </div>
+                    <p
+                      style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: "16px",
+                        color: "var(--color-text-primary)",
+                        lineHeight: "1.7",
+                        marginLeft: "2rem",
+                      }}
+                    >
+                      {aiFeedback.feedback}
+                    </p>
+                  </div>
+                )}
+
+                {/* Prompt Improvements */}
+                {aiFeedback.improvements && (
+                  <div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5rem",
+                        marginBottom: "0.75rem",
+                      }}
+                    >
+                      <Lightbulb size={20} style={{ color: "var(--color-success)" }} />
+                      <span
+                        style={{
+                          fontFamily: "var(--font-body)",
+                          fontSize: "18px",
+                          fontWeight: "600",
+                          color: "var(--color-success)",
+                        }}
+                      >
+                        Suggestions
+                      </span>
+                    </div>
+                    <p
+                      style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: "16px",
+                        color: "var(--color-text-primary)",
+                        lineHeight: "1.7",
+                        marginLeft: "2rem",
+                      }}
+                    >
+                      {aiFeedback.improvements}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Toast Components */}
