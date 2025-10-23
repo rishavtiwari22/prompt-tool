@@ -15,3 +15,16 @@
     transform: translateY(0);
   }
 }
+
+
+.paper.border-3 {
+  border-radius: 
+    255px 15px 225px 15px / 
+    15px 225px 15px 255px;
+}
+
+.paper-btn {
+  border-radius: 
+    225px 15px 235px 15px / 
+    15px 235px 15px 225px !important;
+}

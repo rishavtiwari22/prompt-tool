@@ -15,52 +15,59 @@ import challenge4Image from "../assets/challanges/challenge-4.png";
 import challenge5Image from "../assets/challanges/challenge-5.png";
 import challenge6Image from "../assets/challanges/challenge-6.png";
 
-const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnlocked, completedLevels = [], setLevelCompleted }) => {
+const Home = ({
+  currentLevel,
+  onLevelChange,
+  unlockedLevels = [1],
+  setLevelUnlocked,
+  completedLevels = [],
+  setLevelCompleted,
+}) => {
   // Use unlockedLevels and setLevelUnlocked from props, not local state
 
   // Handler for Play button in modal
   const handlePlayNextLevel = async () => {
-    console.log('Play button clicked, current level:', currentLevel);
+    console.log("Play button clicked, current level:", currentLevel);
     const nextLevel = currentLevel + 1;
     const maxLevel = 5; // Maximum available levels
-    
+
     // Mark current level as completed
-    if (typeof setLevelCompleted === 'function') {
+    if (typeof setLevelCompleted === "function") {
       setLevelCompleted(currentLevel);
     }
-    
+
     // Check if this is the last level - restart from level 1
     if (currentLevel >= maxLevel) {
-      console.log('Last level completed - restarting from level 1');
-      
+      console.log("Last level completed - restarting from level 1");
+
       // Play button click sound
       await audioManager.playButtonClick();
-      
+
       // Clear states
       setPrompt("");
       setGeneratedImage(null);
       setAccuracy(0);
-      
+
       // Navigate back to level 1
-      if (typeof onLevelChange === 'function') {
+      if (typeof onLevelChange === "function") {
         onLevelChange(1);
       }
       return;
     }
-    
+
     // Play button click sound
     await audioManager.playButtonClick();
-    
+
     // Clear states first
     setPrompt("");
     setGeneratedImage(null);
     setAccuracy(0);
-    
+
     // Unlock and navigate to next level
-    if (typeof setLevelUnlocked === 'function') {
+    if (typeof setLevelUnlocked === "function") {
       setLevelUnlocked(nextLevel);
     }
-    if (typeof onLevelChange === 'function') {
+    if (typeof onLevelChange === "function") {
       onLevelChange(nextLevel);
     }
   };
@@ -91,8 +98,8 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
       // Add a small delay to ensure the component is rendered
       setTimeout(() => {
         aiFeedbackRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
+          behavior: "smooth",
+          block: "start",
         });
       }, 300);
     }
@@ -186,9 +193,13 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
       const targetImage = targetImages[currentLevel];
       setIsComparing(true);
 
-      const result = await compareImagesWithFeedback(targetImage, generatedImageUrl, prompt.trim());
+      const result = await compareImagesWithFeedback(
+        targetImage,
+        generatedImageUrl,
+        prompt.trim()
+      );
       const similarity = result.score || 0;
-      
+
       setAccuracy(similarity);
       setAiFeedback(result);
 
@@ -268,13 +279,14 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
               style={{
                 borderColor: "var(--color-text-primary)",
                 backgroundColor: "white",
-                padding: "2rem",
-                height: "400px",
+                padding: "0.1rem",
+                height: "450px",
+                maxWidth: "550px",
+                margin: "0 auto 2rem auto",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                marginBottom: "2rem",
               }}
             >
               {/* ModalLevel - Show when accuracy >= 70 */}
@@ -308,24 +320,26 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                 />
               )}
 
-            {/* ModalLevel preview toggle */}
-            {isModalPreviewOpen && (
-              <ModalLevel
-                onClose={() => setIsModalPreviewOpen(false)}
-                onPlay={() => setIsModalPreviewOpen(false)}
-                score={accuracy }
-                level={currentLevel}
-              />
-            )}
-              
+              {/* ModalLevel preview toggle */}
+              {isModalPreviewOpen && (
+                <ModalLevel
+                  onClose={() => setIsModalPreviewOpen(false)}
+                  onPlay={() => setIsModalPreviewOpen(false)}
+                  score={accuracy}
+                  level={currentLevel}
+                />
+              )}
+
               {!imageLoadErrors[currentLevel] ? (
                 <img
                   src={targetImages[currentLevel]}
                   alt={`Level ${currentLevel} target: ${levelDescriptions[currentLevel]}`}
                   style={{
-                    maxWidth: "100%",
-                    maxHeight: "100%",
-                    objectFit: "contain",
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    borderRadius:
+                      "255px 15px 225px 15px / 15px 225px 15px 255px",
                   }}
                   onError={(e) => {
                     console.error(
@@ -562,7 +576,10 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                           marginBottom: "0.75rem",
                         }}
                       >
-                        <Eye size={20} style={{ color: "var(--color-accent)" }} />
+                        <Eye
+                          size={20}
+                          style={{ color: "var(--color-accent)" }}
+                        />
                         <span
                           style={{
                             fontFamily: "var(--font-body)",
@@ -599,7 +616,10 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                           marginBottom: "0.75rem",
                         }}
                       >
-                        <Lightbulb size={20} style={{ color: "var(--color-success)" }} />
+                        <Lightbulb
+                          size={20}
+                          style={{ color: "var(--color-success)" }}
+                        />
                         <span
                           style={{
                             fontFamily: "var(--font-body)",
@@ -637,14 +657,15 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
               style={{
                 borderColor: "var(--color-text-primary)",
                 backgroundColor: "white",
-                padding: "2rem",
-                height: "400px",
+                padding: "0.1rem",
+                height: "450px",
+                maxWidth: "550px",
+                margin: "0 auto 2rem auto",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
                 textAlign: "center",
-                marginBottom: "2rem",
               }}
             >
               {isGenerating || isComparing ? (
@@ -710,9 +731,11 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                     src={generatedImage}
                     alt="Generated image"
                     style={{
-                      maxWidth: "100%",
-                      maxHeight: "100%",
-                      objectFit: "contain",
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      borderRadius:
+                        "255px 15px 225px 15px / 15px 225px 15px 255px",
                     }}
                   />
                 </>
@@ -723,8 +746,9 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                       src={illustrationImage}
                       alt="Prompt learning illustration"
                       style={{
-                        maxWidth: "280px",
+                        width: "100%",
                         height: "auto",
+                        maxWidth: "280px",
                         marginBottom: "1.5rem",
                       }}
                       onError={(e) => {
@@ -816,8 +840,6 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                 borderColor: "var(--color-text-primary)",
                 backgroundColor: "white",
                 padding: "1rem 1.25rem",
-               
-                
               }}
             >
               <div className="flex items-end gap-3">
@@ -886,24 +908,30 @@ const Home = ({ currentLevel, onLevelChange, unlockedLevels = [1], setLevelUnloc
                 >
                   {isGenerating ? (
                     <>
-                      <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
+                      <Loader2
+                        size={16}
+                        style={{ animation: "spin 1s linear infinite" }}
+                      />
                       <span style={{ marginLeft: "6px" }}>Generating</span>
                     </>
                   ) : isComparing ? (
                     <>
-                      <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
+                      <Loader2
+                        size={16}
+                        style={{ animation: "spin 1s linear infinite" }}
+                      />
                       <span style={{ marginLeft: "6px" }}>Analyzing</span>
                     </>
                   ) : prompt.trim() ? (
                     <Send size={18} />
                   ) : (
                     <>
-                      Create Image <Send size={16} style={{ marginLeft: "6px" }} />
+                      Create Image{" "}
+                      <Send size={16} style={{ marginLeft: "6px" }} />
                     </>
                   )}
                 </button>
               </div>
-
             </div>
           </div>
         </div>
