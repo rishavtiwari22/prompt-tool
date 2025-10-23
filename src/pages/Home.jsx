@@ -279,7 +279,7 @@ const Home = ({
               style={{
                 borderColor: "var(--color-text-primary)",
                 backgroundColor: "white",
-                padding: "0.1rem",
+                padding: "0.02rem",
                 height: "450px",
                 maxWidth: "550px",
                 margin: "0 auto 2rem auto",
@@ -657,7 +657,7 @@ const Home = ({
               style={{
                 borderColor: "var(--color-text-primary)",
                 backgroundColor: "white",
-                padding: "0.1rem",
+                padding: "0.02rem",
                 height: "450px",
                 maxWidth: "550px",
                 margin: "0 auto 2rem auto",
