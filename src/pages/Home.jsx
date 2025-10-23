@@ -47,6 +47,7 @@ const Home = ({
       setPrompt("");
       setGeneratedImage(null);
       setAccuracy(0);
+      setAiFeedback(null);
 
       // Navigate back to level 1
       if (typeof onLevelChange === "function") {
@@ -62,6 +63,7 @@ const Home = ({
     setPrompt("");
     setGeneratedImage(null);
     setAccuracy(0);
+    setAiFeedback(null);
 
     // Unlock and navigate to next level
     if (typeof setLevelUnlocked === "function") {
