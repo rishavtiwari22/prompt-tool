@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Navbar';
 import Home from './pages/Home';
 import LandingPage from './components/LandingPage';
-import AudioDebugger from './components/AudioDebugger';
 
 function App() {
   const [currentLevel, setCurrentLevel] = useState(1);
@@ -60,9 +59,6 @@ function App() {
           </Routes>
         </>
       )}
-      
-      {/* Audio Debug Component - Remove in production */}
-      {import.meta.env.DEV && <AudioDebugger />}
     </Router>
   );
 }
