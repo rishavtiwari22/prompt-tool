@@ -86,12 +86,12 @@ export const compareImagesWithSiliconFlow = async (targetImagePath, generatedIma
 
 Format EXACTLY as:
 SIMILARITY SCORE: [number]%
-VISUAL DIFFERENCES: [detailed analysis]
-PROMPT IMPROVEMENTS: [suggestions]`
+VISUAL DIFFERENCES: [max 80 words brief analysis]
+PROMPT IMPROVEMENTS: [max 80 words concise suggestions]`
       : `Compare these images:
 SIMILARITY SCORE: [number]%
-VISUAL DIFFERENCES: [analysis]
-OBSERVATIONS: [insights]`;
+VISUAL DIFFERENCES: [max 80 words brief analysis]
+OBSERVATIONS: [max 80 words concise insights]`;
 
     const payload = {
       model: "Qwen/Qwen3-VL-8B-Instruct",
@@ -103,8 +103,8 @@ OBSERVATIONS: [insights]`;
           { type: "image_url", image_url: { url: `data:image/jpeg;base64,${generatedBase64}` } }
         ]
       }],
-      max_tokens: 1500,
-      temperature: 0.3,
+      max_tokens: 800,
+      temperature: 0.2,
       stream: false
     };
 
