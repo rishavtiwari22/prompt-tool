@@ -247,30 +247,33 @@ const Home = ({
             }}
           ></div>
 
-          {/* LEFT COLUMN - Image Display Section */}
+          {/* LEFT COLUMN - Target Image & Input Section */}
           <ImageDisplaySection
             currentLevel={currentLevel}
-            accuracy={accuracy}
-            aiFeedback={aiFeedback}
             targetImages={targetImages}
             levelDescriptions={levelDescriptions}
             imageLoadErrors={imageLoadErrors}
             setImageLoadErrors={setImageLoadErrors}
-            aiFeedbackRef={aiFeedbackRef}
-          />
-
-          {/* RIGHT COLUMN - Image Generation Section */}
-          <ImageGenerationSection
             prompt={prompt}
             setPrompt={setPrompt}
+            generatedImage={generatedImage}
+            isGenerating={isGenerating}
+            isComparing={isComparing}
+            handleCreateImage={handleCreateImage}
+            handleReset={handleReset}
+          />
+
+          {/* RIGHT COLUMN - Generated Image & Results Section */}
+          <ImageGenerationSection
             generatedImage={generatedImage}
             isGenerating={isGenerating}
             isComparing={isComparing}
             illustrationImage={illustrationImage}
             imageLoadErrors={imageLoadErrors}
             setImageLoadErrors={setImageLoadErrors}
-            handleCreateImage={handleCreateImage}
-            handleReset={handleReset}
+            accuracy={accuracy}
+            aiFeedback={aiFeedback}
+            aiFeedbackRef={aiFeedbackRef}
           />
         </div>
       </div>

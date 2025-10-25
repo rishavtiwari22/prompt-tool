@@ -1,29 +1,20 @@
 import React, { useRef, useEffect } from "react";
-import { Target, Lightbulb, Eye } from "lucide-react";
+import { Target, RefreshCw, Send, Loader2 } from "lucide-react";
 
 const ImageDisplaySection = ({
   currentLevel,
-  accuracy,
-  aiFeedback,
   targetImages,
   levelDescriptions,
   imageLoadErrors,
   setImageLoadErrors,
-  aiFeedbackRef,
+  prompt,
+  setPrompt,
+  generatedImage,
+  isGenerating,
+  isComparing,
+  handleCreateImage,
+  handleReset,
 }) => {
-  // Get progress bar color based on accuracy range
-  const getProgressBarColor = (accuracy) => {
-    if (accuracy >= 70) {
-      return "var(--color-success)"; // Green for high scores (70%+)
-    } else if (accuracy >= 50) {
-      return "var(--color-secondary)"; // Blue for medium scores (50-69%)
-    } else if (accuracy >= 25) {
-      return "var(--color-accent)"; // Pink for low scores (25-49%)
-    } else {
-      return "var(--color-primary)"; // Purple for very low scores (0-24%)
-    }
-  };
-
   return (
     <div className="lg:pr-12">
       {/* Target Image Box */}
@@ -103,252 +94,132 @@ const ImageDisplaySection = ({
         )}
       </div>
 
-      {/* Accuracy Score Section */}
-      <div>
-        <h4
-          className="h4 text-center"
+      {/* Reset Button - Centered - Space always reserved, button visible only when image is generated */}
+      <div className="flex justify-center" style={{ marginBottom: "1rem" }}>
+        <button
+          onClick={handleReset}
+          className="paper-btn"
           style={{
-            color: "var(--color-text-primary)",
-            marginBottom: "1.25rem",
+            backgroundColor: "var(--color-accent-light)",
+            color: "var(--color-accent-dark)",
+            border: "2px solid var(--color-accent)",
+            padding: "0.5rem 1.25rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.4rem",
+            fontFamily: "var(--font-body)",
+            fontSize: "16px",
+            cursor: generatedImage ? "pointer" : "default",
+            transition: "all 0.2s ease",
+            opacity: generatedImage ? 1 : 0,
+            visibility: generatedImage ? "visible" : "hidden",
+            pointerEvents: generatedImage ? "auto" : "none",
           }}
         >
-          Accuracy
-        </h4>
-
-        {/* Progress Bar - Redesigned to match reference images */}
-        <div className="relative" style={{ padding: "0 0.35rem" }}>
-          <div
-            style={{
-              width: "100%",
-              height: "22px",
-              border: "3px solid var(--color-text-primary)",
-              borderRadius: "20px",
-              backgroundColor: "white",
-              position: "relative",
-              overflow: "visible",
-            }}
-          >
-            {/* Progress Fill */}
-            <div
-              style={{
-                width: `${accuracy}%`,
-                height: "100%",
-                backgroundColor: getProgressBarColor(accuracy),
-                borderRadius: "17px",
-                transition: "width 0.5s ease, background-color 0.3s ease",
-                position: "relative",
-              }}
-            >
-              {/* Current Percentage Badge on Progress Bar - Show when accuracy > 0 */}
-              {accuracy > 0 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    right: "-20px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    backgroundColor: "white",
-                    border: "3px solid var(--color-text-primary)",
-                    borderRadius: "20px",
-                    padding: "2px 12px",
-                    fontFamily: "var(--font-body)",
-                    fontSize: "16px",
-                    fontWeight: "600",
-                    color: "var(--color-text-primary)",
-                    whiteSpace: "nowrap",
-                    zIndex: 3,
-                  }}
-                >
-                  {accuracy}%
-                </div>
-              )}
-            </div>
-
-            {/* 70% Standing Line Marker */}
-            <div
-              style={{
-                position: "absolute",
-                left: "70%",
-                top: "-6px",
-                bottom: "-6px",
-                width: "3px",
-                backgroundColor: "var(--color-text-primary)",
-                zIndex: 2,
-                transform: "translateX(-50%)",
-              }}
-            ></div>
-
-            {/* 0% Label at Start - Only show when accuracy is 0 */}
-            {accuracy === 0 && (
-              <div
-                style={{
-                  position: "absolute",
-                  left: "0",
-                  top: "50%",
-                  transform: "translate(-8px, -50%)",
-                  backgroundColor: "white",
-                  border: "3px solid var(--color-text-primary)",
-                  borderRadius: "20px",
-                  padding: "2px 10px",
-                  fontFamily: "var(--font-body)",
-                  fontSize: "16px",
-                  fontWeight: "600",
-                  color: "var(--color-text-primary)",
-                  zIndex: 3,
-                }}
-              >
-                0%
-              </div>
-            )}
-          </div>
-
-          {/* 70% Target Label - Below the standing line */}
-          <div
-            style={{
-              position: "relative",
-              width: "100%",
-              height: "30px",
-              marginTop: "0.5rem",
-            }}
-          >
-            <span
-              style={{
-                position: "absolute",
-                left: "70%",
-                transform: "translateX(-50%)",
-                fontFamily: "var(--font-body)",
-                fontSize: "16px",
-                color: "var(--color-text-primary)",
-                fontWeight: "600",
-              }}
-            >
-              70%
-            </span>
-          </div>
-        </div>
+          Reset
+          <RefreshCw size={16} />
+        </button>
       </div>
 
-      {/* AI Feedback Section - In Left Column Below Progress Bar */}
-      {aiFeedback && aiFeedback.feedback && (
-        <div
-          ref={aiFeedbackRef}
-          className="paper border-2"
-          style={{
-            borderColor: "var(--color-text-primary)",
-            backgroundColor: "white",
-            padding: "1rem 1.5rem",
-            marginTop: "2rem",
-            animation: "fadeIn 0.5s ease-in-out",
-          }}
-        >
-          {/* Header */}
-          <div
+      {/* Prompt Input Box - Full Width Aligned */}
+      <div
+        className="paper border-3"
+        style={{
+          borderColor: "var(--color-text-primary)",
+          backgroundColor: "white",
+          padding: "1rem 1.25rem",
+        }}
+      >
+        <div className="flex items-end gap-3">
+          <textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                handleCreateImage();
+              }
+            }}
+            placeholder="Describe what you see"
+            className="flex-1 input--prompt"
+            rows={1}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.75rem",
-              marginBottom: "1rem",
+              border: "none",
+              outline: "none",
+              fontFamily: "var(--font-body)",
+              fontSize: "18px",
+              color: "var(--color-text-primary)",
+              backgroundColor: "transparent",
+              resize: "none",
+              overflowY: "auto",
+              maxHeight: "64px",
+              minHeight: "46px",
+              padding: "0.75rem 0.5rem",
+              lineHeight: "1.4",
+              transition: "all 0.2s ease",
+            }}
+            onInput={(e) => {
+              // Auto-expand as you type
+              e.target.style.height = "auto";
+              e.target.style.height = `${e.target.scrollHeight}px`;
+            }}
+          />
+
+          <button
+            onClick={handleCreateImage}
+            disabled={!prompt.trim() || isComparing || isGenerating}
+            className="paper-btn flex items-center justify-center"
+            style={{
+              backgroundColor:
+                !prompt.trim() || isComparing || isGenerating
+                  ? "#f3f4f6"
+                  : "var(--color-primary-light)",
+              color:
+                !prompt.trim() || isComparing || isGenerating
+                  ? "#9ca3af"
+                  : "var(--color-primary-dark)",
+              border: `2px solid ${
+                !prompt.trim() || isComparing || isGenerating
+                  ? "#d1d5db"
+                  : "var(--color-primary)"
+              }`,
+              height: "46px",
+              padding: prompt.trim() ? "0 16px" : "0 18px",
+              minWidth: prompt.trim() ? "46px" : "150px",
+              cursor:
+                !prompt.trim() || isComparing || isGenerating
+                  ? "not-allowed"
+                  : "pointer",
+              transition: "all 0.3s ease",
+              whiteSpace: "nowrap",
             }}
           >
-            <Lightbulb size={24} style={{ color: "var(--color-primary)" }} />
-            <span
-              style={{
-                fontFamily: "var(--font-heading)",
-                fontSize: "20px",
-                fontWeight: "400",
-                color: "var(--color-text-primary)",
-              }}
-            >
-              AI Feedback
-            </span>
-          </div>
-
-          {/* Content - Always Visible */}
-          <div
-            style={{
-              paddingTop: "1rem",
-              borderTop: "2px solid var(--color-divider)",
-            }}
-          >
-            {/* Visual Differences */}
-            {aiFeedback.feedback && (
-              <div style={{ marginBottom: "1.5rem" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  <Eye size={20} style={{ color: "var(--color-accent)" }} />
-                  <span
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "18px",
-                      fontWeight: "600",
-                      color: "var(--color-accent-dark)",
-                    }}
-                  >
-                    Visual Differences
-                  </span>
-                </div>
-                <p
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontSize: "16px",
-                    color: "var(--color-text-primary)",
-                    lineHeight: "1.7",
-                    marginLeft: "2rem",
-                  }}
-                >
-                  {aiFeedback.feedback}
-                </p>
-              </div>
+            {isGenerating ? (
+              <>
+                <Loader2
+                  size={16}
+                  style={{ animation: "spin 1s linear infinite" }}
+                />
+                <span style={{ marginLeft: "6px" }}>Generating</span>
+              </>
+            ) : isComparing ? (
+              <>
+                <Loader2
+                  size={16}
+                  style={{ animation: "spin 1s linear infinite" }}
+                />
+                <span style={{ marginLeft: "6px" }}>Analyzing</span>
+              </>
+            ) : prompt.trim() ? (
+              <Send size={18} />
+            ) : (
+              <>
+                Create Image <Send size={16} style={{ marginLeft: "6px" }} />
+              </>
             )}
-
-            {/* Suggestions */}
-            {aiFeedback.improvements && (
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  <Lightbulb
-                    size={20}
-                    style={{ color: "var(--color-success)" }}
-                  />
-                  <span
-                    style={{
-                      fontFamily: "var(--font-body)",
-                      fontSize: "18px",
-                      fontWeight: "600",
-                      color: "var(--color-success)",
-                    }}
-                  >
-                    Suggestions
-                  </span>
-                </div>
-                <p
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontSize: "16px",
-                    color: "var(--color-text-primary)",
-                    lineHeight: "1.7",
-                    marginLeft: "2rem",
-                  }}
-                >
-                  {aiFeedback.improvements}
-                </p>
-              </div>
-            )}
-          </div>
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 };
