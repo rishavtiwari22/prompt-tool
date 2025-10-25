@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Navbar';
-import Home from './pages/Home';
-import LandingPage from './components/LandingPage';
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Header from "./components/Navbar";
+import Home from "./pages/Home";
+import LandingPage from "./components/LandingPage";
 
 function App() {
   const [currentLevel, setCurrentLevel] = useState(1);
@@ -13,7 +13,6 @@ function App() {
   const handleLevelChange = (level) => {
     if (!unlockedLevels.includes(level)) return;
     setCurrentLevel(level);
-
   };
 
   const handleStartGame = () => {
@@ -42,20 +41,37 @@ function App() {
         <LandingPage onStartGame={handleStartGame} />
       ) : (
         <>
-          <Header currentLevel={currentLevel} onLevelChange={handleLevelChange} unlockedLevels={unlockedLevels} completedLevels={completedLevels} />
+          <Header
+            currentLevel={currentLevel}
+            onLevelChange={handleLevelChange}
+            unlockedLevels={unlockedLevels}
+            completedLevels={completedLevels}
+          />
           {/* PaperCSS-style thick horizontal divider matching Figma */}
-          <hr 
-            className="border-primary" 
-            style={{ 
+          <hr
+            className="border-primary"
+            style={{
               margin: 0,
-              border: 'none',
-              borderTop: '1px solid #000000',
+              border: "none",
+              borderTop: "1px solid #000000",
               opacity: 0.25,
-              height: 0
-            }} 
+              height: 0,
+            }}
           />
           <Routes>
-            <Route path="/" element={<Home currentLevel={currentLevel} onLevelChange={handleLevelChange} unlockedLevels={unlockedLevels} setLevelUnlocked={setLevelUnlocked} completedLevels={completedLevels} setLevelCompleted={setLevelCompleted} />} />
+            <Route
+              path="/"
+              element={
+                <Home
+                  currentLevel={currentLevel}
+                  onLevelChange={handleLevelChange}
+                  unlockedLevels={unlockedLevels}
+                  setLevelUnlocked={setLevelUnlocked}
+                  completedLevels={completedLevels}
+                  setLevelCompleted={setLevelCompleted}
+                />
+              }
+            />
           </Routes>
         </>
       )}
