@@ -25,7 +25,7 @@ const imageToBase64 = async (imagePath) => {
       }
       throw new Error('Invalid data URL format');
     }
-    
+
     // Handle local Vite paths (/src/assets/...)
     // Convert to proper URL for Vite dev server
     let imageUrl = imagePath;
@@ -39,11 +39,11 @@ const imageToBase64 = async (imagePath) => {
       // Handle other absolute paths
       imageUrl = new URL(imagePath, window.location.origin).href;
     }
-    
+
     // Handle http/https URLs or blob URLs or converted local URLs
-    if (imageUrl.startsWith('http://') || 
-        imageUrl.startsWith('https://') || 
-        imageUrl.startsWith('blob:')) {
+    if (imageUrl.startsWith('http://') ||
+      imageUrl.startsWith('https://') ||
+      imageUrl.startsWith('blob:')) {
       const response = await fetch(imageUrl);
       if (!response.ok) {
         throw new Error(`Failed to fetch image: ${response.statusText} from ${imageUrl}`);
@@ -56,7 +56,7 @@ const imageToBase64 = async (imagePath) => {
         reader.readAsDataURL(blob);
       });
     }
-    
+
     throw new Error(`Unsupported image format: ${imagePath.substring(0, 50)}...`);
   } catch (error) {
     throw new Error(`Failed to process image: ${error.message}`);
@@ -68,7 +68,7 @@ export const compareImagesWithSiliconFlow = async (targetImagePath, generatedIma
     console.log("🚀 Starting SiliconFlow image comparison...");
     console.log("📸 Target image:", targetImagePath?.substring(0, 100));
     console.log("📸 Generated image:", generatedImagePath?.substring(0, 100));
-    
+
     const apiKey = initSiliconFlow();
 
     console.log("🔄 Converting images to base64...");
@@ -79,19 +79,34 @@ export const compareImagesWithSiliconFlow = async (targetImagePath, generatedIma
 
     console.log("✅ Images converted successfully");
 
-    const promptText = originalPrompt 
+    const promptText = originalPrompt
       ? `Compare these two images:
 🎯 FIRST: Target image
 ✏️ SECOND: Generated (prompt: "${originalPrompt}")
 
+Note: Use simple, playful **Hinglish** (Hindi + English) suitable for a 5-8 year old child.
+Note: Keep all suggestions simple and actionable, giving short English prompt examples where needed.
+
+📝 Example (for understanding only, don’t copy):
+VISUAL DIFFERENCES: Dekho! Target image mein ek bada lal apple hai. Lekin generated image mein do apple hain — ek orange aur ek lal! Background bhi safed nahi, hara hai.
+PROMPT IMPROVEMENTS: Agar sirf ek lal apple chahiye, toh likho "one red apple on white background". Agar leaves nahi chahiye, toh likho "no leaves".
+
 Format EXACTLY as:
 SIMILARITY SCORE: [number]%
-VISUAL DIFFERENCES: [max 80 words brief analysis]
-PROMPT IMPROVEMENTS: [max 80 words concise suggestions]`
+VISUAL DIFFERENCES: [max 70 simple words brief analysis in Hinglish for 5-8 year boy]
+PROMPT IMPROVEMENTS: [max 70 simple words concise suggestions in Hinglish for 5-8 year boy]`
       : `Compare these images:
+Note: Use simple, playful **Hinglish** (Hindi + English) suitable for a 5-8 year old child.
+Note: Keep all suggestions simple and actionable, giving short English prompt examples where needed.
+
+
+📝 Example (for understanding only, don’t copy):
+VISUAL DIFFERENCES: Dekho! Target image mein ek bada lal apple hai. Lekin generated image mein do apple hain — ek orange aur ek lal! Background bhi safed nahi, hara hai.
+PROMPT IMPROVEMENTS: Agar sirf ek lal apple chahiye, toh likho "one red apple on white background". Agar leaves nahi chahiye, toh likho "no leaves".
+
 SIMILARITY SCORE: [number]%
-VISUAL DIFFERENCES: [max 80 words brief analysis]
-OBSERVATIONS: [max 80 words concise insights]`;
+VISUAL DIFFERENCES: [max 70 simple words brief analysis in Hinglish for 5-8 year boy]
+OBSERVATIONS: [max 70 simple words concise insights in Hinglish for 5-8 year boy]`;
 
     const payload = {
       model: "Qwen/Qwen3-VL-8B-Instruct",
