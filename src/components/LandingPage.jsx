@@ -1,6 +1,5 @@
-
-
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Play,
   Sparkles,
@@ -14,7 +13,8 @@ import "../styles/landing.css";
 // Import image assets properly for production
 import leftTopIcon from "../assets/left-top.svg";
 
-const LandingPage = ({ onStartGame }) => {
+const LandingPage = () => {
+  const navigate = useNavigate();
   const [isStarting, setIsStarting] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -43,14 +43,14 @@ const LandingPage = ({ onStartGame }) => {
       // Play button click sound
       await audioManager.playButtonClick();
 
-      // Smooth transition delay
+      // Smooth transition delay then navigate to game
       setTimeout(() => {
-        onStartGame();
+        navigate("/game");
       }, 1200);
     } catch (error) {
       console.warn("Audio failed to start:", error);
       setTimeout(() => {
-        onStartGame();
+        navigate("/game");
       }, 800);
     }
   };

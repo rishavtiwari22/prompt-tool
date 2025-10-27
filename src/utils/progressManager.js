@@ -1,9 +1,9 @@
 // progressManager.js - Utility for managing level progress in localStorage
 
 const STORAGE_KEYS = {
-  COMPLETED_LEVELS: 'prompt-learning-tool-completedLevels',
-  CURRENT_LEVEL: 'prompt-learning-tool-currentLevel', 
-  UNLOCKED_LEVELS: 'prompt-learning-tool-unlockedLevels'
+  COMPLETED_LEVELS: "prompt-learning-tool-completedLevels",
+  CURRENT_LEVEL: "prompt-learning-tool-currentLevel",
+  UNLOCKED_LEVELS: "prompt-learning-tool-unlockedLevels",
 };
 
 /**
@@ -12,22 +12,26 @@ const STORAGE_KEYS = {
  */
 export const loadProgressFromLocalStorage = () => {
   try {
-    const completedLevels = JSON.parse(localStorage.getItem(STORAGE_KEYS.COMPLETED_LEVELS)) || [];
-    const currentLevel = parseInt(localStorage.getItem(STORAGE_KEYS.CURRENT_LEVEL)) || 1;
-    const unlockedLevels = JSON.parse(localStorage.getItem(STORAGE_KEYS.UNLOCKED_LEVELS)) || [1];
+    const completedLevels =
+      JSON.parse(localStorage.getItem(STORAGE_KEYS.COMPLETED_LEVELS)) || [];
+    const currentLevel =
+      parseInt(localStorage.getItem(STORAGE_KEYS.CURRENT_LEVEL)) || 1;
+    const unlockedLevels = JSON.parse(
+      localStorage.getItem(STORAGE_KEYS.UNLOCKED_LEVELS)
+    ) || [1];
 
     return {
       currentLevel,
       completedLevels,
-      unlockedLevels
+      unlockedLevels,
     };
   } catch (error) {
-    console.error('Error loading progress from localStorage:', error);
+    console.error("Error loading progress from localStorage:", error);
     // Return default values if there's an error
     return {
       currentLevel: 1,
       completedLevels: [],
-      unlockedLevels: [1]
+      unlockedLevels: [1],
     };
   }
 };
@@ -40,7 +44,7 @@ export const saveCurrentLevel = (level) => {
   try {
     localStorage.setItem(STORAGE_KEYS.CURRENT_LEVEL, level.toString());
   } catch (error) {
-    console.error('Error saving current level to localStorage:', error);
+    console.error("Error saving current level to localStorage:", error);
   }
 };
 
@@ -50,9 +54,12 @@ export const saveCurrentLevel = (level) => {
  */
 export const saveCompletedLevels = (completedLevels) => {
   try {
-    localStorage.setItem(STORAGE_KEYS.COMPLETED_LEVELS, JSON.stringify(completedLevels));
+    localStorage.setItem(
+      STORAGE_KEYS.COMPLETED_LEVELS,
+      JSON.stringify(completedLevels)
+    );
   } catch (error) {
-    console.error('Error saving completed levels to localStorage:', error);
+    console.error("Error saving completed levels to localStorage:", error);
   }
 };
 
@@ -62,9 +69,12 @@ export const saveCompletedLevels = (completedLevels) => {
  */
 export const saveUnlockedLevels = (unlockedLevels) => {
   try {
-    localStorage.setItem(STORAGE_KEYS.UNLOCKED_LEVELS, JSON.stringify(unlockedLevels));
+    localStorage.setItem(
+      STORAGE_KEYS.UNLOCKED_LEVELS,
+      JSON.stringify(unlockedLevels)
+    );
   } catch (error) {
-    console.error('Error saving unlocked levels to localStorage:', error);
+    console.error("Error saving unlocked levels to localStorage:", error);
   }
 };
 
@@ -107,8 +117,8 @@ export const clearProgress = () => {
     localStorage.removeItem(STORAGE_KEYS.COMPLETED_LEVELS);
     localStorage.removeItem(STORAGE_KEYS.CURRENT_LEVEL);
     localStorage.removeItem(STORAGE_KEYS.UNLOCKED_LEVELS);
-    console.log('Progress cleared from localStorage');
+    console.log("Progress cleared from localStorage");
   } catch (error) {
-    console.error('Error clearing progress from localStorage:', error);
+    console.error("Error clearing progress from localStorage:", error);
   }
 };
