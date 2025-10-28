@@ -34,6 +34,18 @@ const LandingPage = () => {
       setImageError(true);
     };
     img.src = leftTopIcon;
+
+    // Try to start background music when landing page loads
+    const startBackgroundMusic = async () => {
+      try {
+        await audioManager.startBackgroundMusic();
+        console.log("🎵 Background music started from landing page");
+      } catch (error) {
+        console.log("🎵 Background music start failed from landing page:", error);
+      }
+    };
+    
+    startBackgroundMusic();
   }, []);
 
   const handleStartGame = async () => {
