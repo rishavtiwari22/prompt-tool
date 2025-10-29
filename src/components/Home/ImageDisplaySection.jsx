@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import { Target, RefreshCw, Send, Loader2 } from "lucide-react";
+import { Target, Send, Loader2 } from "lucide-react";
 
 const ImageDisplaySection = ({
   currentLevel,
@@ -92,33 +92,6 @@ const ImageDisplaySection = ({
             </p>
           </div>
         )}
-      </div>
-
-      {/* Reset Button - Centered - Space always reserved, button visible only when image is generated */}
-      <div className="flex justify-center" style={{ marginBottom: "1rem" }}>
-        <button
-          onClick={handleReset}
-          className="paper-btn"
-          style={{
-            backgroundColor: "var(--color-accent-light)",
-            color: "var(--color-accent-dark)",
-            border: "2px solid var(--color-accent)",
-            padding: "0.5rem 1.25rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.4rem",
-            fontFamily: "var(--font-body)",
-            fontSize: "16px",
-            cursor: generatedImage ? "pointer" : "default",
-            transition: "all 0.2s ease",
-            opacity: generatedImage ? 1 : 0,
-            visibility: generatedImage ? "visible" : "hidden",
-            pointerEvents: generatedImage ? "auto" : "none",
-          }}
-        >
-          Reset
-          <RefreshCw size={16} />
-        </button>
       </div>
 
       {/* Prompt Input Box - Full Width Aligned */}

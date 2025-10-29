@@ -214,28 +214,7 @@ const ImageGenerationSection = ({
               }}
             >
               {/* Current Percentage Badge on Progress Bar - Show when accuracy > 0 */}
-              {accuracy > 0 && (
-                <div
-                  style={{
-                    position: "absolute",
-                    right: "-20px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    backgroundColor: "white",
-                    border: "3px solid var(--color-text-primary)",
-                    borderRadius: "20px",
-                    padding: "2px 12px",
-                    fontFamily: "var(--font-body)",
-                    fontSize: "16px",
-                    fontWeight: "600",
-                    color: "var(--color-text-primary)",
-                    whiteSpace: "nowrap",
-                    zIndex: 3,
-                  }}
-                >
-                  {accuracy}%
-                </div>
-              )}
+              {/* Removed numeric accuracy display */}
             </div>
 
             {/* 70% Standing Line Marker */}
@@ -252,28 +231,7 @@ const ImageGenerationSection = ({
               }}
             ></div>
 
-            {/* 0% Label at Start - Only show when accuracy is 0 */}
-            {accuracy === 0 && (
-              <div
-                style={{
-                  position: "absolute",
-                  left: "0",
-                  top: "50%",
-                  transform: "translate(-8px, -50%)",
-                  backgroundColor: "white",
-                  border: "3px solid var(--color-text-primary)",
-                  borderRadius: "20px",
-                  padding: "2px 10px",
-                  fontFamily: "var(--font-body)",
-                  fontSize: "16px",
-                  fontWeight: "600",
-                  color: "var(--color-text-primary)",
-                  zIndex: 3,
-                }}
-              >
-                0%
-              </div>
-            )}
+            {/* Removed 0% label */}
           </div>
 
           {/* 70% Target Label - Below the standing line */}
@@ -284,20 +242,7 @@ const ImageGenerationSection = ({
               height: "30px",
               marginTop: "0.5rem",
             }}
-          >
-            <span
-              style={{
-                position: "absolute",
-                left: "70%",
-                transform: "translateX(-50%)",
-                fontFamily: "var(--font-body)",
-                fontSize: "16px",
-                color: "var(--color-text-primary)",
-                fontWeight: "600",
-              }}
-            >
-              70%
-            </span>
+          >              {/* Removed 70% target label */}
           </div>
         </div>
       </div>
