@@ -184,16 +184,13 @@ const LandingPage = () => {
           >
             <span
               style={{
-                display: "block",
-                // marginBottom: "0.5rem",
-                color: "var(--color-text-primary)",
+                color: "black",
               }}
             >
-              Image genie
+              Welcome to{" "}
             </span>
             <span
               style={{
-                display: "block",
                 color: "var(--color-primary)",
               }}
             >
@@ -222,29 +219,21 @@ const LandingPage = () => {
                 color: "var(--color-text-primary)",
               }}
             >
-              Say the magic words and bring images to life. Level up your prompt
-              power play with the Image Genie!
+            Level up your prompt spells play with the Abracadraw
             </p>
 
-            {/* Supporting line 1 */}
+            {/* Supporting line - Combined */}
             <p
               style={{
-                fontSize: "clamp(1rem, 2.2vw, 1.25rem)",
-                lineHeight: "1.7",
-                marginBottom: "0.75rem",
+                fontSize: "clamp(1.1rem, 2.2vw, 1.35rem)",
+                lineHeight: "1.6",
+                maxWidth: "90%",
+                margin: "0 auto",
+                wordSpacing: "-0.05em",
+                letterSpacing: "-0.01em",
               }}
             >
-              Beat every challenge with the magic of your words!
-            </p>
-
-            {/* Supporting line 2 */}
-            <p
-              style={{
-                fontSize: "clamp(1rem, 2.2vw, 1.25rem)",
-                lineHeight: "1.7",
-              }}
-            >
-              Describe it right, and your genie brings it to life!
+            Beat every challenge with the magic spells of your words. Describe it right, and your spells brings it to life
             </p>
           </div>
 
