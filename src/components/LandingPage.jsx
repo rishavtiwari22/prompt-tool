@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import audioManager from "../utils/audioManager";
 import "../styles/landing.css";
+import VerificationModal from "./VerificationModal";
 // Import image assets properly for production
 import leftTopIcon from "../assets/left-top.svg";
 
@@ -19,6 +20,7 @@ const LandingPage = () => {
   const [mounted, setMounted] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -48,23 +50,14 @@ const LandingPage = () => {
     startBackgroundMusic();
   }, []);
 
-  const handleStartGame = async () => {
+  const handleStartGame = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleVerification = async ({ name, passcode }) => {
     setIsStarting(true);
-
-    try {
-      // Play button click sound
-      await audioManager.playButtonClick();
-
-      // Smooth transition delay then navigate to game
-      setTimeout(() => {
-        navigate("/game");
-      }, 1200);
-    } catch (error) {
-      console.warn("Audio failed to start:", error);
-      setTimeout(() => {
-        navigate("/game");
-      }, 800);
-    }
+    // TODO: Store the user's name in a context or state management system if needed
+    navigate("/game");
   };
 
   return (
@@ -72,10 +65,16 @@ const LandingPage = () => {
       className="landing-page-container min-h-screen relative overflow-hidden"
       style={{
         background: `
+          linear-gradient(to bottom right, 
+            rgba(255, 255, 255, 0.05), 
+            rgba(115, 69, 228, 0.05)
+          ),
           radial-gradient(circle at 25% 25%, var(--color-dot) 2px, transparent 2px),
           radial-gradient(circle at 75% 75%, var(--color-dot) 2px, transparent 2px),
           var(--color-bg)
         `,
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
         backgroundSize: "60px 60px",
         backgroundPosition: "0 0, 30px 30px",
       }}
@@ -381,6 +380,15 @@ const LandingPage = () => {
           />
         ))}
       </div>
+
+      {/* Verification Modal */}
+      {isModalOpen && (
+        <VerificationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onVerify={handleVerification}
+        />
+      )}
     </div>
   );
 };
