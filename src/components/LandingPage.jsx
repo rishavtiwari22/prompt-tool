@@ -212,11 +212,12 @@ const LandingPage = () => {
             {/* Main tagline - Larger and bold */}
             <p
               style={{
-                fontSize: "clamp(1.2rem, 2.8vw, 1.5rem)",
+                fontSize: "clamp(1.3rem, 3vw, 1.55rem)",
                 lineHeight: "1.6",
                 fontWeight: "600",
                 marginBottom: "1.5rem",
-                color: "var(--color-text-primary)",
+                color: "#20293a",
+                fontFamily: "'Neucha', cursive",
               }}
             >
             Level up your prompt spells play with the Abracadraw
@@ -225,12 +226,14 @@ const LandingPage = () => {
             {/* Supporting line - Combined */}
             <p
               style={{
-                fontSize: "clamp(1.1rem, 2.2vw, 1.35rem)",
+                fontSize: "clamp(1.2rem, 2.4vw, 1.4rem)",
                 lineHeight: "1.6",
                 maxWidth: "90%",
                 margin: "0 auto",
                 wordSpacing: "-0.05em",
                 letterSpacing: "-0.01em",
+                fontFamily: "'Neucha', cursive",
+                color: "#64748b",
               }}
             >
             Beat every challenge with the magic spells of your words. Describe it right, and your spells brings it to life
