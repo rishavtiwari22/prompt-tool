@@ -15,6 +15,7 @@ import {
   saveUnlockedLevels,
   saveCompletedLevels,
 } from "./utils/progressManager";
+import audioManager from "./utils/audioManager";
 
 // Smart Landing Page component that redirects if user has progress
 function SmartLandingPage({ onStartGame, hasProgress }) {
@@ -71,6 +72,48 @@ function App() {
   const [completedLevels, setCompletedLevels] = useState(
     initialProgress.completedLevels
   );
+
+  // Initialize audio manager when app loads
+  useEffect(() => {
+    console.log("🎵 App loaded - ensuring background music starts");
+    
+    // Try to start background music immediately on app load
+    const tryStartMusic = async () => {
+      try {
+        await audioManager.startBackgroundMusic();
+      } catch (error) {
+        console.log("🎵 Initial music start failed, will retry on interaction:", error);
+      }
+    };
+    
+    tryStartMusic();
+    
+    // Also add a one-time listener for any user interaction to start music
+    const startMusicOnFirstInteraction = async () => {
+      try {
+        await audioManager.startBackgroundMusic();
+        console.log("🎵 Background music started after page interaction");
+      } catch (error) {
+        console.log("🎵 Music start after interaction failed:", error);
+      }
+      // Remove listeners after first attempt
+      document.removeEventListener('click', startMusicOnFirstInteraction);
+      document.removeEventListener('keydown', startMusicOnFirstInteraction);
+      document.removeEventListener('touchstart', startMusicOnFirstInteraction);
+    };
+    
+    // Add event listeners for user interaction
+    document.addEventListener('click', startMusicOnFirstInteraction, { once: true });
+    document.addEventListener('keydown', startMusicOnFirstInteraction, { once: true });
+    document.addEventListener('touchstart', startMusicOnFirstInteraction, { once: true });
+    
+    // Cleanup function
+    return () => {
+      document.removeEventListener('click', startMusicOnFirstInteraction);
+      document.removeEventListener('keydown', startMusicOnFirstInteraction);
+      document.removeEventListener('touchstart', startMusicOnFirstInteraction);
+    };
+  }, []);
 
   // Check if user has progress (has completed at least one level or is beyond level 1)
   const hasProgress =

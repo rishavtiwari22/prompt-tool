@@ -5,6 +5,10 @@ class AudioManager {
   constructor() {
     this.audioEnabled = true;
     this.audioCache = new Map();
+    this.backgroundMusic = null;
+    this.backgroundMusicVolume = 0.2;
+    this.backgroundMusicLowVolume = 0.05;
+    this.fadeTimeout = null;
 
     // Audio file mappings - using public folder paths for deployment
     this.audioFiles = {
@@ -15,6 +19,7 @@ class AudioManager {
       reset: "/audio/Reset.mp3",
       accuracyGoingBack: "/audio/AccuracyGoingBack.mp3",
       soundToggle: "/audio/SoundOnOffButton.mp3",
+      backgroundMusic: "/audio/backgroundSound.mp3",
       // Score-based feedback audio
       score0to25: "/audio/0-25.mp3",
       score26to50: "/audio/26-50.mp3",
@@ -43,11 +48,15 @@ class AudioManager {
         "buttonClick",
         "resultGenerate",
         "levelComplete",
+        "backgroundMusic",
         "score0to25",
         "score26to50",
         "score51to80",
         "score81to100",
       ]);
+      
+      // Start background music immediately when page loads
+      this.startBackgroundMusic();
     }
   }
 
@@ -81,6 +90,73 @@ class AudioManager {
     }
 
     return results;
+  }
+
+  startBackgroundMusic() {
+    if (!this.audioEnabled) return;
+    
+    try {
+      // Stop any existing background music first
+      this.stopBackgroundMusic();
+      
+      // Get the background music from cache or create new instance
+      const cachedAudio = this.audioCache.get("backgroundMusic");
+      if (cachedAudio) {
+        this.backgroundMusic = cachedAudio;
+      } else {
+        this.backgroundMusic = new Audio('/audio/backgroundSound.mp3');
+        this.audioCache.set("backgroundMusic", this.backgroundMusic);
+      }
+      
+      // Configure background music
+      this.backgroundMusic.loop = true;
+      this.backgroundMusic.volume = this.backgroundMusicVolume;
+      this.backgroundMusic.playbackRate = 1.0; // Normal speed
+      this.backgroundMusic.currentTime = 0; // Start from beginning
+      
+      // Play the music
+      this.backgroundMusic.play().then(() => {
+        console.log('🎵 Background music started successfully');
+      }).catch(error => {
+        console.log('Background music autoplay failed:', error);
+      });
+    } catch (error) {
+      console.error('Error starting background music:', error);
+    }
+  }
+
+  stopBackgroundMusic() {
+    if (this.backgroundMusic) {
+      this.backgroundMusic.pause();
+      this.backgroundMusic.currentTime = 0;
+      console.log("🔇 Background music stopped");
+    }
+
+    // Clear any pending timeouts
+    if (this.fadeTimeout) {
+      clearTimeout(this.fadeTimeout);
+      this.fadeTimeout = null;
+    }
+  }
+
+  lowerBackgroundMusic() {
+    if (this.backgroundMusic && this.audioEnabled && !this.backgroundMusic.paused) {
+      this.backgroundMusic.volume = this.backgroundMusicLowVolume;
+    }
+  }
+
+  restoreBackgroundMusic() {
+    if (this.backgroundMusic && this.audioEnabled && !this.backgroundMusic.paused) {
+      if (this.fadeTimeout) {
+        clearTimeout(this.fadeTimeout);
+      }
+      
+      this.fadeTimeout = setTimeout(() => {
+        if (this.backgroundMusic && !this.backgroundMusic.paused) {
+          this.backgroundMusic.volume = this.backgroundMusicVolume;
+        }
+      }, 500);
+    }
   }
 
   async preloadAudio(audioKeys) {
@@ -152,6 +228,14 @@ class AudioManager {
       const audio = new Audio(audioPath);
       audio.preload = "auto";
       audio.volume = 0.7; // Fixed default volume
+      audio.playbackRate = 1.0; // Ensure normal speed
+      audio.preservesPitch = true; // Maintain audio quality
+      
+      // Enable looping for background music
+      if (audioKey === "backgroundMusic") {
+        audio.loop = true;
+        console.log("🎵 Background music configured for looping");
+      }
 
       // Add timeout for loading
       const timeout = setTimeout(() => {
@@ -197,6 +281,11 @@ class AudioManager {
       return Promise.resolve();
     }
 
+    // Lower background music when playing other sounds
+    if (audioKey !== "backgroundMusic") {
+      this.lowerBackgroundMusic();
+    }
+
     try {
       let audio = this.audioCache.get(audioKey);
 
@@ -205,30 +294,48 @@ class AudioManager {
         audio = await this.loadAudio(audioKey);
       }
 
-      // Clone audio for overlapping sounds
-      const audioClone = audio.cloneNode();
-      audioClone.volume = options.volume ?? 0.7; // Fixed default volume
+      // For background music, use the original audio element to avoid conflicts
+      const audioToPlay = audioKey === "backgroundMusic" ? audio : audio.cloneNode();
+      audioToPlay.volume = options.volume ?? 0.7; // Fixed default volume
+      
+      // Ensure normal playback speed
+      audioToPlay.playbackRate = 1.0;
 
-      if (options.loop) {
-        audioClone.loop = true;
+      if (options.loop && audioKey !== "backgroundMusic") {
+        audioToPlay.loop = true;
       }
 
-      // Add error handling for the cloned audio
-      audioClone.addEventListener("error", (e) => {
+      // Add error handling for the audio
+      audioToPlay.addEventListener("error", (e) => {
         console.warn(`Playback error for ${audioKey}:`, e);
       });
 
-      const playPromise = audioClone.play();
+      // Add ended event listener to restore background music volume (only for non-background sounds)
+      if (audioKey !== "backgroundMusic") {
+        audioToPlay.addEventListener("ended", () => {
+          this.restoreBackgroundMusic();
+        });
+      }
+
+      const playPromise = audioToPlay.play();
 
       if (playPromise !== undefined) {
         return playPromise.catch((error) => {
           console.warn(`Audio play failed for ${audioKey}:`, error);
+          // Restore background music even if play failed
+          if (audioKey !== "backgroundMusic") {
+            this.restoreBackgroundMusic();
+          }
         });
       }
 
-      return audioClone;
+      return audioToPlay;
     } catch (error) {
       console.warn(`Failed to play audio: ${audioKey}`, error);
+      // Restore background music on error
+      if (audioKey !== "backgroundMusic") {
+        this.restoreBackgroundMusic();
+      }
       // Fallback to generated tone
       this.playFallbackTone(audioKey);
     }
@@ -304,9 +411,25 @@ class AudioManager {
   }
 
   async toggleAudio() {
+    // First check current state to determine what sound to play
+    const willBeEnabled = !this.audioEnabled;
+    
+    // Play toggle sound (always allowed)
     await this.playSound("soundToggle", { volume: 0.8 });
-    this.audioEnabled = !this.audioEnabled;
+    
+    // Toggle the audio state
+    this.audioEnabled = willBeEnabled;
     localStorage.setItem("audioEnabled", JSON.stringify(this.audioEnabled));
+
+    if (this.audioEnabled) {
+      // Start background music when audio is enabled
+      console.log("🔊 Audio enabled - starting background music");
+      this.startBackgroundMusic();
+    } else {
+      // Stop background music when audio is disabled
+      console.log("🔇 Audio disabled - stopping background music");
+      this.stopBackgroundMusic();
+    }
 
     return this.audioEnabled;
   }
@@ -314,11 +437,18 @@ class AudioManager {
   getAudioState() {
     return {
       enabled: this.audioEnabled,
+      backgroundMusicPlaying: this.backgroundMusic && !this.backgroundMusic.paused,
     };
   }
 
   // Clean up resources
   destroy() {
+    this.stopBackgroundMusic();
+    
+    if (this.fadeTimeout) {
+      clearTimeout(this.fadeTimeout);
+    }
+
     this.audioCache.forEach((audio) => {
       audio.pause();
       audio.src = "";
@@ -345,4 +475,6 @@ export const {
   playScoreBasedFeedback,
   toggleAudio,
   getAudioState,
+  startBackgroundMusic,
+  stopBackgroundMusic,
 } = audioManager;
