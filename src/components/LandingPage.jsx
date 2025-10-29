@@ -43,10 +43,13 @@ const LandingPage = () => {
         await audioManager.startBackgroundMusic();
         console.log("🎵 Background music started from landing page");
       } catch (error) {
-        console.log("🎵 Background music start failed from landing page:", error);
+        console.log(
+          "🎵 Background music start failed from landing page:",
+          error
+        );
       }
     };
-    
+
     startBackgroundMusic();
   }, []);
 
@@ -220,7 +223,7 @@ const LandingPage = () => {
                 fontFamily: "'Neucha', cursive",
               }}
             >
-            Level up your prompt spells play with the Abracadraw
+              Level up your prompt spells play with the Abracadraw
             </p>
 
             {/* Supporting line - Combined */}
@@ -236,7 +239,8 @@ const LandingPage = () => {
                 color: "#64748b",
               }}
             >
-            Beat every challenge with the magic spells of your words. Describe it right, and your spells brings it to life
+              Beat every challenge with the magic spells of your words. Describe
+              it right, and your spells brings it to life
             </p>
           </div>
 
