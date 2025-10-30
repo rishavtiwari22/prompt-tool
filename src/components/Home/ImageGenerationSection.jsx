@@ -29,7 +29,7 @@ const ImageGenerationSection = ({
       className="lg:pl-12"
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      {/* Generated Image Box - Centered in right section */}
+      {/* Generated Image Box - Centered in right section */
       <div
         className="paper border-3"
         style={{

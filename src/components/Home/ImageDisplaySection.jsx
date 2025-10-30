@@ -20,7 +20,7 @@ const ImageDisplaySection = ({
       className="lg:pr-12"
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      {/* Target Image Box - Centered in left section */}
+      {/* Target Image Box - Centered in left section */
       <div
         className="paper border-3"
         style={{
