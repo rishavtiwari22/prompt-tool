@@ -16,7 +16,7 @@ const ImageDisplaySection = ({
   handleReset,
 }) => {
   return (
-    <div className="lg:pr-12">
+  <div className="lg:pr-12" style={{ marginTop: '0.5rem' }}>
       {/* Target Image Box */}
       <div
         className="paper border-3"
@@ -24,9 +24,9 @@ const ImageDisplaySection = ({
           borderColor: "var(--color-text-primary)",
           backgroundColor: "white",
           padding: "0.02rem",
-          height: "450px",
-          maxWidth: "550px",
-          margin: "0 auto 2rem auto",
+          height: "400px",
+          maxWidth: "500px",
+          margin: "0 auto 1.2rem auto",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -100,7 +100,7 @@ const ImageDisplaySection = ({
         style={{
           borderColor: "var(--color-text-primary)",
           backgroundColor: "white",
-          padding: "1rem 1.25rem",
+          padding: "0.5rem 0.75rem",
         }}
       >
         <div className="flex items-end gap-3">

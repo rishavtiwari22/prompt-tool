@@ -25,7 +25,7 @@ const ImageGenerationSection = ({
     }
   };
   return (
-    <div className="lg:pl-12">
+  <div className="lg:pl-12" style={{ marginTop: '0.5rem' }}>
       {/* Generated Image Box */}
       <div
         className="paper border-3"
@@ -33,9 +33,9 @@ const ImageGenerationSection = ({
           borderColor: "var(--color-text-primary)",
           backgroundColor: "white",
           padding: "0.02rem",
-          height: "450px",
-          maxWidth: "550px",
-          margin: "0 auto 2rem auto",
+          height: "400px",
+          maxWidth: "500px",
+          margin: "0 auto 1.2rem auto",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -178,12 +178,12 @@ const ImageGenerationSection = ({
       </div>
 
       {/* Accuracy Score Section */}
-      <div>
+      <div style={{ marginTop: '0.5rem' }}>
         <h4
           className="h4 text-center"
           style={{
             color: "var(--color-text-primary)",
-            marginBottom: "1.25rem",
+            marginBottom: "0.75rem",
           }}
         >
           Accuracy
