@@ -16,8 +16,11 @@ const ImageDisplaySection = ({
   handleReset,
 }) => {
   return (
-    <div className="lg:pr-12">
-      {/* Target Image Box - Moved up by reducing top margin */}
+    <div
+      className="lg:pr-12"
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
+      {/* Target Image Box - Centered in left section */}
       <div
         className="paper border-3"
         style={{
@@ -26,7 +29,8 @@ const ImageDisplaySection = ({
           padding: "0.02rem",
           height: "450px",
           maxWidth: "550px",
-          margin: "0 auto 2rem auto", // Removed top margin, kept bottom margin
+          width: "100%",
+          marginBottom: "2rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -94,13 +98,15 @@ const ImageDisplaySection = ({
         )}
       </div>
 
-      {/* Prompt Input Box - Full Width Aligned */}
+      {/* Prompt Input Box - Centered in left section */}
       <div
         className="paper border-3"
         style={{
           borderColor: "var(--color-text-primary)",
           backgroundColor: "white",
           padding: "1rem 1.25rem",
+          maxWidth: "550px",
+          width: "100%",
         }}
       >
         <div className="flex items-end gap-3">

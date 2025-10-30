@@ -71,7 +71,7 @@ const Home = ({
       onLevelChange(nextLevel);
     }
   };
-  
+
   const [prompt, setPrompt] = useState("");
   const [accuracy, setAccuracy] = useState(0);
   const [generatedImage, setGeneratedImage] = useState(null);
@@ -218,8 +218,8 @@ const Home = ({
         {/* New Layout: Fixed left section, scrollable right section */}
         <div
           className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 relative"
-          style={{ 
-            overflow: "hidden", 
+          style={{
+            overflow: "hidden",
             paddingTop: "2rem",
             height: "calc(100vh - 120px)", // Adjust based on your header height
           }}
@@ -242,7 +242,7 @@ const Home = ({
           ></div>
 
           {/* LEFT COLUMN - Target Image & Input Section (STICKY) */}
-          <div 
+          <div
             className="lg:pr-12"
             style={{
               position: "relative",
@@ -267,7 +267,7 @@ const Home = ({
           </div>
 
           {/* RIGHT COLUMN - Generated Image & Results Section (SCROLLABLE) */}
-          <div 
+          <div
             className="lg:pl-12"
             style={{
               position: "relative",

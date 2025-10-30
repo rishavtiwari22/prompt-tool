@@ -25,8 +25,11 @@ const ImageGenerationSection = ({
     }
   };
   return (
-    <div className="lg:pl-12">
-      {/* Generated Image Box */}
+    <div
+      className="lg:pl-12"
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
+      {/* Generated Image Box - Centered in right section */}
       <div
         className="paper border-3"
         style={{
@@ -35,7 +38,8 @@ const ImageGenerationSection = ({
           padding: "0.02rem",
           height: "450px",
           maxWidth: "550px",
-          margin: "0 auto 2rem auto",
+          width: "100%",
+          marginBottom: "2rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -177,21 +181,28 @@ const ImageGenerationSection = ({
         )}
       </div>
 
-      {/* Accuracy Score Section - Reduced spacing */}
-      <div style={{ marginBottom: "1.5rem",marginTop: "-0.5rem"  }}> {/* Reduced from 3rem to 1.5rem */}
+      {/* Accuracy Score Section - Centered in right section */}
+      <div
+        style={{
+          marginBottom: "1.5rem",
+          marginTop: "-0.5rem",
+          maxWidth: "550px",
+          width: "100%",
+        }}
+      >
         <h4
           className="h4 text-center"
           style={{
             color: "var(--color-text-primary)",
-            marginBottom: "0.75rem", // Reduced from 1.25rem to 0.75rem
-            fontSize: "1.1rem", // Reduced font size from default h4
-            fontWeight: "400", // Lighter font weight
+            marginBottom: "0.75rem",
+            fontSize: "1.1rem",
+            fontWeight: "400",
           }}
         >
           ACCURACY
         </h4>
 
-        {/* Progress Bar - Reduced spacing */}
+        {/* Progress Bar - Centered */}
         <div className="relative" style={{ padding: "0 0.35rem" }}>
           <div
             style={{
@@ -214,8 +225,7 @@ const ImageGenerationSection = ({
                 transition: "width 0.5s ease, background-color 0.3s ease",
                 position: "relative",
               }}
-            >
-            </div>
+            ></div>
 
             {/* 70% Standing Line Marker */}
             <div
@@ -240,12 +250,11 @@ const ImageGenerationSection = ({
               height: "10px", // Reduced from 20px to 10px
               marginTop: "0.15rem", // Reduced from 0.25rem
             }}
-          >
-          </div>
+          ></div>
         </div>
       </div>
 
-      {/* AI Feedback Section - Reduced top margin and added bottom padding */}
+      {/* AI Feedback Section - Centered in right section */}
       {aiFeedback && aiFeedback.feedback && (
         <div
           ref={aiFeedbackRef}
@@ -254,8 +263,10 @@ const ImageGenerationSection = ({
             borderColor: "var(--color-text-primary)",
             backgroundColor: "white",
             padding: "1rem 1.5rem",
-            marginTop: "0.5rem", // Reduced from 1rem to 0.5rem
-            marginBottom: "3rem", // Added more bottom space
+            marginTop: "0.5rem",
+            marginBottom: "3rem",
+            maxWidth: "550px",
+            width: "100%",
             animation: "fadeIn 0.5s ease-in-out",
           }}
         >
