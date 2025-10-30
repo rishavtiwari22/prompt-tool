@@ -24,18 +24,23 @@ const ImageGenerationSection = ({
       return "var(--color-primary)"; // Purple for very low scores (0-24%)
     }
   };
+  
   return (
-  <div className="lg:pl-12" style={{ marginTop: '0.5rem' }}>
-      {/* Generated Image Box */}
+    <div
+      className="lg:pl-12"
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
+      {/* Generated Image Box - Centered in right section */}
       <div
         className="paper border-3"
         style={{
           borderColor: "var(--color-text-primary)",
           backgroundColor: "white",
           padding: "0.02rem",
-          height: "400px",
-          maxWidth: "500px",
-          margin: "0 auto 1.2rem auto",
+          height: "450px",
+          maxWidth: "550px",
+          width: "100%",
+          marginBottom: "2rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -177,19 +182,28 @@ const ImageGenerationSection = ({
         )}
       </div>
 
-      {/* Accuracy Score Section */}
-      <div style={{ marginTop: '0.5rem' }}>
+      {/* Accuracy Score Section - Centered in right section */}
+      <div
+        style={{
+          marginBottom: "1.5rem",
+          marginTop: "-0.5rem",
+          maxWidth: "550px",
+          width: "100%",
+        }}
+      >
         <h4
           className="h4 text-center"
           style={{
             color: "var(--color-text-primary)",
             marginBottom: "0.75rem",
+            fontSize: "1.1rem",
+            fontWeight: "400",
           }}
         >
-          Accuracy
+          ACCURACY
         </h4>
 
-        {/* Progress Bar - Redesigned to match reference images */}
+        {/* Progress Bar - Centered */}
         <div className="relative" style={{ padding: "0 0.35rem" }}>
           <div
             style={{
@@ -212,42 +226,36 @@ const ImageGenerationSection = ({
                 transition: "width 0.5s ease, background-color 0.3s ease",
                 position: "relative",
               }}
-            >
-              {/* Current Percentage Badge on Progress Bar - Show when accuracy > 0 */}
-              {/* Removed numeric accuracy display */}
-            </div>
+            ></div>
 
             {/* 70% Standing Line Marker */}
             <div
               style={{
                 position: "absolute",
                 left: "70%",
-                top: "-6px",
-                bottom: "-6px",
+                top: "-12px",
+                bottom: "-12px",
                 width: "3px",
                 backgroundColor: "var(--color-text-primary)",
                 zIndex: 2,
                 transform: "translateX(-50%)",
               }}
             ></div>
-
-            {/* Removed 0% label */}
           </div>
 
-          {/* 70% Target Label - Below the standing line */}
+          {/* Reduced spacing after progress bar */}
           <div
             style={{
               position: "relative",
               width: "100%",
-              height: "30px",
-              marginTop: "0.5rem",
+              height: "10px",
+              marginTop: "0.15rem",
             }}
-          >              {/* Removed 70% target label */}
-          </div>
+          ></div>
         </div>
       </div>
 
-      {/* AI Feedback Section - In Right Column Below Progress Bar */}
+      {/* AI Feedback Section - Centered in right section */}
       {aiFeedback && aiFeedback.feedback && (
         <div
           ref={aiFeedbackRef}
@@ -256,7 +264,10 @@ const ImageGenerationSection = ({
             borderColor: "var(--color-text-primary)",
             backgroundColor: "white",
             padding: "1rem 1.5rem",
-            marginTop: "2rem",
+            marginTop: "0.5rem",
+            marginBottom: "3rem",
+            maxWidth: "550px",
+            width: "100%",
             animation: "fadeIn 0.5s ease-in-out",
           }}
         >

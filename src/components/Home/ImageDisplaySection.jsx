@@ -16,17 +16,21 @@ const ImageDisplaySection = ({
   handleReset,
 }) => {
   return (
-  <div className="lg:pr-12" style={{ marginTop: '0.5rem' }}>
-      {/* Target Image Box */}
+    <div
+      className="lg:pr-12"
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
+      {/* Target Image Box - Centered in left section */}
       <div
         className="paper border-3"
         style={{
           borderColor: "var(--color-text-primary)",
           backgroundColor: "white",
           padding: "0.02rem",
-          height: "400px",
-          maxWidth: "500px",
-          margin: "0 auto 1.2rem auto",
+          height: "450px",
+          maxWidth: "550px",
+          width: "100%",
+          marginBottom: "2rem",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -94,13 +98,15 @@ const ImageDisplaySection = ({
         )}
       </div>
 
-      {/* Prompt Input Box - Full Width Aligned */}
+      {/* Prompt Input Box - Centered in left section */}
       <div
         className="paper border-3"
         style={{
           borderColor: "var(--color-text-primary)",
           backgroundColor: "white",
-          padding: "0.5rem 0.75rem",
+          padding: "1rem 1.25rem",
+          maxWidth: "550px",
+          width: "100%",
         }}
       >
         <div className="flex items-end gap-3">
