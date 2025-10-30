@@ -27,7 +27,7 @@ function SmartLandingPage({ onStartGame, hasProgress }) {
   return <LandingPage onStartGame={onStartGame} />;
 }
 
-// Game Layout component
+// Game Layout component with sticky header
 function GameLayout({
   children,
   currentLevel,
@@ -36,26 +36,36 @@ function GameLayout({
   completedLevels,
 }) {
   return (
-    <>
-      <Header
-        currentLevel={currentLevel}
-        onLevelChange={onLevelChange}
-        unlockedLevels={unlockedLevels}
-        completedLevels={completedLevels}
-      />
-      {/* PaperCSS-style thick horizontal divider matching Figma */}
-      <hr
-        className="border-primary"
-        style={{
-          margin: 0,
-          border: "none",
-          borderTop: "1px solid #000000",
-          opacity: 0.25,
-          height: 0,
-        }}
-      />
-      {children}
-    </>
+    <div style={{ 
+      height: "100vh", 
+      overflow: "hidden",
+      display: "flex",
+      flexDirection: "column"
+    }}>
+      {/* Sticky Header */}
+      <div style={{ 
+        position: "sticky", 
+        top: 0, 
+        zIndex: 1000,
+        backgroundColor: "rgba(255, 255, 255, 1)",
+        borderBottom: "1px solid rgba(0, 0, 0, 0.25)"
+      }}>
+        <Header
+          currentLevel={currentLevel}
+          onLevelChange={onLevelChange}
+          unlockedLevels={unlockedLevels}
+          completedLevels={completedLevels}
+        />
+      </div>
+      
+      {/* Main Content Area */}
+      <div style={{ 
+        flex: 1, 
+        overflow: "hidden" 
+      }}>
+        {children}
+      </div>
+    </div>
   );
 }
 

@@ -23,8 +23,6 @@ const Home = ({
   completedLevels = [],
   setLevelCompleted,
 }) => {
-  // Use unlockedLevels and setLevelUnlocked from props, not local state
-
   // Handler for Play button in modal
   const handlePlayNextLevel = async () => {
     console.log("Play button clicked, current level:", currentLevel);
@@ -73,6 +71,7 @@ const Home = ({
       onLevelChange(nextLevel);
     }
   };
+  
   const [prompt, setPrompt] = useState("");
   const [accuracy, setAccuracy] = useState(0);
   const [generatedImage, setGeneratedImage] = useState(null);
@@ -91,21 +90,20 @@ const Home = ({
   // Image loading states
   const [imageLoadErrors, setImageLoadErrors] = useState({});
 
-  // Ref for AI feedback section to enable auto-scroll
+  // Ref for AI feedback section - but we won't use auto-scroll anymore
   const aiFeedbackRef = useRef(null);
 
-  // Auto-scroll to AI feedback when it becomes available
-  useEffect(() => {
-    if (aiFeedback && aiFeedback.feedback && aiFeedbackRef.current) {
-      // Add a small delay to ensure the component is rendered
-      setTimeout(() => {
-        aiFeedbackRef.current.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 300);
-    }
-  }, [aiFeedback]);
+  // REMOVED: Auto-scroll functionality as requested
+  // useEffect(() => {
+  //   if (aiFeedback && aiFeedback.feedback && aiFeedbackRef.current) {
+  //     setTimeout(() => {
+  //       aiFeedbackRef.current.scrollIntoView({
+  //         behavior: "smooth",
+  //         block: "start",
+  //       });
+  //     }, 300);
+  //   }
+  // }, [aiFeedback]);
 
   // Target images for each level
   const targetImages = {
@@ -114,7 +112,6 @@ const Home = ({
     3: challenge3Image,
     4: challenge4Image,
     5: challenge5Image,
-    // 6: challenge6Image // removed, not used
   };
 
   // Level descriptions
@@ -124,7 +121,6 @@ const Home = ({
     3: "Challenge 3",
     4: "Challenge 4",
     5: "Challenge 5",
-    // 6: "Challenge 6" // removed, not used
   };
 
   // Show reset confirmation modal
@@ -219,24 +215,21 @@ const Home = ({
   return (
     <div className="px-6 md:px-10 pb-16px">
       <div className="max-w-7xl mx-auto">
-        {/* Reduced the top spacing significantly */}
-        <div
-          className="hidden lg:block"
-          aria-hidden="true"
-          style={{ height: "0" }}
-        ></div>
-        {/* Two Column Layout with Divider - Moved up by reducing paddingTop */}
-
+        {/* New Layout: Fixed left section, scrollable right section */}
         <div
           className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 relative"
-          style={{ overflow: "hidden", paddingTop: "2rem" }} // Reduced from "4rem" to "1rem"
+          style={{ 
+            overflow: "hidden", 
+            paddingTop: "2rem",
+            height: "calc(100vh - 120px)", // Adjust based on your header height
+          }}
         >
-          {/* Vertical Divider - adjusted to match new top spacing */}
+          {/* Vertical Divider */}
           <div
             className="hidden lg:block absolute left-1/2"
             aria-hidden="true"
             style={{
-              top: "-2rem", // Adjusted to match the new paddingTop value
+              top: "-2rem",
               bottom: "0",
               transform: "translateX(-50%)",
               zIndex: 0,
@@ -248,34 +241,55 @@ const Home = ({
             }}
           ></div>
 
-          {/* LEFT COLUMN - Target Image & Input Section */}
-          <ImageDisplaySection
-            currentLevel={currentLevel}
-            targetImages={targetImages}
-            levelDescriptions={levelDescriptions}
-            imageLoadErrors={imageLoadErrors}
-            setImageLoadErrors={setImageLoadErrors}
-            prompt={prompt}
-            setPrompt={setPrompt}
-            generatedImage={generatedImage}
-            isGenerating={isGenerating}
-            isComparing={isComparing}
-            handleCreateImage={handleCreateImage}
-            handleReset={handleReset}
-          />
+          {/* LEFT COLUMN - Target Image & Input Section (STICKY) */}
+          <div 
+            className="lg:pr-12"
+            style={{
+              position: "relative",
+              height: "100%",
+              overflow: "hidden", // Left section should not scroll
+            }}
+          >
+            <ImageDisplaySection
+              currentLevel={currentLevel}
+              targetImages={targetImages}
+              levelDescriptions={levelDescriptions}
+              imageLoadErrors={imageLoadErrors}
+              setImageLoadErrors={setImageLoadErrors}
+              prompt={prompt}
+              setPrompt={setPrompt}
+              generatedImage={generatedImage}
+              isGenerating={isGenerating}
+              isComparing={isComparing}
+              handleCreateImage={handleCreateImage}
+              handleReset={handleReset}
+            />
+          </div>
 
-          {/* RIGHT COLUMN - Generated Image & Results Section */}
-          <ImageGenerationSection
-            generatedImage={generatedImage}
-            isGenerating={isGenerating}
-            isComparing={isComparing}
-            illustrationImage={illustrationImage}
-            imageLoadErrors={imageLoadErrors}
-            setImageLoadErrors={setImageLoadErrors}
-            accuracy={accuracy}
-            aiFeedback={aiFeedback}
-            aiFeedbackRef={aiFeedbackRef}
-          />
+          {/* RIGHT COLUMN - Generated Image & Results Section (SCROLLABLE) */}
+          <div 
+            className="lg:pl-12"
+            style={{
+              position: "relative",
+              height: "100%",
+              overflowY: "auto", // Right section scrolls when content overflows
+              overflowX: "hidden",
+              scrollbarWidth: "thin", // For Firefox
+              scrollbarColor: "rgba(0,0,0,0.2) transparent", // For Firefox
+            }}
+          >
+            <ImageGenerationSection
+              generatedImage={generatedImage}
+              isGenerating={isGenerating}
+              isComparing={isComparing}
+              illustrationImage={illustrationImage}
+              imageLoadErrors={imageLoadErrors}
+              setImageLoadErrors={setImageLoadErrors}
+              accuracy={accuracy}
+              aiFeedback={aiFeedback}
+              aiFeedbackRef={aiFeedbackRef}
+            />
+          </div>
         </div>
       </div>
 
@@ -296,7 +310,7 @@ const Home = ({
         setAccuracy={setAccuracy}
       />
 
-      {/* CSS for spinner animation */}
+      {/* CSS for spinner animation and custom scrollbar */}
       <style>{`
         @keyframes spin {
           from {
@@ -305,6 +319,24 @@ const Home = ({
           to {
             transform: rotate(360deg);
           }
+        }
+        
+        /* Custom scrollbar for webkit browsers */
+        .lg\\:pl-12::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .lg\\:pl-12::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        .lg\\:pl-12::-webkit-scrollbar-thumb {
+          background-color: rgba(0,0,0,0.2);
+          border-radius: 3px;
+        }
+        
+        .lg\\:pl-12::-webkit-scrollbar-thumb:hover {
+          background-color: rgba(0,0,0,0.3);
         }
       `}</style>
     </div>
