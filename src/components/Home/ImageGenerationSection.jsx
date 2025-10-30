@@ -24,12 +24,13 @@ const ImageGenerationSection = ({
       return "var(--color-primary)"; // Purple for very low scores (0-24%)
     }
   };
+  
   return (
     <div
       className="lg:pl-12"
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      {/* Generated Image Box - Centered in right section */
+      {/* Generated Image Box - Centered in right section */}
       <div
         className="paper border-3"
         style={{
@@ -247,8 +248,8 @@ const ImageGenerationSection = ({
             style={{
               position: "relative",
               width: "100%",
-              height: "10px", // Reduced from 20px to 10px
-              marginTop: "0.15rem", // Reduced from 0.25rem
+              height: "10px",
+              marginTop: "0.15rem",
             }}
           ></div>
         </div>
