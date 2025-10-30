@@ -26,7 +26,7 @@ const ImageGenerationSection = ({
   };
   return (
     <div className="lg:pl-12">
-      {/* Generated Image Box - Moved up by removing top margin */}
+      {/* Generated Image Box */}
       <div
         className="paper border-3"
         style={{
@@ -35,7 +35,7 @@ const ImageGenerationSection = ({
           padding: "0.02rem",
           height: "450px",
           maxWidth: "550px",
-          margin: "0 auto 2rem auto", // Removed top margin, kept bottom margin
+          margin: "0 auto 2rem auto",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -177,19 +177,21 @@ const ImageGenerationSection = ({
         )}
       </div>
 
-      {/* Accuracy Score Section - Moved up with less margin */}
-      <div style={{ marginBottom: "3rem" }}>
+      {/* Accuracy Score Section - Reduced spacing */}
+      <div style={{ marginBottom: "1.5rem",marginTop: "-0.5rem"  }}> {/* Reduced from 3rem to 1.5rem */}
         <h4
           className="h4 text-center"
           style={{
             color: "var(--color-text-primary)",
-            marginBottom: "1.25rem",
+            marginBottom: "0.75rem", // Reduced from 1.25rem to 0.75rem
+            fontSize: "1.1rem", // Reduced font size from default h4
+            fontWeight: "400", // Lighter font weight
           }}
         >
-          Accuracy
+          ACCURACY
         </h4>
 
-        {/* Progress Bar - Redesigned to match reference images */}
+        {/* Progress Bar - Reduced spacing */}
         <div className="relative" style={{ padding: "0 0.35rem" }}>
           <div
             style={{
@@ -213,41 +215,37 @@ const ImageGenerationSection = ({
                 position: "relative",
               }}
             >
-              {/* Current Percentage Badge on Progress Bar - Show when accuracy > 0 */}
-              {/* Removed numeric accuracy display */}
             </div>
 
-            {/* 70% Standing Line Marker - Moved up significantly */}
+            {/* 70% Standing Line Marker */}
             <div
               style={{
                 position: "absolute",
                 left: "70%",
-                top: "-12px", // Moved up from -6px to -12px
-                bottom: "-12px", // Moved up from -6px to -12px
+                top: "-12px",
+                bottom: "-12px",
                 width: "3px",
                 backgroundColor: "var(--color-text-primary)",
                 zIndex: 2,
                 transform: "translateX(-50%)",
               }}
             ></div>
-
-            {/* Removed 0% label */}
           </div>
 
-          {/* 70% Target Label - Below the standing line with more space */}
+          {/* Reduced spacing after progress bar */}
           <div
             style={{
               position: "relative",
               width: "100%",
-              height: "20px", // Reduced from 30px to 20px
-              marginTop: "0.25rem", // Reduced from 0.5rem
+              height: "10px", // Reduced from 20px to 10px
+              marginTop: "0.15rem", // Reduced from 0.25rem
             }}
-          >              {/* Removed 70% target label */}
+          >
           </div>
         </div>
       </div>
 
-      {/* AI Feedback Section - In Right Column Below Progress Bar */}
+      {/* AI Feedback Section - Reduced top margin and added bottom padding */}
       {aiFeedback && aiFeedback.feedback && (
         <div
           ref={aiFeedbackRef}
@@ -256,7 +254,8 @@ const ImageGenerationSection = ({
             borderColor: "var(--color-text-primary)",
             backgroundColor: "white",
             padding: "1rem 1.5rem",
-            marginTop: "1rem", // Reduced from 2rem to 1rem
+            marginTop: "0.5rem", // Reduced from 1rem to 0.5rem
+            marginBottom: "3rem", // Added more bottom space
             animation: "fadeIn 0.5s ease-in-out",
           }}
         >
