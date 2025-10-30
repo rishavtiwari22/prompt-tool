@@ -219,23 +219,24 @@ const Home = ({
   return (
     <div className="px-6 md:px-10 pb-16px">
       <div className="max-w-7xl mx-auto">
+        {/* Reduced the top spacing significantly */}
         <div
           className="hidden lg:block"
           aria-hidden="true"
           style={{ height: "0" }}
         ></div>
-        {/* Two Column Layout with Divider */}
+        {/* Two Column Layout with Divider - Moved up by reducing paddingTop */}
 
         <div
           className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-0 relative"
-          style={{ overflow: "hidden", paddingTop: "4rem" }}
+          style={{ overflow: "hidden", paddingTop: "2rem" }} // Reduced from "4rem" to "1rem"
         >
-          {/* Vertical Divider - extended upward to meet horizontal divider */}
+          {/* Vertical Divider - adjusted to match new top spacing */}
           <div
             className="hidden lg:block absolute left-1/2"
             aria-hidden="true"
             style={{
-              top: "-4rem", // Match the paddingTop value
+              top: "-2rem", // Adjusted to match the new paddingTop value
               bottom: "0",
               transform: "translateX(-50%)",
               zIndex: 0,

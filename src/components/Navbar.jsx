@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import RulesModal from "../components/RulesModal";
 import AudioControl from "../components/AudioControl";
@@ -58,7 +57,7 @@ function Navbar({
         style={{ overflow: isMenuOpen ? "visible" : "hidden" }}
       >
         <nav
-          className="bg-transparent py-2 sm:py-3"
+          className="bg-transparent py-1"
           style={{ backgroundColor: "rgba(255, 255, 255, 1)" }}
         >
           <div
@@ -299,7 +298,7 @@ function Navbar({
                     How to Play
                   </span>
                 </button>
-              </div>
+                </div>
             </div>
           </div>
         )}

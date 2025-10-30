@@ -26,7 +26,7 @@ const ImageGenerationSection = ({
   };
   return (
     <div className="lg:pl-12">
-      {/* Generated Image Box */}
+      {/* Generated Image Box - Moved up by removing top margin */}
       <div
         className="paper border-3"
         style={{
@@ -35,7 +35,7 @@ const ImageGenerationSection = ({
           padding: "0.02rem",
           height: "450px",
           maxWidth: "550px",
-          margin: "0 auto 2rem auto",
+          margin: "0 auto 2rem auto", // Removed top margin, kept bottom margin
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -177,8 +177,8 @@ const ImageGenerationSection = ({
         )}
       </div>
 
-      {/* Accuracy Score Section */}
-      <div>
+      {/* Accuracy Score Section - Moved up with less margin */}
+      <div style={{ marginBottom: "3rem" }}>
         <h4
           className="h4 text-center"
           style={{
@@ -217,13 +217,13 @@ const ImageGenerationSection = ({
               {/* Removed numeric accuracy display */}
             </div>
 
-            {/* 70% Standing Line Marker */}
+            {/* 70% Standing Line Marker - Moved up significantly */}
             <div
               style={{
                 position: "absolute",
                 left: "70%",
-                top: "-6px",
-                bottom: "-6px",
+                top: "-12px", // Moved up from -6px to -12px
+                bottom: "-12px", // Moved up from -6px to -12px
                 width: "3px",
                 backgroundColor: "var(--color-text-primary)",
                 zIndex: 2,
@@ -234,13 +234,13 @@ const ImageGenerationSection = ({
             {/* Removed 0% label */}
           </div>
 
-          {/* 70% Target Label - Below the standing line */}
+          {/* 70% Target Label - Below the standing line with more space */}
           <div
             style={{
               position: "relative",
               width: "100%",
-              height: "30px",
-              marginTop: "0.5rem",
+              height: "20px", // Reduced from 30px to 20px
+              marginTop: "0.25rem", // Reduced from 0.5rem
             }}
           >              {/* Removed 70% target label */}
           </div>
@@ -256,7 +256,7 @@ const ImageGenerationSection = ({
             borderColor: "var(--color-text-primary)",
             backgroundColor: "white",
             padding: "1rem 1.5rem",
-            marginTop: "2rem",
+            marginTop: "1rem", // Reduced from 2rem to 1rem
             animation: "fadeIn 0.5s ease-in-out",
           }}
         >

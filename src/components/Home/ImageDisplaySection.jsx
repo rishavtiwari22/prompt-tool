@@ -17,7 +17,7 @@ const ImageDisplaySection = ({
 }) => {
   return (
     <div className="lg:pr-12">
-      {/* Target Image Box */}
+      {/* Target Image Box - Moved up by reducing top margin */}
       <div
         className="paper border-3"
         style={{
@@ -26,7 +26,7 @@ const ImageDisplaySection = ({
           padding: "0.02rem",
           height: "450px",
           maxWidth: "550px",
-          margin: "0 auto 2rem auto",
+          margin: "0 auto 2rem auto", // Removed top margin, kept bottom margin
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
