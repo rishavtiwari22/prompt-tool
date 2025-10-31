@@ -1,10 +1,54 @@
 // Simple Image Generation Utility for Prompt Learning Tool
 
 /**
- * Generate an image from a text prompt using Pollinations AI
+ * Generate an image from a text prompt using custom deployed API
  * @param {string} prompt - The text prompt to generate image from
  * @returns {Promise<string>} - URL of the generated image
  */
+export const generateImage = async (prompt) => {
+  try {
+    // Validate prompt
+    if (!prompt || prompt.trim().length === 0) {
+      throw new Error("Prompt cannot be empty");
+    }
+
+    // Call the custom image generation API
+    const response = await fetch("https://prompt-main-server.prompt-tool.workers.dev/api/generate-image", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        prompt: prompt.trim()
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Assuming the API returns an object with image URL
+    if (data && data.imageUrl) {
+      console.log("✅ Successfully generated image using custom API");
+      return data.imageUrl;
+    } else if (data && data.url) {
+      console.log("✅ Successfully generated image using custom API");
+      return data.url;
+    } else {
+      throw new Error("Invalid response format from image generation API");
+    }
+    
+  } catch (error) {
+    console.error("❌ Error in generateImage:", error);
+    throw new Error(`Image generation failed: ${error.message}`);
+  }
+};
+
+// COMMENTED OUT: Previous Pollinations AI implementation
+// This was causing issues when multiple users were using the tool together
+/*
 export const generateImage = async (prompt) => {
   try {
     // Validate prompt
@@ -64,12 +108,10 @@ export const generateImage = async (prompt) => {
     throw new Error(`Image generation failed: ${error.message}`);
   }
 };
+*/
 
-/**
- * Test if an image URL is accessible and loads successfully
- * @param {string} imageUrl - The image URL to test
- * @returns {Promise<boolean>} - True if image loads successfully
- */
+// COMMENTED OUT: testImageUrl function - no longer needed with new API
+/*
 const testImageUrl = (imageUrl) => {
   return new Promise((resolve) => {
     const testImg = new Image();
@@ -92,6 +134,7 @@ const testImageUrl = (imageUrl) => {
     testImg.src = imageUrl;
   });
 };
+*/
 
 /**
  * Generate image with progress callback
