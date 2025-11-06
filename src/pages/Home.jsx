@@ -3,6 +3,7 @@ import illustrationImage from "../assets/Frame 473.svg";
 import { compareImagesWithFeedback } from "../utils/imageComparison";
 import { generateImageWithProgress } from "../utils/imageGeneration";
 import audioManager from "../utils/audioManager";
+import analytics from "../utils/analytics";
 import ImageDisplaySection from "../components/Home/ImageDisplaySection";
 import ImageGenerationSection from "../components/Home/ImageGenerationSection";
 import LevelModalManager from "../components/Home/LevelModalManager";
@@ -23,6 +24,12 @@ const Home = ({
   completedLevels = [],
   setLevelCompleted,
 }) => {
+  // Challenge start tracking
+  useEffect(() => {
+    const challengeName = levelDescriptions[currentLevel];
+    analytics.trackChallengeStarted(currentLevel, challengeName);
+  }, [currentLevel]);
+
   // Handler for Play button in modal
   const handlePlayNextLevel = async () => {
     console.log("Play button clicked, current level:", currentLevel);
@@ -130,6 +137,9 @@ const Home = ({
 
   // Actual reset functionality
   const handleConfirmReset = async () => {
+    // Track reset action
+    analytics.trackResetAction(currentLevel, accuracy);
+    
     await audioManager.playReset();
     setPrompt("");
     setPreviousAccuracy(accuracy);
@@ -155,6 +165,10 @@ const Home = ({
   const handleCreateImage = async () => {
     if (!prompt.trim()) return;
 
+    // Track prompt entered
+    const wordCount = prompt.trim().split(/\s+/).length;
+    analytics.trackPromptEntered(currentLevel, prompt.trim(), wordCount);
+
     // Play button click sound
     await audioManager.playButtonClick();
 
@@ -163,11 +177,18 @@ const Home = ({
     setPreviousAccuracy(accuracy);
     setAccuracy(0);
 
+    const startTime = Date.now();
+
     try {
       console.log("Creating image with prompt:", prompt);
 
       // Generate image using the utility
       const generatedImageUrl = await generateImageWithProgress(prompt.trim());
+      
+      const generationTime = Date.now() - startTime;
+      
+      // Track image generation
+      analytics.trackImageGenerated(currentLevel, prompt.trim(), generationTime);
 
       setGeneratedImage(generatedImageUrl);
 
@@ -187,6 +208,9 @@ const Home = ({
 
       setAccuracy(similarity);
       setAiFeedback(result);
+      
+      // Track accuracy scored
+      analytics.trackAccuracyScored(currentLevel, similarity, previousAccuracy);
 
       // Play score-based audio feedback
       await audioManager.playScoreBasedFeedback(similarity);
@@ -196,6 +220,13 @@ const Home = ({
         // High accuracy - also play level completion sound
         setTimeout(async () => {
           await audioManager.playLevelComplete();
+          // Track challenge completion
+          analytics.trackChallengeCompleted(
+            currentLevel,
+            levelDescriptions[currentLevel],
+            similarity,
+            Math.floor((Date.now() - startTime) / 1000)
+          );
         }, 500);
       } else if (similarity < previousAccuracy) {
         // Accuracy decreased - play additional negative feedback
