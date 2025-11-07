@@ -217,41 +217,7 @@ const GameComplete = ({ onPlayAgain, resetToLevel1 }) => {
               Play Again
             </button>
 
-            {/* Home Button */}
-            <button
-              onClick={handleGoHome}
-              className="paper-btn"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.75rem",
-                padding: "1.25rem 2.5rem",
-                fontSize: "1.1rem",
-                fontWeight: "500",
-                color: "var(--color-text-secondary)",
-                background: "white",
-                border: `2px solid var(--color-text-disabled)`,
-                borderRadius: "15px",
-                cursor: "pointer",
-                transition: "all 0.3s",
-                fontFamily: "var(--font-body)",
-                minWidth: "150px",
-                justifyContent: "center",
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.background = "var(--color-text-disabled)";
-                e.target.style.color = "white";
-                e.target.style.transform = "translateY(-3px)";
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.background = "white";
-                e.target.style.color = "var(--color-text-secondary)";
-                e.target.style.transform = "translateY(0)";
-              }}
-            >
-              <Home size={18} />
-              Home
-            </button>
+        
           </div>
         </div>
       </div>
