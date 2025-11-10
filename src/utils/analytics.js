@@ -1,11 +1,29 @@
-// Analytics utility for Google Analytics
+// Analytics utility for Google Analytics and Mixpanel
+import mixpanel from 'mixpanel-browser';
+
 // Initialize analytics services
 export const initializeAnalytics = () => {
-  // Get measurement ID from environment variables
+  // Get measurement IDs from environment variables
   const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  const MIXPANEL_TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN;
 
-  console.log('🔍 Initializing Google Analytics...');
+  console.log('🔍 Initializing Analytics...');
   console.log('GA ID:', GA_MEASUREMENT_ID);
+  console.log('Mixpanel Token:', MIXPANEL_TOKEN ? 'Present' : 'Missing');
+
+  // Initialize Mixpanel if token is available
+  if (MIXPANEL_TOKEN) {
+    mixpanel.init(MIXPANEL_TOKEN, {
+      debug: import.meta.env.DEV, // Enable debug in development
+      track_pageview: true,
+      persistence: 'localStorage',
+      autocapture: true,
+      record_sessions_percent: 100
+    });
+    console.log('✅ Mixpanel initialized successfully');
+  } else {
+    console.warn('⚠️ Mixpanel token not found - Mixpanel tracking disabled');
+  }
 
   // Google Analytics is already initialized in index.html
   if (GA_MEASUREMENT_ID && typeof gtag !== 'undefined') {
@@ -27,6 +45,15 @@ export const trackPageView = (pageName, additionalProps = {}) => {
       });
     }
 
+    // Mixpanel page view
+    if (mixpanel && import.meta.env.VITE_MIXPANEL_TOKEN) {
+      mixpanel.track('Page View', {
+        page_name: pageName,
+        url: window.location.href,
+        ...additionalProps
+      });
+    }
+
     console.log(`📊 Page view tracked: ${pageName}`);
   } catch (error) {
     console.error('❌ Error tracking page view:', error);
@@ -42,6 +69,14 @@ export const trackEvent = (eventName, properties = {}) => {
         event_category: properties.category || 'User Interaction',
         event_label: properties.label,
         value: properties.value,
+        ...properties
+      });
+    }
+
+    // Mixpanel event
+    if (mixpanel && import.meta.env.VITE_MIXPANEL_TOKEN) {
+      mixpanel.track(eventName, {
+        timestamp: new Date().toISOString(),
         ...properties
       });
     }
@@ -159,6 +194,24 @@ export const trackApplicationEnd = (timeSpent, challengesCompleted) => {
   });
 };
 
+// User identification (for Mixpanel)
+export const identifyUser = (userId, userProperties = {}) => {
+  try {
+    if (mixpanel && import.meta.env.VITE_MIXPANEL_TOKEN) {
+      mixpanel.identify(userId);
+      mixpanel.people.set({
+        $name: userProperties.name,
+        $email: userProperties.email,
+        last_login: new Date(),
+        ...userProperties
+      });
+    }
+    console.log(`👤 User identified: ${userId}`);
+  } catch (error) {
+    console.error('❌ Error identifying user:', error);
+  }
+};
+
 // Export default object with all functions
 const analytics = {
   initialize: initializeAnalytics,
@@ -174,7 +227,8 @@ const analytics = {
   trackFeedbackFormSubmitted,
   trackAudioToggle,
   trackApplicationStart,
-  trackApplicationEnd
+  trackApplicationEnd,
+  identifyUser
 };
 
 export default analytics;
