@@ -9,6 +9,7 @@ import {
 import Header from "./components/Navbar";
 import Home from "./pages/Home";
 import LandingPage from "./components/LandingPage";
+import GameComplete from "./pages/GameComplete";
 import {
   loadProgressFromLocalStorage,
   saveCurrentLevel,
@@ -36,20 +37,24 @@ function GameLayout({
   completedLevels,
 }) {
   return (
-    <div style={{ 
-      height: "100vh", 
-      overflow: "hidden",
-      display: "flex",
-      flexDirection: "column"
-    }}>
+    <div
+      style={{
+        height: "100vh",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       {/* Sticky Header */}
-      <div style={{ 
-        position: "sticky", 
-        top: 0, 
-        zIndex: 1000,
-        backgroundColor: "rgba(255, 255, 255, 1)",
-        borderBottom: "1px solid rgba(0, 0, 0, 0.25)"
-      }}>
+      <div
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 1000,
+          backgroundColor: "rgba(255, 255, 255, 1)",
+          borderBottom: "1px solid rgba(0, 0, 0, 0.25)",
+        }}
+      >
         <Header
           currentLevel={currentLevel}
           onLevelChange={onLevelChange}
@@ -57,12 +62,14 @@ function GameLayout({
           completedLevels={completedLevels}
         />
       </div>
-      
+
       {/* Main Content Area */}
-      <div style={{ 
-        flex: 1, 
-        overflow: "hidden" 
-      }}>
+      <div
+        style={{
+          flex: 1,
+          overflow: "hidden",
+        }}
+      >
         {children}
       </div>
     </div>
@@ -86,18 +93,21 @@ function App() {
   // Initialize audio manager when app loads
   useEffect(() => {
     console.log("🎵 App loaded - ensuring background music starts");
-    
+
     // Try to start background music immediately on app load
     const tryStartMusic = async () => {
       try {
         await audioManager.startBackgroundMusic();
       } catch (error) {
-        console.log("🎵 Initial music start failed, will retry on interaction:", error);
+        console.log(
+          "🎵 Initial music start failed, will retry on interaction:",
+          error
+        );
       }
     };
-    
+
     tryStartMusic();
-    
+
     // Also add a one-time listener for any user interaction to start music
     const startMusicOnFirstInteraction = async () => {
       try {
@@ -107,21 +117,27 @@ function App() {
         console.log("🎵 Music start after interaction failed:", error);
       }
       // Remove listeners after first attempt
-      document.removeEventListener('click', startMusicOnFirstInteraction);
-      document.removeEventListener('keydown', startMusicOnFirstInteraction);
-      document.removeEventListener('touchstart', startMusicOnFirstInteraction);
+      document.removeEventListener("click", startMusicOnFirstInteraction);
+      document.removeEventListener("keydown", startMusicOnFirstInteraction);
+      document.removeEventListener("touchstart", startMusicOnFirstInteraction);
     };
-    
+
     // Add event listeners for user interaction
-    document.addEventListener('click', startMusicOnFirstInteraction, { once: true });
-    document.addEventListener('keydown', startMusicOnFirstInteraction, { once: true });
-    document.addEventListener('touchstart', startMusicOnFirstInteraction, { once: true });
-    
+    document.addEventListener("click", startMusicOnFirstInteraction, {
+      once: true,
+    });
+    document.addEventListener("keydown", startMusicOnFirstInteraction, {
+      once: true,
+    });
+    document.addEventListener("touchstart", startMusicOnFirstInteraction, {
+      once: true,
+    });
+
     // Cleanup function
     return () => {
-      document.removeEventListener('click', startMusicOnFirstInteraction);
-      document.removeEventListener('keydown', startMusicOnFirstInteraction);
-      document.removeEventListener('touchstart', startMusicOnFirstInteraction);
+      document.removeEventListener("click", startMusicOnFirstInteraction);
+      document.removeEventListener("keydown", startMusicOnFirstInteraction);
+      document.removeEventListener("touchstart", startMusicOnFirstInteraction);
     };
   }, []);
 
@@ -196,6 +212,24 @@ function App() {
                 setLevelCompleted={setLevelCompleted}
               />
             </GameLayout>
+          }
+        />
+
+        {/* Game Complete Route - Shows after finishing all levels */}
+        <Route
+          path="/game-complete"
+          element={
+            <GameComplete
+              onPlayAgain={() => {
+                // Reset to level 1 and redirect to game
+                setCurrentLevel(1);
+                setUnlockedLevels([1]);
+                setCompletedLevels([]);
+                saveCurrentLevel(1);
+                saveUnlockedLevels([1]);
+                saveCompletedLevels([]);
+              }}
+            />
           }
         />
 

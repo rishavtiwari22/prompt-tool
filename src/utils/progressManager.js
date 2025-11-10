@@ -4,6 +4,7 @@ const STORAGE_KEYS = {
   COMPLETED_LEVELS: "prompt-learning-tool-completedLevels",
   CURRENT_LEVEL: "prompt-learning-tool-currentLevel",
   UNLOCKED_LEVELS: "prompt-learning-tool-unlockedLevels",
+  FEEDBACK_SHOWN: "prompt-learning-tool-feedbackShown",
 };
 
 /**
@@ -110,6 +111,30 @@ export const unlockLevel = (level, currentUnlockedLevels) => {
 };
 
 /**
+ * Check if feedback modal has been shown
+ * @returns {boolean} Whether feedback modal has been shown
+ */
+export const hasFeedbackBeenShown = () => {
+  try {
+    return localStorage.getItem(STORAGE_KEYS.FEEDBACK_SHOWN) === "true";
+  } catch (error) {
+    console.error("Error checking feedback status from localStorage:", error);
+    return false;
+  }
+};
+
+/**
+ * Mark feedback modal as shown
+ */
+export const markFeedbackAsShown = () => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.FEEDBACK_SHOWN, "true");
+  } catch (error) {
+    console.error("Error saving feedback status to localStorage:", error);
+  }
+};
+
+/**
  * Clear all progress from localStorage (for debugging/reset purposes)
  */
 export const clearProgress = () => {
@@ -117,6 +142,7 @@ export const clearProgress = () => {
     localStorage.removeItem(STORAGE_KEYS.COMPLETED_LEVELS);
     localStorage.removeItem(STORAGE_KEYS.CURRENT_LEVEL);
     localStorage.removeItem(STORAGE_KEYS.UNLOCKED_LEVELS);
+    localStorage.removeItem(STORAGE_KEYS.FEEDBACK_SHOWN);
     console.log("Progress cleared from localStorage");
   } catch (error) {
     console.error("Error clearing progress from localStorage:", error);
