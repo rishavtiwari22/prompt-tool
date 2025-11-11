@@ -12,10 +12,8 @@ import challenge2Image from "../assets/challanges/challenge-1.png";
 import challenge1Image from "../assets/challanges/challenge-2.png";
 import challenge3Image from "../assets/challanges/challenge-3.png";
 import challenge4Image from "../assets/challanges/challenge-4.png";
-
-import challenge2Imagetest from "../assets/challanges/challenge-1.png";
-// import challenge5Image from "../assets/challanges/challenge-5.png";
-import challenge6Image from "../assets/challanges/challenge-6.png";
+import challenge5Image from "../assets/challanges/challenge-5.png";
+// import challenge6Image from "../assets/challanges/challenge-6.png";
 
 const Home = ({
   currentLevel,
@@ -113,7 +111,7 @@ const Home = ({
     2: challenge2Image,
     3: challenge3Image,
     4: challenge4Image,
-    5: challenge2Imagetest,
+    5: challenge5Image,
   };
 
   // Level descriptions
