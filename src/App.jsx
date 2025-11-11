@@ -9,6 +9,7 @@ import {
 import Header from "./components/Navbar";
 import Home from "./pages/Home";
 import LandingPage from "./components/LandingPage";
+import StudentFeedbackForm from "./components/StudentFeedbackForm";
 import GameComplete from "./pages/GameComplete";
 import {
   loadProgressFromLocalStorage,
@@ -17,6 +18,7 @@ import {
   saveCompletedLevels,
 } from "./utils/progressManager";
 import audioManager from "./utils/audioManager";
+import analytics from "./utils/analytics";
 
 // Smart Landing Page component that redirects if user has progress
 function SmartLandingPage({ onStartGame, hasProgress }) {
@@ -90,10 +92,17 @@ function App() {
     initialProgress.completedLevels
   );
 
+  // Feedback form state
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+
   // Initialize audio manager when app loads
   useEffect(() => {
     console.log("🎵 App loaded - ensuring background music starts");
-
+    
+    // Initialize analytics
+    analytics.initialize();
+    analytics.trackApplicationStart();
+    
     // Try to start background music immediately on app load
     const tryStartMusic = async () => {
       try {
@@ -147,6 +156,10 @@ function App() {
 
   const handleLevelChange = (level) => {
     if (!unlockedLevels.includes(level)) return;
+    
+    // Track level change
+    analytics.trackLevelChanged(currentLevel, level);
+    
     setCurrentLevel(level);
     // Save current level to localStorage
     saveCurrentLevel(level);
@@ -173,10 +186,35 @@ function App() {
     setCompletedLevels((prev) => {
       if (prev.includes(level)) return prev;
       const updated = [...prev, level].sort((a, b) => a - b);
+      
       // Save to localStorage
       saveCompletedLevels(updated);
+      
+      // Show feedback form after completing 3rd challenge or 5th challenge
+      if (updated.length === 3 || updated.length === 5) {
+        setTimeout(() => {
+          setShowFeedbackForm(true);
+        }, 2000); // Show after 2 seconds
+      }
+      
       return updated;
     });
+  };
+
+  // Reset game to Level 1 (for Play Again functionality)
+  const resetToLevel1 = async () => {
+    // Reset all game state
+    setCurrentLevel(1);
+    setUnlockedLevels([1]);
+    setCompletedLevels([]);
+    
+    // Save to localStorage
+    saveCurrentLevel(1);
+    saveUnlockedLevels([1]);
+    saveCompletedLevels([]);
+    
+    // Track analytics
+    analytics.trackGameReset();
   };
 
   return (
@@ -210,6 +248,7 @@ function App() {
                 setLevelUnlocked={setLevelUnlocked}
                 completedLevels={completedLevels}
                 setLevelCompleted={setLevelCompleted}
+                resetToLevel1={resetToLevel1}
               />
             </GameLayout>
           }
@@ -220,15 +259,8 @@ function App() {
           path="/game-complete"
           element={
             <GameComplete
-              onPlayAgain={() => {
-                // Reset to level 1 and redirect to game
-                setCurrentLevel(1);
-                setUnlockedLevels([1]);
-                setCompletedLevels([]);
-                saveCurrentLevel(1);
-                saveUnlockedLevels([1]);
-                saveCompletedLevels([]);
-              }}
+              onPlayAgain={resetToLevel1}
+              resetToLevel1={resetToLevel1}
             />
           }
         />
@@ -236,6 +268,26 @@ function App() {
         {/* Fallback route - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+
+      {/* Feedback Form - Global */}
+      <StudentFeedbackForm
+        isOpen={showFeedbackForm}
+        onClose={() => setShowFeedbackForm(false)}
+        challengesCompleted={completedLevels.length}
+        onSubmit={async (feedbackData) => {
+          console.log('Feedback submitted:', feedbackData);
+          
+          // Track feedback submission
+          analytics.trackFeedbackSubmitted(
+            completedLevels.length,
+            feedbackData.experience || 'Not provided',
+            feedbackData.feedback || 'Not provided'
+          );
+          
+          // Here you can send feedback to your backend
+          // For now, just log it
+        }}
+      />
     </Router>
   );
 }
