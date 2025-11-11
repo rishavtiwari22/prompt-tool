@@ -13,7 +13,9 @@ import challenge2Image from "../assets/challanges/challenge-1.png";
 import challenge1Image from "../assets/challanges/challenge-2.png";
 import challenge3Image from "../assets/challanges/challenge-3.png";
 import challenge4Image from "../assets/challanges/challenge-4.png";
-import challenge5Image from "../assets/challanges/challenge-5.png";
+
+import challenge2Imagetest from "../assets/challanges/challenge-1.png";
+// import challenge5Image from "../assets/challanges/challenge-5.png";
 import challenge6Image from "../assets/challanges/challenge-6.png";
 
 const Home = ({
@@ -118,7 +120,7 @@ const Home = ({
     2: challenge2Image,
     3: challenge3Image,
     4: challenge4Image,
-    5: challenge5Image,
+    5: challenge2Imagetest,
   };
 
   // Level descriptions
@@ -151,6 +153,21 @@ const Home = ({
   // Close reset modal
   const handleCloseResetModal = () => {
     setShowResetModal(false);
+  };
+
+  // Reset game to Level 1 (for Play Again functionality)
+  const resetToLevel1 = async () => {
+    await audioManager.playReset();
+
+    // Reset all game state
+    setPrompt("");
+    setPreviousAccuracy(accuracy);
+    setAccuracy(0);
+    setGeneratedImage(null);
+    setAiFeedback(null);
+
+    // Reset to level 1
+    handleLevelChange(1);
   };
 
   const handleLevelChange = (level) => {
@@ -339,6 +356,7 @@ const Home = ({
         setPrompt={setPrompt}
         setGeneratedImage={setGeneratedImage}
         setAccuracy={setAccuracy}
+        resetToLevel1={resetToLevel1}
       />
 
       {/* CSS for spinner animation and custom scrollbar */}
