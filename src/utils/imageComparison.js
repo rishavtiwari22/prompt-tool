@@ -1,29 +1,16 @@
 /**
- * SiliconFlow Image Comparison Utility using Qwen3-VL-8B-Instruct
+ * Image Comparison Utility using Cloudflare Workers API
  * 
- * SETUP: Set VITE_SILICONFLOW_API_KEY in .env file
- * Get key from: https://account.siliconflow.com/
- * Cost: Only $0.05 per million tokens
+ * API Endpoint: https://prompt-learning-server.prompt-tool.workers.dev/api/compare-images
+ * No API key required - serverless backend handles authentication
  */
 
-const initSiliconFlow = () => {
-  const apiKey = import.meta.env.VITE_SILICONFLOW_API_KEY;
-  if (!apiKey) {
-    throw new Error("SiliconFlow API key not found. Please set VITE_SILICONFLOW_API_KEY in .env file.");
-  }
-  return apiKey;
-};
-
-const imageToBase64 = async (imagePath) => {
+const imageToDataURL = async (imagePath) => {
   try {
     // Check if already a data URL (data:image/...)
     if (imagePath.startsWith('data:')) {
-      // Extract base64 part from data URL
-      const base64Match = imagePath.match(/^data:image\/[^;]+;base64,(.+)$/);
-      if (base64Match) {
-        return base64Match[1];
-      }
-      throw new Error('Invalid data URL format');
+      // Already in correct format
+      return imagePath;
     }
 
     // Handle local Vite paths (/src/assets/...)
@@ -51,7 +38,7 @@ const imageToBase64 = async (imagePath) => {
       const blob = await response.blob();
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.onloadend = () => resolve(reader.result);
         reader.onerror = reject;
         reader.readAsDataURL(blob);
       });
@@ -65,68 +52,27 @@ const imageToBase64 = async (imagePath) => {
 
 export const compareImagesWithSiliconFlow = async (targetImagePath, generatedImagePath, originalPrompt = "") => {
   try {
-    console.log("🚀 Starting SiliconFlow image comparison...");
+    console.log("🚀 Starting image comparison...");
     console.log("📸 Target image:", targetImagePath?.substring(0, 100));
     console.log("📸 Generated image:", generatedImagePath?.substring(0, 100));
 
-    const apiKey = initSiliconFlow();
-
-    console.log("🔄 Converting images to base64...");
-    const [targetBase64, generatedBase64] = await Promise.all([
-      imageToBase64(targetImagePath),
-      imageToBase64(generatedImagePath),
+    console.log("🔄 Converting images to data URLs...");
+    const [targetImage, generatedImage] = await Promise.all([
+      imageToDataURL(targetImagePath),
+      imageToDataURL(generatedImagePath),
     ]);
 
     console.log("✅ Images converted successfully");
 
-    const promptText = originalPrompt
-      ? `Compare these two images:
-🎯 FIRST: Target image
-✏️ SECOND: Generated (prompt: "${originalPrompt}")
-
-Note: Use simple, playful **Hinglish** (Hindi + English) suitable for a 5-8 year old child.
-Note: Keep all suggestions simple and actionable, giving short English prompt examples where needed.
-
-📝 Example (for understanding only, don’t copy):
-VISUAL DIFFERENCES: Dekho! Target image mein ek bada lal apple hai. Lekin generated image mein do apple hain — ek orange aur ek lal! Background bhi safed nahi, hara hai.
-PROMPT IMPROVEMENTS: Agar sirf ek lal apple chahiye, toh likho "one red apple on white background". Agar leaves nahi chahiye, toh likho "no leaves".
-
-Format EXACTLY as:
-SIMILARITY SCORE: [number]%
-VISUAL DIFFERENCES: [max 70 simple words brief analysis in Hinglish for 5-8 year boy]
-PROMPT IMPROVEMENTS: [max 70 simple words concise suggestions in Hinglish for 5-8 year boy]`
-      : `Compare these images:
-Note: Use simple, playful **Hinglish** (Hindi + English) suitable for a 5-8 year old child.
-Note: Keep all suggestions simple and actionable, giving short English prompt examples where needed.
-
-
-📝 Example (for understanding only, don’t copy):
-VISUAL DIFFERENCES: Dekho! Target image mein ek bada lal apple hai. Lekin generated image mein do apple hain — ek orange aur ek lal! Background bhi safed nahi, hara hai.
-PROMPT IMPROVEMENTS: Agar sirf ek lal apple chahiye, toh likho "one red apple on white background". Agar leaves nahi chahiye, toh likho "no leaves".
-
-SIMILARITY SCORE: [number]%
-VISUAL DIFFERENCES: [max 70 simple words brief analysis in Hinglish for 5-8 year boy]
-OBSERVATIONS: [max 70 simple words concise insights in Hinglish for 5-8 year boy]`;
-
     const payload = {
-      model: "Qwen/Qwen3-VL-8B-Instruct",
-      messages: [{
-        role: "user",
-        content: [
-          { type: "text", text: promptText },
-          { type: "image_url", image_url: { url: `data:image/jpeg;base64,${targetBase64}` } },
-          { type: "image_url", image_url: { url: `data:image/jpeg;base64,${generatedBase64}` } }
-        ]
-      }],
-      max_tokens: 800,
-      temperature: 0.2,
-      stream: false
+      targetImage,
+      generatedImage,
+      originalPrompt: originalPrompt || ""
     };
 
-    const response = await fetch('https://api.siliconflow.cn/v1/chat/completions', {
+    const response = await fetch('https://prompt-learning-server.prompt-tool.workers.dev/api/compare-images', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload)
@@ -134,23 +80,25 @@ OBSERVATIONS: [max 70 simple words concise insights in Hinglish for 5-8 year boy
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`SiliconFlow API error: ${response.status} - ${errorText}`);
+      throw new Error(`API error: ${response.status} - ${errorText}`);
     }
 
     const data = await response.json();
-    const text = data.choices[0].message.content;
 
     console.log("✅ Analysis complete!");
 
+    // Parse the response from the API
+    const text = data.analysis || data.fullResponse || "";
+    
     const scoreMatch = text.match(/SIMILARITY SCORE:\s*(\d+)%?/i);
-    const similarityScore = scoreMatch ? parseInt(scoreMatch[1]) : null;
+    const similarityScore = scoreMatch ? parseInt(scoreMatch[1]) : (data.similarityScore || null);
 
     const differencesMatch = text.match(/VISUAL DIFFERENCES:\s*(.+?)(?=PROMPT IMPROVEMENTS:|OBSERVATIONS:|$)/is);
-    const differences = differencesMatch ? differencesMatch[1].trim() : "";
+    const differences = differencesMatch ? differencesMatch[1].trim() : (data.keyDifferences || "");
 
     const improvementsMatch = text.match(/PROMPT IMPROVEMENTS:\s*(.+?)$/is);
     const observations = text.match(/OBSERVATIONS:\s*(.+?)$/is);
-    const improvements = improvementsMatch ? improvementsMatch[1].trim() : observations ? observations[1].trim() : "";
+    const improvements = improvementsMatch ? improvementsMatch[1].trim() : observations ? observations[1].trim() : (data.promptImprovements || "");
 
     return {
       success: true,
@@ -159,13 +107,12 @@ OBSERVATIONS: [max 70 simple words concise insights in Hinglish for 5-8 year boy
       keyDifferences: differences,
       promptImprovements: improvements,
       metadata: {
-        model: "Qwen/Qwen3-VL-8B-Instruct",
-        provider: "SiliconFlow",
+        provider: "Cloudflare Workers",
         timestamp: new Date().toISOString(),
       },
     };
   } catch (error) {
-    console.error("❌ SiliconFlow comparison failed:", error.message);
+    console.error("❌ Image comparison failed:", error.message);
     return {
       success: false,
       error: error.message,
@@ -182,7 +129,7 @@ export const compareImagesSimple = async (targetImagePath, generatedImagePath, o
     const result = await compareImagesWithSiliconFlow(targetImagePath, generatedImagePath, originalPrompt);
     return result.success && result.similarityScore !== null ? result.similarityScore : 0;
   } catch (error) {
-    console.error("SiliconFlow simple comparison failed:", error);
+    console.error("Image comparison failed:", error);
     return 0;
   }
 };
@@ -207,7 +154,7 @@ export const compareImagesWithFeedback = async (targetImagePath, generatedImageP
       error: result.error
     };
   } catch (error) {
-    console.error("SiliconFlow feedback comparison failed:", error);
+    console.error("Image comparison failed:", error);
     return {
       score: 0,
       feedback: "Error during comparison",
@@ -227,7 +174,7 @@ export const getQualityInfo = (percentage) => {
   if (percentage >= 55) return { text: "Good Match", color: "#84cc16", emoji: "👌" };
   if (percentage >= 40) return { text: "Fair Match", color: "#ca8a04", emoji: "🤔" };
   if (percentage >= 25) return { text: "Poor Match", color: "#ea580c", emoji: "😐" };
-  return { text: "Very Poor Match", color: "#dc2626", emoji: "��" };
+  return { text: "Very Poor Match", color: "#dc2626", emoji: "😟" };
 };
 
 // Export for convenience
