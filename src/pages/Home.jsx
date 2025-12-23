@@ -53,6 +53,9 @@ const Home = ({
       setGeneratedImage(null);
       setAccuracy(0);
       setAiFeedback(null);
+      // Clear history on full restart
+      setLevelHistory({});
+      setShownSuccessModals({});
 
       // Navigate back to level 1
       if (typeof onLevelChange === "function") {
@@ -63,12 +66,6 @@ const Home = ({
 
     // Play button click sound
     await audioManager.playButtonClick();
-
-    // Clear states first
-    setPrompt("");
-    setGeneratedImage(null);
-    setAccuracy(0);
-    setAiFeedback(null);
 
     // Unlock and navigate to next level
     if (typeof setLevelUnlocked === "function") {
@@ -112,6 +109,60 @@ const Home = ({
   //   }
   // }, [aiFeedback]);
 
+  // NEW: Level History State to persist data across levels
+  const [levelHistory, setLevelHistory] = useState(() => {
+    // Load from local storage on initialization
+    try {
+      const saved = localStorage.getItem("levelHistory");
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      console.error("Failed to load levelHistory:", e);
+      return {};
+    }
+  });
+
+  // NEW: State to track which success modals have been shown
+  const [shownSuccessModals, setShownSuccessModals] = useState(() => {
+    try {
+      const saved = localStorage.getItem("shownSuccessModals");
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      console.error("Failed to load shownSuccessModals:", e);
+      return {};
+    }
+  });
+
+  // NEW: Persist levelHistory
+  useEffect(() => {
+    localStorage.setItem("levelHistory", JSON.stringify(levelHistory));
+  }, [levelHistory]);
+
+  // NEW: Persist shownSuccessModals
+  useEffect(() => {
+    localStorage.setItem("shownSuccessModals", JSON.stringify(shownSuccessModals));
+  }, [shownSuccessModals]);
+
+  // NEW: Effect to restore or reset state when changing levels
+  useEffect(() => {
+    if (levelHistory[currentLevel]) {
+      // Restore state from history
+      const history = levelHistory[currentLevel];
+      setPrompt(history.prompt || "");
+      setGeneratedImage(history.generatedImage || null);
+      setAccuracy(history.accuracy || 0);
+      setAiFeedback(history.aiFeedback || null);
+      setPreviousAccuracy(history.previousAccuracy || 0);
+    } else {
+      // Reset state if no history exists for this level
+      setPrompt("");
+      setGeneratedImage(null);
+      setAccuracy(0);
+      setAiFeedback(null);
+      setPreviousAccuracy(0);
+    }
+  }, [currentLevel]);
+
+
   // Target images for each level
   const targetImages = {
     1: challenge1Image,
@@ -146,6 +197,20 @@ const Home = ({
     setAccuracy(0);
     setGeneratedImage(null);
     setAiFeedback(null);
+    
+    // Clear history for this level
+    setLevelHistory(prev => {
+      const newHistory = { ...prev };
+      delete newHistory[currentLevel];
+      return newHistory;
+    });
+
+    // Reset modal shown status for this level
+    setShownSuccessModals(prev => {
+      const newShown = { ...prev };
+      delete newShown[currentLevel];
+      return newShown;
+    });
   };
 
   // Close reset modal
@@ -163,9 +228,21 @@ const Home = ({
     setAccuracy(0);
     setGeneratedImage(null);
     setAiFeedback(null);
+    
+    // Clear all history
+    setLevelHistory({});
+    setShownSuccessModals({});
 
     // Reset to level 1
     handleLevelChange(1);
+  };
+
+  // Helper to mark feedback as shown
+  const handleMarkFeedbackShown = (level) => {
+    setShownSuccessModals(prev => ({
+      ...prev,
+      [level]: true
+    }));
   };
 
   const handleLevelChange = (level) => {
@@ -249,6 +326,19 @@ const Home = ({
           await audioManager.playAccuracyDecrease();
         }, 800);
       }
+      
+      // Save to Level History
+      setLevelHistory(prev => ({
+        ...prev,
+        [currentLevel]: {
+          prompt: prompt.trim(),
+          generatedImage: generatedImageUrl,
+          accuracy: similarity,
+          aiFeedback: result,
+          previousAccuracy: previousAccuracy
+        }
+      }));
+      
     } catch (error) {
       console.error("Image generation or comparison failed:", error);
       setAccuracy(0);
@@ -355,6 +445,8 @@ const Home = ({
         setGeneratedImage={setGeneratedImage}
         setAccuracy={setAccuracy}
         resetToLevel1={resetToLevel1}
+        hasShownFeedback={!!shownSuccessModals[currentLevel]}
+        onMarkFeedbackShown={() => handleMarkFeedbackShown(currentLevel)}
       />
 
       {/* CSS for spinner animation and custom scrollbar */}
