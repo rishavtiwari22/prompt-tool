@@ -48,8 +48,8 @@ const ImageGenerationSection = ({
           textAlign: "center",
         }}
       >
-        {isGenerating || isComparing ? (
-          // Loading State with Animation
+{isGenerating && !generatedImage ? (
+          // Loading State with Animation (Generating only)
           <div
             style={{
               display: "flex",
@@ -74,7 +74,7 @@ const ImageGenerationSection = ({
               />
             </div>
 
-            {/* Loading Text with Dots Animation */}
+            {/* Loading Text */}
             <div
               style={{
                 fontFamily: "var(--font-body)",
@@ -83,11 +83,7 @@ const ImageGenerationSection = ({
                 fontWeight: "500",
               }}
             >
-              {isComparing ? (
-                <>Analyzing your image</>
-              ) : (
-                <>Creating your masterpiece</>
-              )}
+              Creating your masterpiece
             </div>
 
             {/* Subtle message */}
@@ -100,13 +96,11 @@ const ImageGenerationSection = ({
                 lineHeight: "1.5",
               }}
             >
-              {isComparing
-                ? "Comparing with target image..."
-                : "This may take a few moments"}
+              This may take a few moments
             </p>
           </div>
         ) : generatedImage ? (
-          <>
+          <div style={{ position: "relative", width: "100%", height: "100%" }}>
             <img
               src={generatedImage}
               alt="Generated image"
@@ -117,7 +111,72 @@ const ImageGenerationSection = ({
                 borderRadius: "255px 15px 225px 15px / 15px 225px 15px 255px",
               }}
             />
-          </>
+
+            {/* Overlay for Comparison/Analysis Phase */}
+            {isComparing && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  backgroundColor: "rgba(255, 255, 255, 0.4)",
+                  backdropFilter: "blur(4px)",
+                  borderRadius: "255px 15px 225px 15px / 15px 225px 15px 255px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "1.5rem",
+                  zIndex: 10,
+                }}
+              >
+                {/* Animated Spinner */}
+                <div
+                  style={{
+                    animation: "spin 1s linear infinite",
+                  }}
+                >
+                  <Loader2
+                    size={64}
+                    style={{
+                      color: "var(--color-primary)",
+                      strokeWidth: 2.5,
+                    }}
+                  />
+                </div>
+
+                {/* Loading Text */}
+                <div
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: "1.25rem",
+                    color: "var(--color-text-primary)",
+                    fontWeight: "500",
+                    textShadow: "0 2px 4px rgba(255,255,255,0.8)",
+                  }}
+                >
+                  Analyzing your image
+                </div>
+
+                {/* Subtle message */}
+                <p
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: "0.95rem",
+                    color: "var(--color-text-primary)",
+                    maxWidth: "280px",
+                    lineHeight: "1.5",
+                    fontWeight: "500",
+                    textShadow: "0 1px 2px rgba(255,255,255,0.8)",
+                  }}
+                >
+                  Comparing with target image...
+                </p>
+              </div>
+            )}
+          </div>
         ) : (
           <div>
             {!imageLoadErrors.illustration ? (

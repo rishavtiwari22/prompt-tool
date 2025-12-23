@@ -16,12 +16,8 @@ const LevelModalManager = ({
   handlePlayNextLevel,
   handleCloseResetModal,
   handleConfirmReset,
-  setLevelUnlocked,
-  onLevelChange,
-  setPrompt,
-  setGeneratedImage,
-  setAccuracy,
-  resetToLevel1,
+  onMarkFeedbackShown,
+  hasShownFeedback,
 }) => {
   const navigate = useNavigate();
   const [showLevelCompleteFirst, setShowLevelCompleteFirst] = useState(false);
@@ -37,6 +33,9 @@ const LevelModalManager = ({
   const handleLevel5Complete = () => {
     // Close level complete modal
     setShowLevelCompleteFirst(false);
+    if (onMarkFeedbackShown) {
+      onMarkFeedbackShown();
+    }
 
     // Mark level as completed first
     const nextLevel = currentLevel + 1;
@@ -56,9 +55,12 @@ const LevelModalManager = ({
   return (
     <>
       {/* ModalLevel - Show when accuracy >= 70 for levels 1-4 */}
-      {accuracy >= 70 && currentLevel < 5 && (
+      {accuracy >= 70 && currentLevel < 5 && !hasShownFeedback && (
         <ModalLevel
           onClose={() => {
+            if (onMarkFeedbackShown) {
+              onMarkFeedbackShown();
+            }
             const nextLevel = currentLevel + 1;
             if (typeof setLevelUnlocked === "function") {
               setLevelUnlocked(nextLevel);
@@ -70,7 +72,12 @@ const LevelModalManager = ({
             setGeneratedImage(null);
             setAccuracy(0);
           }}
-          onPlay={handlePlayNextLevel}
+          onPlay={() => {
+            if (onMarkFeedbackShown) {
+              onMarkFeedbackShown();
+            }
+            handlePlayNextLevel();
+          }}
           score={accuracy}
           level={currentLevel}
         />
