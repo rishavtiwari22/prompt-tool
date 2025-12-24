@@ -12,6 +12,7 @@ const API_KEYS = [
   import.meta.env.VITE_IMAGE_ROUTER_API_KEY_7
 ].filter(key => key); // Remove undefined keys
 
+
 const API_URL = 'https://api.imagerouter.io/v1/openai/images/generations';
 
 // Validate API keys on module load
