@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import illustrationImage from "../assets/Frame 473.svg";
 import { compareImagesWithFeedback } from "../utils/imageComparison";
-import { generateImageWithProgress } from "../utils/imageGeneration";
+import { generateImageWithProgress } from "../utils/imageRouter";
 import audioManager from "../utils/audioManager";
 import analytics from "../utils/analytics";
 import ImageDisplaySection from "../components/Home/ImageDisplaySection";
