@@ -20,10 +20,23 @@ import {
 import audioManager from "./utils/audioManager";
 import analytics from "./utils/analytics";
 
-// Smart Landing Page component that redirects if user has progress
-function SmartLandingPage({ onStartGame, hasProgress }) {
-  // If user has progress (completed levels), redirect to game
-  if (hasProgress) {
+// Protected Route component
+function ProtectedRoute({ children }) {
+  const isAuthenticated = localStorage.getItem("prompt_tool_auth");
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
+// Smart Landing Page component that redirects if user is authenticated
+function SmartLandingPage({ onStartGame }) {
+  const isAuthenticated = localStorage.getItem("prompt_tool_auth");
+
+  // If user is authenticated, redirect to game
+  if (isAuthenticated) {
     return <Navigate to="/game" replace />;
   }
 
@@ -231,26 +244,28 @@ function App() {
           }
         />
 
-        {/* Game Route - Always accessible */}
+        {/* Game Route - Protected by Authentication */}
         <Route
           path="/game"
           element={
-            <GameLayout
-              currentLevel={currentLevel}
-              onLevelChange={handleLevelChange}
-              unlockedLevels={unlockedLevels}
-              completedLevels={completedLevels}
-            >
-              <Home
+            <ProtectedRoute>
+              <GameLayout
                 currentLevel={currentLevel}
                 onLevelChange={handleLevelChange}
                 unlockedLevels={unlockedLevels}
-                setLevelUnlocked={setLevelUnlocked}
                 completedLevels={completedLevels}
-                setLevelCompleted={setLevelCompleted}
-                resetToLevel1={resetToLevel1}
-              />
-            </GameLayout>
+              >
+                <Home
+                  currentLevel={currentLevel}
+                  onLevelChange={handleLevelChange}
+                  unlockedLevels={unlockedLevels}
+                  setLevelUnlocked={setLevelUnlocked}
+                  completedLevels={completedLevels}
+                  setLevelCompleted={setLevelCompleted}
+                  resetToLevel1={resetToLevel1}
+                />
+              </GameLayout>
+            </ProtectedRoute>
           }
         />
 

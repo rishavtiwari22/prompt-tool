@@ -59,7 +59,8 @@ const LandingPage = () => {
 
   const handleVerification = async ({ name, passcode }) => {
     setIsStarting(true);
-    // TODO: Store the user's name in a context or state management system if needed
+    // Store auth details to persist session
+    localStorage.setItem("prompt_tool_auth", JSON.stringify({ name, passcode }));
     navigate("/game");
   };
 
