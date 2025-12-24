@@ -7,69 +7,82 @@ const SILICONFLOW_API_URL = 'https://api.siliconflow.com/v1/chat/completions';
 const SILICONFLOW_MODEL = 'Qwen/Qwen3-VL-8B-Instruct';
 
 /**
- * Convert image to base64 format
- * Supports: data URLs, HTTP/HTTPS URLs, blob URLs
+ * Resize and convert image to base64
+ * Ensures max dimension of 1024px and uses JPEG compression
  */
-async function imageToBase64(imagePath) {
+async function resizeAndCompressImage(imagePath) {
   try {
-    // If already a data URL, extract base64 part
-    if (imagePath.startsWith('data:image/')) {
-      const base64Match = imagePath.match(/base64,(.+)/);
-      if (base64Match) {
-        return base64Match[1];
-      }
-      throw new Error('Invalid data URL format');
-    }
+    let source = imagePath;
+    let cleanupUrl = null;
 
-    // If it's a URL (HTTP/HTTPS/blob), fetch and convert
+    // If it's a remote URL, fetch it first to create a local blob
+    // This avoids CORS issues when drawing to canvas if the server doesn't send headers
+    // but allows fetching (which standard fetch sometimes does better, or we catch the error early)
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://') || imagePath.startsWith('blob:')) {
       const response = await fetch(imagePath);
       if (!response.ok) {
-        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText} from ${imagePath}`);
+        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
       }
-      
       const blob = await response.blob();
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const dataUrl = reader.result;
-          const base64Match = dataUrl.match(/base64,(.+)/);
-          if (base64Match) {
-            resolve(base64Match[1]);
-          } else {
-            reject(new Error('Failed to convert blob to base64'));
-          }
-        };
-        reader.onerror = () => reject(new Error('FileReader error'));
-        reader.readAsDataURL(blob);
-      });
+      source = URL.createObjectURL(blob);
+      cleanupUrl = source;
     }
 
-    // Handle local paths (e.g., from assets) by creating a temporary image element
-    // This handles Vite's import paths that might be relative
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = "Anonymous";
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            const dataURL = canvas.toDataURL('image/png');
-            const base64Match = dataURL.match(/base64,(.+)/);
-            if (base64Match) {
-                resolve(base64Match[1]);
-            } else {
-                reject(new Error('Failed to convert loaded image to base64'));
-            }
-        };
-        img.onerror = () => reject(new Error(`Failed to load image from path: ${imagePath}`));
-        img.src = imagePath;
+    return await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "Anonymous";
+      
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        const MAX_DIM = 1024; // Target max dimension
+
+        // Calculate new dimensions
+        if (width > MAX_DIM || height > MAX_DIM) {
+          if (width > height) {
+            height = Math.round((height * MAX_DIM) / width);
+            width = MAX_DIM;
+          } else {
+            width = Math.round((width * MAX_DIM) / height);
+            height = MAX_DIM;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        
+        // Draw and resize
+        ctx.fillStyle = '#FFFFFF'; // Fill background white for transparent PNGs
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert to base64 with JPEG compression
+        // 0.7 quality provides good balance of size vs quality for VLM
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        const base64Match = dataUrl.match(/base64,(.+)/);
+        
+        // Cleanup
+        if (cleanupUrl) URL.revokeObjectURL(cleanupUrl);
+
+        if (base64Match) {
+          resolve(base64Match[1]);
+        } else {
+          reject(new Error('Failed to extract base64 data'));
+        }
+      };
+
+      img.onerror = () => {
+        if (cleanupUrl) URL.revokeObjectURL(cleanupUrl);
+        reject(new Error(`Failed to load image for processing: ${imagePath}`));
+      };
+
+      img.src = source;
     });
 
   } catch (error) {
-    throw new Error(`Image conversion failed: ${error.message}`);
+    throw new Error(`Image processing failed: ${error.message}`);
   }
 }
 
@@ -145,12 +158,16 @@ export async function compareImagesWithSiliconFlow(targetImagePath, generatedIma
     }
 
     console.log('🔍 Starting image comparison...');
+    const startTime = Date.now();
 
-    // Convert both images to base64
-    const targetBase64 = await imageToBase64(targetImagePath);
-    const generatedBase64 = await imageToBase64(generatedImagePath);
+    // Resize and process images to ensure payload isn't too large
+    // This helps avoid 524 timeouts
+    const [targetBase64, generatedBase64] = await Promise.all([
+      resizeAndCompressImage(targetImagePath),
+      resizeAndCompressImage(generatedImagePath)
+    ]);
 
-    console.log('✅ Images converted to base64');
+    console.log(`✅ Images processed in ${Date.now() - startTime}ms`);
 
     // Build request payload
     const requestPayload = {
@@ -177,7 +194,7 @@ export async function compareImagesWithSiliconFlow(targetImagePath, generatedIma
         ]
       }],
       max_tokens: 800,
-      temperature: 0.2,
+      temperature: 0,
       stream: false
     };
 
@@ -194,8 +211,23 @@ export async function compareImagesWithSiliconFlow(targetImagePath, generatedIma
     });
 
     if (!response.ok) {
+      // Handle cloudflare timeout specifically
+      if (response.status === 524) {
+        throw new Error('Image comparison timed out (524). Server was too slow. Please try again.');
+      }
+      
       const errorData = await response.text();
-      throw new Error(`SiliconFlow API error: ${response.status} - ${errorData}`);
+      // Try to parse JSON error if possible
+      try {
+        const jsonError = JSON.parse(errorData);
+        if (jsonError.message) {
+          throw new Error(`SiliconFlow API Error: ${jsonError.message}`);
+        }
+      } catch (e) {
+        // Use raw text if not json
+      }
+      
+      throw new Error(`SiliconFlow API error: ${response.status} - ${errorData.substring(0, 100)}`);
     }
 
     const data = await response.json();
