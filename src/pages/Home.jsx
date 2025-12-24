@@ -291,10 +291,17 @@ const Home = ({
       const targetImage = targetImages[currentLevel];
       setIsComparing(true);
 
+      const apiKey = import.meta.env.VITE_SILICONFLOW_API_KEY;
+      if (!apiKey) {
+        console.error("Missing SiliconFlow API Key");
+        // Optionally handle UI feedback for missing key
+      }
+
       const result = await compareImagesWithFeedback(
         targetImage,
         generatedImageUrl,
-        prompt.trim()
+        prompt.trim(),
+        apiKey
       );
       const similarity = result.score || 0;
 

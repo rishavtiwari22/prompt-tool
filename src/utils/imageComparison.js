@@ -1,187 +1,289 @@
 /**
- * Image Comparison Utility using Cloudflare Workers API
- * 
- * API Endpoint: https://prompt-learning-server.prompt-tool.workers.dev/api/compare-images
- * No API key required - serverless backend handles authentication
+ * Image Comparison Logic using SiliconFlow API
+ * Compares two images and provides feedback in Hinglish for children
  */
 
-const imageToDataURL = async (imagePath) => {
+const SILICONFLOW_API_URL = 'https://api.siliconflow.com/v1/chat/completions';
+const SILICONFLOW_MODEL = 'Qwen/Qwen3-VL-8B-Instruct';
+
+/**
+ * Convert image to base64 format
+ * Supports: data URLs, HTTP/HTTPS URLs, blob URLs
+ */
+async function imageToBase64(imagePath) {
   try {
-    // Check if already a data URL (data:image/...)
-    if (imagePath.startsWith('data:')) {
-      // Already in correct format
-      return imagePath;
-    }
-
-    // Handle local Vite paths (/src/assets/...)
-    // Convert to proper URL for Vite dev server
-    let imageUrl = imagePath;
-    if (imagePath.startsWith('/src/')) {
-      // In Vite, /src/ paths need to be accessed via base URL
-      imageUrl = new URL(imagePath, window.location.origin).href;
-    } else if (imagePath.startsWith('src/')) {
-      // Handle paths without leading slash
-      imageUrl = new URL('/' + imagePath, window.location.origin).href;
-    } else if (imagePath.startsWith('/')) {
-      // Handle other absolute paths
-      imageUrl = new URL(imagePath, window.location.origin).href;
-    }
-
-    // Handle http/https URLs or blob URLs or converted local URLs
-    if (imageUrl.startsWith('http://') ||
-      imageUrl.startsWith('https://') ||
-      imageUrl.startsWith('blob:')) {
-      const response = await fetch(imageUrl);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch image: ${response.statusText} from ${imageUrl}`);
+    // If already a data URL, extract base64 part
+    if (imagePath.startsWith('data:image/')) {
+      const base64Match = imagePath.match(/base64,(.+)/);
+      if (base64Match) {
+        return base64Match[1];
       }
+      throw new Error('Invalid data URL format');
+    }
+
+    // If it's a URL (HTTP/HTTPS/blob), fetch and convert
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://') || imagePath.startsWith('blob:')) {
+      const response = await fetch(imagePath);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText} from ${imagePath}`);
+      }
+      
       const blob = await response.blob();
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result);
-        reader.onerror = reject;
+        reader.onloadend = () => {
+          const dataUrl = reader.result;
+          const base64Match = dataUrl.match(/base64,(.+)/);
+          if (base64Match) {
+            resolve(base64Match[1]);
+          } else {
+            reject(new Error('Failed to convert blob to base64'));
+          }
+        };
+        reader.onerror = () => reject(new Error('FileReader error'));
         reader.readAsDataURL(blob);
       });
     }
 
-    throw new Error(`Unsupported image format: ${imagePath.substring(0, 50)}...`);
+    // Handle local paths (e.g., from assets) by creating a temporary image element
+    // This handles Vite's import paths that might be relative
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            const dataURL = canvas.toDataURL('image/png');
+            const base64Match = dataURL.match(/base64,(.+)/);
+            if (base64Match) {
+                resolve(base64Match[1]);
+            } else {
+                reject(new Error('Failed to convert loaded image to base64'));
+            }
+        };
+        img.onerror = () => reject(new Error(`Failed to load image from path: ${imagePath}`));
+        img.src = imagePath;
+    });
+
   } catch (error) {
-    throw new Error(`Failed to process image: ${error.message}`);
+    throw new Error(`Image conversion failed: ${error.message}`);
   }
-};
+}
 
-export const compareImagesWithSiliconFlow = async (targetImagePath, generatedImagePath, originalPrompt = "") => {
+/**
+ * Build prompt template for comparison
+ */
+function buildComparisonPrompt(originalPrompt) {
+  const promptSection = originalPrompt ? `✏️ SECOND: Generated (prompt: "${originalPrompt}")` : '✏️ SECOND: Generated image';
+  
+  return `Compare these two images:
+🎯 FIRST: Target image (jo banana hai)
+${promptSection}
+
+Note: Use simple, playful Hinglish (Hindi + English) suitable for a 5-8 year old child.
+Note: Keep all suggestions simple and actionable, giving short English prompt examples where needed.
+
+Format EXACTLY as:
+SIMILARITY SCORE: [number]%
+VISUAL DIFFERENCES: [max 70 simple words brief analysis in Hinglish for 5-8 year boy]
+PROMPT IMPROVEMENTS: [max 70 simple words - target image jaisa image banane ke liye prompt me kya add/change karein, specific suggestions with English prompt examples in Hinglish for 5-8 year boy]`;
+}
+
+/**
+ * Parse AI response to extract structured data
+ */
+function parseComparisonResponse(responseText) {
+  const result = {
+    similarityScore: null,
+    keyDifferences: '',
+    promptImprovements: '',
+    fullResponse: responseText
+  };
+
   try {
-    console.log("🚀 Starting image comparison...");
-    console.log("📸 Target image:", targetImagePath?.substring(0, 100));
-    console.log("📸 Generated image:", generatedImagePath?.substring(0, 100));
+    // Extract similarity score
+    const scoreMatch = responseText.match(/SIMILARITY\s+SCORE:\s*(\d+)%/i);
+    if (scoreMatch) {
+      result.similarityScore = parseInt(scoreMatch[1], 10);
+    }
 
-    console.log("🔄 Converting images to data URLs...");
-    const [targetImage, generatedImage] = await Promise.all([
-      imageToDataURL(targetImagePath),
-      imageToDataURL(generatedImagePath),
-    ]);
+    // Extract visual differences
+    const diffMatch = responseText.match(/VISUAL\s+DIFFERENCES:\s*(.+?)(?=PROMPT\s+IMPROVEMENTS:|$)/is);
+    if (diffMatch) {
+      result.keyDifferences = diffMatch[1].trim();
+    }
 
-    console.log("✅ Images converted successfully");
+    // Extract prompt improvements
+    const improvMatch = responseText.match(/PROMPT\s+IMPROVEMENTS:\s*(.+?)$/is);
+    if (improvMatch) {
+      result.promptImprovements = improvMatch[1].trim();
+    }
 
-    const payload = {
-      targetImage,
-      generatedImage,
-      originalPrompt: originalPrompt || ""
+    return result;
+  } catch (error) {
+    console.error('Error parsing response:', error);
+    return result;
+  }
+}
+
+/**
+ * Main function: Compare two images using SiliconFlow API
+ * @param {string} targetImagePath - Target image (path, URL, or data URL)
+ * @param {string} generatedImagePath - Generated image (path, URL, or data URL)
+ * @param {string} originalPrompt - User's original prompt (optional)
+ * @param {string} apiKey - SiliconFlow API key
+ * @returns {Promise<Object>} Comparison result with score, differences, and improvements
+ */
+export async function compareImagesWithSiliconFlow(targetImagePath, generatedImagePath, originalPrompt = '', apiKey) {
+  try {
+    // Validate API key
+    if (!apiKey) {
+      throw new Error('SiliconFlow API key not found. Please set VITE_SILICONFLOW_API_KEY in your .env file.');
+    }
+
+    console.log('🔍 Starting image comparison...');
+
+    // Convert both images to base64
+    const targetBase64 = await imageToBase64(targetImagePath);
+    const generatedBase64 = await imageToBase64(generatedImagePath);
+
+    console.log('✅ Images converted to base64');
+
+    // Build request payload
+    const requestPayload = {
+      model: SILICONFLOW_MODEL,
+      messages: [{
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: buildComparisonPrompt(originalPrompt)
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:image/jpeg;base64,${targetBase64}`
+            }
+          },
+          {
+            type: 'image_url',
+            image_url: {
+              url: `data:image/jpeg;base64,${generatedBase64}`
+            }
+          }
+        ]
+      }],
+      max_tokens: 800,
+      temperature: 0.2,
+      stream: false
     };
 
-    const response = await fetch('https://prompt-learning-server.prompt-tool.workers.dev/api/compare-images', {
+    console.log('📤 Sending request to SiliconFlow API...');
+
+    // Call SiliconFlow API
+    const response = await fetch(SILICONFLOW_API_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(requestPayload)
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API error: ${response.status} - ${errorText}`);
+      const errorData = await response.text();
+      throw new Error(`SiliconFlow API error: ${response.status} - ${errorData}`);
     }
 
     const data = await response.json();
+    console.log('✅ Received response from SiliconFlow');
 
-    console.log("✅ Analysis complete!");
-
-    // Parse the response from the API
-    const text = data.analysis || data.fullResponse || "";
+    // Extract and parse response
+    const aiResponse = data?.choices?.[0]?.message?.content || '';
     
-    const scoreMatch = text.match(/SIMILARITY SCORE:\s*(\d+)%?/i);
-    const similarityScore = scoreMatch ? parseInt(scoreMatch[1]) : (data.similarityScore || null);
+    if (!aiResponse) {
+      throw new Error('No content in API response');
+    }
 
-    const differencesMatch = text.match(/VISUAL DIFFERENCES:\s*(.+?)(?=PROMPT IMPROVEMENTS:|OBSERVATIONS:|$)/is);
-    const differences = differencesMatch ? differencesMatch[1].trim() : (data.keyDifferences || "");
+    const parsed = parseComparisonResponse(aiResponse);
 
-    const improvementsMatch = text.match(/PROMPT IMPROVEMENTS:\s*(.+?)$/is);
-    const observations = text.match(/OBSERVATIONS:\s*(.+?)$/is);
-    const improvements = improvementsMatch ? improvementsMatch[1].trim() : observations ? observations[1].trim() : (data.promptImprovements || "");
-
+    // Return complete result
     return {
       success: true,
-      similarityScore,
-      fullResponse: text,
-      keyDifferences: differences,
-      promptImprovements: improvements,
+      similarityScore: parsed.similarityScore,
+      fullResponse: parsed.fullResponse,
+      keyDifferences: parsed.keyDifferences,
+      promptImprovements: parsed.promptImprovements,
       metadata: {
-        provider: "Cloudflare Workers",
-        timestamp: new Date().toISOString(),
-      },
+        model: SILICONFLOW_MODEL,
+        provider: 'SiliconFlow',
+        timestamp: new Date().toISOString()
+      }
     };
+
   } catch (error) {
-    console.error("❌ Image comparison failed:", error.message);
+    console.error('❌ Image comparison error:', error);
     return {
       success: false,
       error: error.message,
       similarityScore: null,
-      fullResponse: "",
-      keyDifferences: "",
-      promptImprovements: "",
+      fullResponse: '',
+      keyDifferences: '',
+      promptImprovements: ''
     };
   }
-};
+}
 
-export const compareImagesSimple = async (targetImagePath, generatedImagePath, originalPrompt) => {
-  try {
-    const result = await compareImagesWithSiliconFlow(targetImagePath, generatedImagePath, originalPrompt);
-    return result.success && result.similarityScore !== null ? result.similarityScore : 0;
-  } catch (error) {
-    console.error("Image comparison failed:", error);
-    return 0;
-  }
-};
+/**
+ * Simplified function: Returns only similarity score
+ */
+export async function compareImagesSimple(targetImagePath, generatedImagePath, originalPrompt = '', apiKey) {
+  const result = await compareImagesWithSiliconFlow(targetImagePath, generatedImagePath, originalPrompt, apiKey);
+  return result.similarityScore || 0;
+}
 
-// NEW: Full feedback version - returns complete object
-export const compareImagesWithFeedback = async (targetImagePath, generatedImagePath, originalPrompt) => {
-  try {
-    const result = await compareImagesWithSiliconFlow(targetImagePath, generatedImagePath, originalPrompt);
-    if (result.success) {
-      return {
-        score: result.similarityScore || 0,
-        feedback: result.keyDifferences || "No feedback available",
-        improvements: result.promptImprovements || "",
-        fullResponse: result.fullResponse || "",
-      };
-    }
+/**
+ * Function with structured feedback for UI
+ */
+export async function compareImagesWithFeedback(targetImagePath, generatedImagePath, originalPrompt = '', apiKey) {
+  const result = await compareImagesWithSiliconFlow(targetImagePath, generatedImagePath, originalPrompt, apiKey);
+  
+  if (!result.success) {
     return {
       score: 0,
-      feedback: "Comparison failed",
-      improvements: "",
-      fullResponse: "",
+      feedback: result.error ? `Error: ${result.error}` : 'Comparison failed',
+      improvements: '',
+      fullResponse: '',
       error: result.error
     };
-  } catch (error) {
-    console.error("Image comparison failed:", error);
-    return {
-      score: 0,
-      feedback: "Error during comparison",
-      improvements: "",
-      fullResponse: "",
-      error: error.message
-    };
   }
-};
 
-// Backward compatibility - returns only score
-export const compareImages = compareImagesSimple;
+  return {
+    score: result.similarityScore || 0,
+    feedback: result.keyDifferences,
+    improvements: result.promptImprovements,
+    fullResponse: result.fullResponse
+  };
+}
 
-export const getQualityInfo = (percentage) => {
-  if (percentage >= 85) return { text: "Excellent Match!", color: "#22c55e", emoji: "🎯" };
-  if (percentage >= 70) return { text: "Very Good Match", color: "#65a30d", emoji: "👍" };
-  if (percentage >= 55) return { text: "Good Match", color: "#84cc16", emoji: "👌" };
-  if (percentage >= 40) return { text: "Fair Match", color: "#ca8a04", emoji: "🤔" };
-  if (percentage >= 25) return { text: "Poor Match", color: "#ea580c", emoji: "😐" };
-  return { text: "Very Poor Match", color: "#dc2626", emoji: "😟" };
-};
-
-// Export for convenience
-export default {
-  compareImagesWithSiliconFlow,
-  compareImagesSimple,
-  compareImagesWithFeedback,
-  compareImages,
-  getQualityInfo,
-};
+/**
+ * Get quality information based on similarity percentage
+ */
+export function getQualityInfo(percentage) {
+  if (percentage >= 85) {
+    return { text: 'Excellent Match!', color: '#22c55e', emoji: '🎯' };
+  } else if (percentage >= 70) {
+    return { text: 'Very Good Match', color: '#65a30d', emoji: '👍' };
+  } else if (percentage >= 55) {
+    return { text: 'Good Match', color: '#84cc16', emoji: '👌' };
+  } else if (percentage >= 40) {
+    return { text: 'Fair Match', color: '#ca8a04', emoji: '🤔' };
+  } else if (percentage >= 25) {
+    return { text: 'Poor Match', color: '#ea580c', emoji: '😐' };
+  } else {
+    return { text: 'Very Poor Match', color: '#dc2626', emoji: '😟' };
+  }
+}
