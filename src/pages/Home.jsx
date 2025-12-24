@@ -255,7 +255,7 @@ const Home = ({
   };
 
   const handleCreateImage = async () => {
-    if (!prompt.trim()) return;
+    if (!prompt.trim() || isGenerating || isComparing) return;
 
     // Track prompt entered
     const wordCount = prompt.trim().split(/\s+/).length;
