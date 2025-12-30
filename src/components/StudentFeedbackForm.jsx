@@ -129,8 +129,7 @@ const StudentFeedbackForm = ({
             fontSize: '24px',
             cursor: 'pointer',
             padding: '8px',
-            borderRadius: '50%',
-            hover: 'background-color: #f0f0f0'
+            borderRadius: '50%'
           }}
         >
           ✕

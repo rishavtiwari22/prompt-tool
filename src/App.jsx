@@ -293,14 +293,24 @@ function App() {
           console.log('Feedback submitted:', feedbackData);
           
           // Track feedback submission
-          analytics.trackFeedbackSubmitted(
-            completedLevels.length,
-            feedbackData.experience || 'Not provided',
-            feedbackData.feedback || 'Not provided'
+          analytics.trackFeedbackFormSubmitted(
+            feedbackData.rating,
+            feedbackData.feedback || 'Not provided',
+            completedLevels.length
           );
           
-          // Here you can send feedback to your backend
-          // For now, just log it
+          // Persist feedback to localStorage (Mock Backend)
+          try {
+            const existingFeedback = JSON.parse(localStorage.getItem('student_feedback') || '[]');
+            existingFeedback.push({
+              ...feedbackData,
+              id: Date.now()
+            });
+            localStorage.setItem('student_feedback', JSON.stringify(existingFeedback));
+            console.log('✅ Feedback persisted to localStorage');
+          } catch (error) {
+            console.error('❌ Error persisting feedback:', error);
+          }
         }}
       />
     </Router>

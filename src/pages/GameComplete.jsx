@@ -28,9 +28,9 @@ const GameComplete = ({ onPlayAgain, resetToLevel1 }) => {
     navigate("/game");
   };
 
-  const handleGoHome = () => {
-    navigate("/");
-  };
+  // const handleGoHome = () => {
+  //   navigate("/");
+  // };
 
   return (
     <>

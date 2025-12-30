@@ -3,13 +3,10 @@ import mixpanel from 'mixpanel-browser';
 
 // Initialize analytics services
 export const initializeAnalytics = () => {
-  // Get measurement IDs from environment variables
-  const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  // Get measurement IDs from environment variables with fallback
+  const GA_MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-8JRDD1R84M';
   const MIXPANEL_TOKEN = import.meta.env.VITE_MIXPANEL_TOKEN;
 
-  console.log('🔍 Initializing Analytics...');
-  console.log('GA ID:', GA_MEASUREMENT_ID);
-  console.log('Mixpanel Token:', MIXPANEL_TOKEN ? 'Present' : 'Missing');
 
   // Initialize Mixpanel if token is available
   if (MIXPANEL_TOKEN) {
@@ -37,8 +34,9 @@ export const initializeAnalytics = () => {
 export const trackPageView = (pageName, additionalProps = {}) => {
   try {
     // Google Analytics page view
+    const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || 'G-8JRDD1R84M';
     if (typeof gtag !== 'undefined') {
-      gtag('config', import.meta.env.VITE_GA_MEASUREMENT_ID, {
+      gtag('config', GA_ID, {
         page_title: pageName,
         page_location: window.location.href,
         ...additionalProps
@@ -157,6 +155,13 @@ export const trackResetAction = (challengeId, currentAccuracy) => {
   });
 };
 
+export const trackGameReset = () => {
+  trackEvent('Game Reset', {
+    category: 'User Action',
+    label: 'Full Game Reset to Level 1'
+  });
+};
+
 export const trackFeedbackFormSubmitted = (rating, feedback, challengesCompleted) => {
   trackEvent('Feedback Form Submitted', {
     category: 'User Feedback',
@@ -166,6 +171,9 @@ export const trackFeedbackFormSubmitted = (rating, feedback, challengesCompleted
     label: `Rating: ${rating}/5`
   });
 };
+
+// Alias for convenience/backward compatibility
+export const trackFeedbackSubmitted = trackFeedbackFormSubmitted;
 
 export const trackAudioToggle = (isEnabled) => {
   trackEvent('Audio Toggled', {
@@ -224,7 +232,9 @@ const analytics = {
   trackPromptEntered,
   trackLevelChanged,
   trackResetAction,
+  trackGameReset,
   trackFeedbackFormSubmitted,
+  trackFeedbackSubmitted, // Alias
   trackAudioToggle,
   trackApplicationStart,
   trackApplicationEnd,
